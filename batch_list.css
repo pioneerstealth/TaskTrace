@@ -1,0 +1,201 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Hind:wght@300;400;500;600;700&display=swap');
+.BatchList{
+  background-color: #457b9d;
+  height:auto;
+  width:300px;
+  margin-top: -10px;
+  margin-left: -10px;
+  text-align: center;
+}
+.BatchList h1{
+  color: white;
+}
+.BatchList a{
+  text-decoration: none;
+
+}
+.container{
+  display: flex;
+}
+.Create_button {
+  background-color: white;
+  height: 60px;
+  width: 950px;
+  border: 1px solid white;
+  position: fixed;
+  top: 0.5px; /* Adjust top position as needed */
+  left: 774px; /* Center horizontally */
+  transform: translateX(-50%); /* Center horizontally */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* Adding bottom shadow to the border */
+}
+
+
+.button{
+  background-color: #457b9d;
+  border: 1px solid #457b9d;
+  margin-left: 700px;
+  margin-top: 20px;
+  width:120px;
+  height: 30px;
+}
+.button a{
+  text-decoration: none;
+  color: white;
+}
+
+body{
+  background-color: rgb(232, 230, 230);
+  font-family: 'Hind', sans-serif;
+}
+#batchLinks{
+  margin-top: 60px;
+}
+
+#batchLinks a{
+  margin: 10px;
+  color:white;
+  width:200px;
+  height: 200px;
+
+}
+
+.Section{
+  display: flex;
+
+}
+
+.BatchDetails{
+  margin-top: 50px;
+  margin-left: 50px;
+}
+h2 {
+  font-family: "Bubblegum Sans", sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  text-align: center; /* Center text horizontally */
+  position: relative;
+ 
+  display: flex;
+  justify-content: center; /* Center text vertically */
+  align-items: center; /* Center text vertically */
+
+}
+
+
+.BatchName{
+  background-color: white;
+  width:auto;
+  height: 100px;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  box-sizing: fixed;
+  padding: 10px;
+
+}
+
+
+.Members{
+  display: flex;
+  margin-top: 30px;
+  gap: 100px;
+}
+#totalMembers{
+  background-color: white;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  width:300px;
+  font-family: "Bubblegum Sans", sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  text-align: center; /* Center text horizontally */
+  position: relative;
+ 
+  display: flex;
+  justify-content: center; /* Center text vertically */
+  align-items: center; 
+}
+
+.table {
+  background-color: white;
+  height: fit-content; /* Set a fixed height or adjust as necessary */
+  display: flex;
+  justify-content: center; /* Center aligns content horizontally */
+  align-items: center;
+  margin-top: 30px; 
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+#tableContainer {
+  width: 100%; 
+  margin-top: 50px;
+
+}
+
+#batchTable {
+  width: 100%;
+  border: none; /* Remove all borders from the table */
+  border-collapse: collapse; /* Ensure cells are merged into a single border */
+}
+#batchTable button {
+  background-color: #457b9d;
+  color: white;
+  border: 2px solid #457b9d;
+}
+.button1{
+  background-color: #457b9d;
+  color: white;
+  border: 2px solid #457b9d;
+  width: 120px;
+height: 30px;
+
+}
+.button1 a{
+text-decoration: none;
+color: white;
+
+}
+
+#batchTable th,
+#batchTable td {
+  padding: 10px;
+  text-align: center; /* Center aligns text in table cells */
+}
+
+#batchTable th:first-child,
+#batchTable td:first-child {
+  border-left: none; /* Remove left border for first column */
+}
+
+#batchTable th:last-child,
+#batchTable td:last-child {
+  border-right: none; /* Remove right border for last column */
+}
+
+#batchTable thead th {
+  border-bottom: none; /* Remove bottom border for table headers */
+}
+
+
+#batchTable th {
+
+  border-top: none; /* Remove top border */
+  border-left: none; /* Remove left border */
+  border-right: none; /* Remove right border */
+}
+
+#batchTable td {
+  border: none; /* Remove all borders from table cells */
+}
+
+#batchTable td:nth-child(3) {
+  text-align: center; /* Center aligns content in the Action column */
+}
+
+#addMemberButton{
+ position: absolute;
+margin-left: 550px;
+margin-top: 20px;
+background-color: #457b9d;
+color: white;
+border:2px solid #457b9d;
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Batch</title>
+    <link rel="stylesheet" href="add_batch.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Add Batch</h2>
+        <label for="batchNameInput">Batch Name:</label>
+        <input type="text" id="batchNameInput" placeholder="Enter batch name">
+        <button id="addMembers">Add Members</button>
+        <table id="batchTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody id="batchTableBody">
+                <!-- Rows will be added dynamically here -->
+            </tbody>
+        </table>
+        <button id="saveButton">Save</button>
+        <!-- Notification container -->
+        <div id="notification" class="notification">
+            <span id="notificationMessage" class="notification-message"></span>
+        </div>
+    </div>
+
+    <script src="add_batch.js" type="module"></script>
+</body>
+</html>

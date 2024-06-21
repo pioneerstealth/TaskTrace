@@ -1,0 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+
+
+.container{
+    height: 90vh;
+    width: 100%;
+}
+
+.nav{
+    margin-top: 2%;
+    margin-left: 1%;
+}
+
+.nav h5{
+    font-family: "Bebas Neue", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    margin-left: 4%;
+    font-size: 1.5rem;
+}
+
+.pic-head{
+    width: 1165px;
+    height: 180px;
+    margin-top: 1%;
+    margin-left: 5%;
+    position: relative;
+    background-color: #55B9DA;
+    box-shadow: 0px 1px 2px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid white;
+    opacity: 0;
+    transform: translateY(20px); /* Initial position off-screen */
+    transition: opacity 0.5s ease-out, transform 0.8s ease-out; /* Smooth transition */
+}
+
+.container.loaded .pic-head {
+    opacity: 1;
+    transform: translateY(0); /* Move to original position */
+}
+
+.pic-head img{
+    z-index: 0;
+    opacity: .4;
+    margin-top: -300px;
+    width: 100%;
+    object-fit: contain;
+}
+
+.pic-head h3{
+    color: red;
+    position: absolute;
+    top: 25%;
+    font-size: 3rem;
+    right: 14%;
+}
+
+.pic-head #home-text{
+    position: absolute;
+    top: 138%;
+    right: 35%;
+    opacity: 1;
+    width: 299px;
+}
+
+.pic-head #logohome{
+    position: absolute;
+    top: 138%;
+    right: 404px;
+    opacity: 1;
+    width: 304px;
+    transition: 1s;
+}
+
+/* .pic-head #logohome:hover{
+    scale: 1.5;
+} */
+
+.head{
+    width: 92%;
+    margin-left: 60px;
+    display: flex;
+    justify-content: space-around;
+    opacity: 0;
+    transform: translateY(60px); /* Initial position off-screen */
+    transition: opacity 1s ease-out, transform 1s ease-out; /* Smooth transition */
+}
+
+.container.loaded .head {
+    opacity: 1;
+    transform: translateY(0); /* Move to original position */
+}
+
+.batches-head{
+    width: 375px;
+    height: 250px;
+    margin-top: 2%;
+    /* margin-left: 5%; */
+    position: relative;
+    background-color: #d1feb9;
+    box-shadow: 0px 1px 2px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid white;
+}
+
+.batches-head img{
+    z-index: 0;
+    opacity: .4;
+    margin-top: 50px;
+    margin-left: 14%;
+    width: 90%;
+    object-fit: contain;
+}
+
+.batches-head .list-img{
+    position: absolute;
+    top: -60px;
+    right: 30px;
+    z-index: 5;
+    opacity: 1;
+}
+
+.batches-head a{
+    position: absolute;
+    right: 20%;
+    top: -15%;
+    z-index: 55;
+    opacity: 1;
+}
+
+.task-head{
+    width: 375px;
+    height: 250px;
+    margin-top: 2%;
+    /* margin-left: 5%; */
+    position: relative;
+    background-color: #513173;
+    box-shadow: 0px 1px 2px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid white;
+}
+
+.task-head img{
+    z-index: 0;
+    opacity: .4;
+    margin-top: 50px;
+    margin-left: 40%;
+    width: 50%;
+    object-fit: contain;
+}
+
+.task-head .task-img{
+    position: absolute;
+    top: -100px;
+    right: -40px;
+    z-index: 5;
+    opacity: 1;
+    width: 450px;
+}
+
+.task-head a{
+    position: absolute;
+    right: -15%;
+    top: -32%;
+    z-index: 55;
+    opacity: 1;
+    width: 800px;
+}
+
+
+.score-head{
+    width: 375px;
+    height: 250px;
+    margin-top: 2%;
+    /* margin-left: 5%; */
+    position: relative;
+    background-color: #ffecd8;
+    box-shadow: 0px 1px 2px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid white;
+}
+
+.score-head img{
+    z-index: 0;
+    opacity: .4;
+    margin-top: 0px;
+    margin-left: 14%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.score-head a{
+    position: absolute;
+    right: 15%;
+    top: -8%;
+    z-index: 55;
+    opacity: 1;
+}
+
+.score-head a img{
+    width: 350px;
+}
+
+
+.head .batches-head a,
+.head .task-head a,
+.head .list-img,
+.head .task-img,
+.head .score-head a {
+    display: none; /* Initially hide all img and a tags */
+    transition: opacity 0.3s ease; /* Add transition for opacity */
+    opacity: 0;
+}
+
+.head .batches-head:hover img,
+.head .batches-head:hover a,
+.head .task-head:hover img,
+.head .task-head:hover a,
+.head .score-head:hover img,
+.head .score-head:hover a {
+    display: inline-block; /* Display img and a tags on hover */
+    opacity: 1;
+}
