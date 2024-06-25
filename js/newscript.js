@@ -46,8 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
     redirect.addEventListener('click', () => window.location.href = "./calculate.html");
     exportBtn.addEventListener('click', exportToExcel);
     completetask.addEventListener('click', markTaskAsDone);
+    redirect.addEventListener('click',redirectTohome);
 
     fetchBatches();
+
 
     batchSelect.addEventListener("change", () => {
         fetchStudents(batchSelect.value);
@@ -120,6 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             mainTimerDisplay.textContent = formatTime(remainingTime);
         }
+    }
+    function redirectTohome(){
+        window.location.href='./home.html';
     }
 
     function markTaskAsDone() {
