@@ -48,152 +48,123 @@ document.addEventListener("DOMContentLoaded", () => {
 function fetchStudents(batch) {
   tableBody.innerHTML = ""; // Clear previous data
   get(ref(db, `batches/${batch}`))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        const students = snapshot.val();
-        students.forEach((student) => {
-          if (student) {
-            const row = createStudentRow(student);
-            tableBody.appendChild(row);
-
-            addStatusButtonFunctionality(row);
-            addEditMarksFunctionality(row);
-            addViewImageFunctionality(
-              row,
-              student.imageUrl || "https://via.placeholder.com/50"
-            );
+      .then(snapshot => {
+          if (snapshot.exists()) {
+              const students = snapshot.val();
+              students.forEach(student => {
+                  if (student) {
+                      const row = createStudentRow(student);
+                      tableBody.appendChild(row);
+                      addStatusButtonFunctionality(row);
+                      addEditMarksFunctionality(row);
+                      addViewImageFunctionality(row,student.imageUrl || 'https://via.placeholder.com/50');
+                  }
+              });
+              document.querySelectorAll(".status-btn").forEach(button => {
+                  button.addEventListener('click', completeTask);
+              });
+          } else {
+              console.log("No data available");
           }
-        });
-        document.querySelectorAll(".status-btn").forEach((button) => {
-          button.addEventListener("click", completeTask);
-        });
-      } else {
-        console.log("No data available");
-      }
-    })
-    .catch(console.error);
-  tableBody.innerHTML = ""; // Clear previous data
-  get(ref(db, `batches/${batch}`))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        const students = snapshot.val();
-        students.forEach((student) => {
-          if (student) {
-            const row = createStudentRow(student);
-            tableBody.appendChild(row);
-            addStatusButtonFunctionality(row);
-            addEditMarksFunctionality(row);
-            addViewImageFunctionality(
-              row,
-              student.imageUrl || "https://via.placeholder.com/50"
-            );
-          }
-        });
-        document.querySelectorAll(".status-btn").forEach((button) => {
-          button.addEventListener("click", completeTask);
-        });
-      } else {
-        console.log("No data available");
-      }
-    })
-    .catch(console.error);
+      }).catch(console.error);
 }
 
 function createStudentRow(student) {
   const row = document.createElement("tr");
   row.innerHTML = `
-        <td>${student.id}</td>
-        <td>${student.name}</td>
-        <td><button class="btn btn-outline-primary status pending">Pending</button></td>
-        <td><button class="btn btn-outline-primary tsk-status pending">Pending</button></td>
-        <td class="timer">00:00:00</td>
-        <td class="marks">${student.marks || "-"}</td>
-        <td><span class="edit-icon"><i class="fa-regular fa-pen-to-square"></i></span></td>
-        <td><span class="view-icon"><i class="fa-regular fa-eye"></i></span></td>
-    `;
+      <td>${student.id}</td>
+      <td>${student.name}</td>
+      <td><button class="btn btn-outline-primary status pending">Pending</button></td>
+      <td><button class="btn btn-outline-primary tsk-status pending">Pending</button></td>
+      <td class="timer">00:00:00</td>
+      <td class="marks">${student.marks || '-'}</td>
+      <td><span class="edit-icon"><i class="fa-regular fa-pen-to-square"></i></span></td>
+      <td><span class="view-icon"><i class="fa-regular fa-eye"></i></span></td>
+  `;
   return row;
 }
 
 function addStatusButtonFunctionality(row) {
-  const statusButton = row.querySelector(".status");
-  const tskstatus = row.querySelector(".tsk-status");
-  statusButton.addEventListener("click", function () {
-    if (this.classList.contains("pending")) {
-      this.classList.remove("pending");
-      this.classList.add("completed");
-      this.textContent = "Completed";
-    } else {
-      this.classList.remove("completed");
-      this.classList.add("pending");
-      this.textContent = "Pending";
-    }
+  const statusButton = row.querySelector('.status');
+  const tskstatus = row.querySelector('.tsk-status');
+  statusButton.addEventListener('click', function() {
+      if (this.classList.contains('pending')) {
+          this.classList.remove('pending');
+          this.classList.add('completed');
+          this.textContent = 'Completed';
+      } else {
+          this.classList.remove('completed');
+          this.classList.add('pending');
+          this.textContent = 'Pending';
+      }
   });
-  tskstatus.addEventListener("click", function () {
-    if (this.classList.contains("pending")) {
-      this.classList.remove("pending");
-      this.classList.add("completed");
-      this.textContent = "Completed";
-    } else {
-      this.classList.remove("completed");
-      this.classList.add("pending");
-      this.textContent = "Pending";
-    }
+  tskstatus.addEventListener('click', function() {
+      if (this.classList.contains('pending')) {
+          this.classList.remove('pending');
+          this.classList.add('completed');
+          this.textContent = 'Completed';
+      } else {
+          this.classList.remove('completed');
+          this.classList.add('pending');
+          this.textContent = 'Pending';
+      }
   });
 }
 
 function addEditMarksFunctionality(row) {
-  const editIcon = row.querySelector(".edit-icon");
-  editIcon.addEventListener("click", function () {
-    enableMarksEditing(row);
+  const editIcon = row.querySelector('.edit-icon');
+  editIcon.addEventListener('click', function() {
+      enableMarksEditing(row);
   });
 }
 
 function enableMarksEditing(row) {
-  const marksCell = row.querySelector(".marks");
+  const marksCell = row.querySelector('.marks');
   const currentMarks = marksCell.textContent;
   marksCell.innerHTML = `<input type="text" value="${currentMarks}" class="edit-marks-input"/>`;
-  const input = marksCell.querySelector("input");
+  const input = marksCell.querySelector('input');
 
   // Save new marks on blur or enter key press
-  input.addEventListener("blur", function () {
-    const newMarks = input.value;
-    marksCell.textContent = newMarks;
-  });
-  input.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
+  input.addEventListener('blur', function() {
       const newMarks = input.value;
       marksCell.textContent = newMarks;
-    }
+  });
+  input.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+          const newMarks = input.value;
+          marksCell.textContent = newMarks;
+      }
   });
 }
 
 function exportToExcel() {
-  const table = document.querySelector("table");
+  const table = document.querySelector('table');
   const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-  XLSX.writeFile(wb, "" + taskName.value + ".xlsx");
+  XLSX.writeFile(wb, ""+taskName.value+".xlsx");
 }
 
 function addViewImageFunctionality(row, imageUrl) {
-  const viewIcon = row.querySelector(".view-icon");
-  viewIcon.addEventListener("click", function () {
-    displayImagePopup(imageUrl);
+  const viewIcon = row.querySelector('.view-icon');
+  viewIcon.addEventListener('click', function() {
+      displayImagePopup(imageUrl);
   });
 }
 
 function displayImagePopup(imageUrl) {
-  const popup = document.getElementById("imagePopup");
-  const popupImage = document.getElementById("popupImage");
+  const popup = document.getElementById('imagePopup');
+  const popupImage = document.getElementById('popupImage');
   popupImage.src = imageUrl;
-  popup.style.display = "block";
+  popup.style.display = 'block';
 }
-document.querySelector(".close").addEventListener("click", function () {
-  document.getElementById("imagePopup").style.display = "none";
+
+document.querySelector('.close').addEventListener('click', function() {
+  document.getElementById('imagePopup').style.display = 'none';
 });
 
-window.addEventListener("click", function (event) {
-  const popup = document.getElementById("imagePopup");
+window.addEventListener('click', function(event) {
+  const popup = document.getElementById('imagePopup');
   if (event.target === popup) {
-    popup.style.display = "none";
+      popup.style.display = 'none';
   }
 });
 
