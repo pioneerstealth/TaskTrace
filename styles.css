@@ -86,7 +86,7 @@ body {
     background-color: #E3F2FD;
     border-radius: 10px;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
-    width: 45%;
+    width: 49.37%;
     height: 87vh;
 
 }
@@ -166,16 +166,17 @@ body {
 
 .table-container-list-batchmates {
     position: relative;
-    top: 10px;
+    top: 11px;
     left: 28px;
     margin-right: 1.25rem;
-    background-color: #d60a0a;
+    background-color: #E3F2FD;
     border-radius: 0.625rem;
     box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
     padding: 0.5rem;
-    width: 566px;
+    width: 600px;
     max-width: 37.5rem;
-    z-index: 3;
+    opacity: 0;
+    z-index: -1;
 }
 
 .table-container-list-batchmates table {
@@ -206,7 +207,8 @@ body {
     border: none;
     font-size: 0.875rem;
 }
-.table-container-list-batchmates .tsk-status   {
+
+.table-container-list-batchmates .tsk-status {
     padding: 0.1875rem 0.5rem;
     border-radius: 0.75rem;
     border: none;
@@ -233,14 +235,14 @@ body {
 .table-container-list-batchmates .tsk-status.completed {
     background-color: #d9eeda;
     color: #4CAF50;
-    width:5rem;
-  }
-  
-  .table-container-list-batchmates .tsk-status.pending {
+    width: 5rem;
+}
+
+.table-container-list-batchmates .tsk-status.pending {
     background-color: #ffeacc;
     color: #FF9800;
-    width:5rem;
-  }
+    width: 5rem;
+}
 
 .edit-marks-input {
     width: 30px;
@@ -249,20 +251,20 @@ body {
 }
 
 .timer-section {
-    position: relative;
-    width: 548px;
+    position: fixed;
+    width: 547px;
     height: 87vh;
-    top: -148px;
-    left: 630px;
+    top: 55px;
+    left: 640px;
     max-width: 37.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 0.625rem;
     box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
-    background-color: #2ead1a;
+    background-color: #fff;
     flex-direction: column;
-    z-index: 3;
+    z-index: -1;
 }
 
 .timer-section .timer-boxes {
@@ -312,8 +314,8 @@ body {
     width: 60%;
     height: 60%;
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
 
 }
 
@@ -361,4 +363,103 @@ body {
 
 .action-buttons .action-btn:hover {
     background-color: #0041f5;
+}
+
+
+/* Keyframes for fade-out animation */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* Add an animation class for the fade-out */
+.fade-out {
+    animation: fadeOut 1s forwards;
+}
+
+@keyframes cardFlip {
+    0% {
+        transform: rotateY(0deg);
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: rotateY(180deg);
+        opacity: 0;
+    }
+}
+
+/* Add an animation class for the fade-out */
+.cardFlip {
+    animation: cardFlip 1.5s forwards ease-in-out;
+}
+
+@keyframes slideOutRight {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    99% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Add an animation class for the slide out */
+.slideOutRight {
+    animation: slideOutRight 1s forwards ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        transform: rotateY(180deg);
+        opacity: 0;
+    }
+
+    /* 50% {
+        opacity: 0;
+    } */
+
+    100% {
+        transform: rotateY(0deg);
+        opacity: 1;
+    }
+}
+
+.fadeIn {
+    animation: fadeIn 1.5s forwards ease-in-out;
+    z-index: 5;
+}
+
+@keyframes scaleUpFromBottom {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+        transform-origin: left;
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        transform-origin: left;
+    }
+}
+
+.scaleUpFromBottom {
+    animation: scaleUpFromBottom 1s forwards ease-in-out;
+    z-index: 5;
 }

@@ -1,169 +1,116 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-import {
-  getDatabase,
-  ref,
-  set,
-  get,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC_X80vOAxGzedQT0Qx17sTZLrYnyxq1cY",
-  authDomain: "live-task-assessment.firebaseapp.com",
-  databaseURL: "https://live-task-assessment-default-rtdb.firebaseio.com",
-  projectId: "live-task-assessment",
-  storageBucket: "live-task-assessment.appspot.com",
-  messagingSenderId: "445826224445",
-  appId: "1:445826224445:web:00071338f875196e06b554",
-  measurementId: "G-FZ979LH8JF",
+    apiKey: "AIzaSyC_X80vOAxGzedQT0Qx17sTZLrYnyxq1cY",
+    authDomain: "live-task-assessment.firebaseapp.com",
+    databaseURL: "https://live-task-assessment-default-rtdb.firebaseio.com",
+    projectId: "live-task-assessment",
+    storageBucket: "live-task-assessment.appspot.com",
+    messagingSenderId: "445826224445",
+    appId: "1:445826224445:web:00071338f875196e06b554",
+    measurementId: "G-FZ979LH8JF"
 };
 
-const exportBtn = document.getElementById("exportBtn");
+
+const exportBtn = document.getElementById('exportBtn');
 const tableBody = document.querySelector("table tbody");
-exportBtn.addEventListener("click", exportToExcel);
+exportBtn.addEventListener('click', exportToExcel);
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getDatabase(app);
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("imagePopup").style.display = "none";
-  fetchStudents("ILP Batch 4");
-
-  const button = document.querySelector(".create-task-button");
-  const leftPanel = document.querySelector(".left-panel");
-  const rightPanel = document.querySelector(".right-panel");
-  const tableContainer = document.querySelector(
-    ".table-container-list-batchmates"
-  );
-  const timerSection = document.querySelector(".timer-section");
-
-  button.addEventListener("click", () => {
-    leftPanel.classList.add("cardFlip");
-    rightPanel.classList.add("slideOutRight");
-    tableContainer.classList.add("fadeIn");
-    timerSection.classList.add("scaleUpFromBottom");
-  });
+document.addEventListener('DOMContentLoaded', () => {
+    fetchStudents("ILP Batch 4");
 });
 function fetchStudents(batch) {
-  tableBody.innerHTML = ""; // Clear previous data
-  get(ref(db, `batches/${batch}`))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        const students = snapshot.val();
-        students.forEach((student) => {
-          if (student) {
-            const row = createStudentRow(student);
-            tableBody.appendChild(row);
+    tableBody.innerHTML = ""; // Clear previous data
+    get(ref(db, `batches/${batch}`))
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                const students = snapshot.val();
+                students.forEach(student => {
+                    if (student) {
+                        const row = createStudentRow(student);
+                        tableBody.appendChild(row);
 
-            addStatusButtonFunctionality(row);
-            addEditMarksFunctionality(row);
-            addViewImageFunctionality(
-              row,
-              student.imageUrl || "https://via.placeholder.com/50"
-            );
-          }
-        });
-        document.querySelectorAll(".status-btn").forEach((button) => {
-          button.addEventListener("click", completeTask);
-        });
-      } else {
-        console.log("No data available");
-      }
-    })
-    .catch(console.error);
+                        addStatusButtonFunctionality(row);
+                        addEditMarksFunctionality(row);
+                    }
+                });
+                document.querySelectorAll(".status-btn").forEach(button => {
+                    button.addEventListener('click', completeTask);
+                });
+            } else {
+                console.log("No data available");
+            }
+        }).catch(console.error);
 }
 
 function createStudentRow(student) {
-  const row = document.createElement("tr");
-  row.innerHTML = `
+    const row = document.createElement("tr");
+    row.innerHTML = `
         <td>${student.id}</td>
         <td>${student.name}</td>
         <td><button class="btn btn-outline-primary status pending">Pending</button></td>
-        <td><button class="btn btn-outline-primary tsk-status pending">Pending</button></td>
         <td class="timer">00:00:00</td>
-        <td class="marks">${student.marks || "-"}</td>
-        <td><span class="edit-icon"><i class="fa-regular fa-pen-to-square"></i></span></td>
-        <td><span class="view-icon"><i class="fa-regular fa-eye"></i></span></td>
+        <td class="marks">${student.marks || '-'}</td>
+        <td><span class="edit-icon"><img src="./assets/image/edit.png"/></span></td>
     `;
-  return row;
+    return row;
 }
 
 function addStatusButtonFunctionality(row) {
-  const statusButton = row.querySelector(".status");
-  const tskstatus = row.querySelector(".tsk-status");
-  statusButton.addEventListener("click", function () {
-    if (this.classList.contains("pending")) {
-      this.classList.remove("pending");
-      this.classList.add("completed");
-      this.textContent = "Completed";
-    } else {
-      this.classList.remove("completed");
-      this.classList.add("pending");
-      this.textContent = "Pending";
-    }
-  });
-  tskstatus.addEventListener("click", function () {
-    if (this.classList.contains("pending")) {
-      this.classList.remove("pending");
-      this.classList.add("completed");
-      this.textContent = "Completed";
-    } else {
-      this.classList.remove("completed");
-      this.classList.add("pending");
-      this.textContent = "Pending";
-    }
-  });
+    const statusButton = row.querySelector('.status');
+    statusButton.addEventListener('click', function() {
+        if (this.classList.contains('pending')) {
+            this.classList.remove('pending');
+            this.classList.add('completed');
+            this.textContent = 'Completed';
+        } else {
+            this.classList.remove('completed');
+            this.classList.add('pending');
+            this.textContent = 'Pending';
+        }
+    });
 }
 
 function addEditMarksFunctionality(row) {
-  const editIcon = row.querySelector(".edit-icon");
-  editIcon.addEventListener("click", function () {
-    enableMarksEditing(row);
-  });
+    const editIcon = row.querySelector('.edit-icon');
+    editIcon.addEventListener('click', function() {
+        enableMarksEditing(row);
+    });
 }
 
 function enableMarksEditing(row) {
-  const marksCell = row.querySelector(".marks");
-  const currentMarks = marksCell.textContent;
-  marksCell.innerHTML = `<input type="text" value="${currentMarks}" class="edit-marks-input"/>`;
-  const input = marksCell.querySelector("input");
+    const marksCell = row.querySelector('.marks');
+    const currentMarks = marksCell.textContent;
+    marksCell.innerHTML = `<input type="text" value="${currentMarks}" class="edit-marks-input"/>`;
+    const input = marksCell.querySelector('input');
 
-  // Save new marks on blur or enter key press
-  input.addEventListener("blur", function () {
-    const newMarks = input.value;
-    marksCell.textContent = newMarks;
-  });
-  input.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      const newMarks = input.value;
-      marksCell.textContent = newMarks;
-    }
-  });
+    // Save new marks on blur or enter key press
+    input.addEventListener('blur', function() {
+        const newMarks = input.value;
+        marksCell.textContent = newMarks;
+    });
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const newMarks = input.value;
+            marksCell.textContent = newMarks;
+        }
+    });
 }
+
+
+
 
 function exportToExcel() {
-  const table = document.querySelector("table");
-  const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-  XLSX.writeFile(wb, "" + taskName.value + ".xlsx");
+    const table = document.querySelector('table');
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+    XLSX.writeFile(wb, ""+taskName.value+".xlsx");
 }
-
-function addViewImageFunctionality(row, imageUrl) {
-  const viewIcon = row.querySelector(".view-icon");
-  viewIcon.addEventListener("click", function () {
-    displayImagePopup(imageUrl);
-  });
-}
-
-function displayImagePopup(imageUrl) {
-  const popup = document.getElementById("imagePopup");
-  const popupImage = document.getElementById("popupImage");
-  popupImage.src = imageUrl;
-  popup.style.display = "block";
-}
-document.querySelector(".close").addEventListener("click", function () {
-  document.getElementById("imagePopup").style.display = "none";
-});
 
 // function startTimer() {
 //     saveStartTimerBtn.disabled = true;
