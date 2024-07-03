@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(340deg, #DDEBFF, #1756B3); /* Adjust colors to match the gradient */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.navbar_log_sign {
+    display: flex;
+    flex-direction: row;
+    border-radius: 6px 6px 0px 0px;
+    justify-content: space-between;
+    box-shadow: 0px -4px 20px;
+    align-items: center;
+    background-color: #1756B3;
+    width: 100%;
+    height: 7%;
+}
+
+.logo_title {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin: 0px 0px 0px 30px;
+    width: 150px;
+    height: 30px;
+    gap: 10px;
+}
+
+.logo {
+    background-color: #ffffff;
+    border-radius: 15px;
+    width: 30px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Maintains aspect ratio */
+}
+
+.analytics{
+    width: 30px;
+    position: absolute;
+    right: 7%;
+}
+
+.user{
+    width: 30px;
+    position: absolute;
+    right: 5%;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-family: "Cinzel", serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    color: white;
+    position: absolute;
+    left: 5.5%;
+    top: 2%;
+}
+
+.header .logo span:first-child {
+    background-color: white;
+    color: #1967d2;
+    border-radius: 50%;
+    padding: 5px 10px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.header .profile img {
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+}
+
+
+.main-content .tasktrace{
+    font-family: "Merienda", cursive;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+    font-size: 3.8rem;
+    color: white;
+    position: absolute;
+    top: 17.8%;
+    left: 12%;
+
+}
+
+.stroke{
+    position: absolute;
+    top: 18.2%;
+    left: 12%;
+    font-family: "Merienda", cursive;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-size: 3.8rem;
+    font-style: normal;
+    color: transparent; /* No fill color */
+    -webkit-text-stroke: 1px rgb(255, 255, 255); 
+}
+
+.main-content img{
+    width: 500px;
+    position: absolute;
+    top: 20.2%;
+    right: 10%;
+    -webkit-transform: scaleX(-1);
+}
+
+.batch-list{
+    /* border: 1px solid black; */
+    padding: 13px 50px 13px 210px;
+    position: absolute;
+    text-decoration: none;
+    font-family: "Merienda", cursive;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    bottom: 42%;
+    color: white;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    border-radius: 10px;
+    left: 12%;
+}
+
+.assign-task{
+    color: white;
+    text-decoration: none;
+    /* border: .5px solid rgb(0, 0, 0); */
+    padding: 13px 195px 13px 50px;
+    font-family: "Merienda", cursive;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    position: absolute;
+    bottom: 31%;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    border-radius: 10px;
+    left: 12%;
+}
+
+.history{
+    color: white;
+    text-decoration: none;
+    /* border: .5px solid rgb(0, 0, 0); */
+    padding: 13px 50px 13px 230px;
+    font-family: "Merienda", cursive;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    position: absolute;
+    bottom: 20.5%;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    border-radius: 10px;
+    left: 12%;
+}
