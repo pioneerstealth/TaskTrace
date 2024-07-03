@@ -73,19 +73,12 @@ body {
 }
 
 
-.main-content {
-    display: flex;
-    width: 100%;
-    height: 92vh;
-    justify-content: center;
-    gap: 50px;
 
-    padding-top: 20px;
-    padding-bottom: 20px;
-
-}
 
 .left-panel {
+    position: absolute;
+    top: 55px;
+    left: 35px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -94,7 +87,8 @@ body {
     border-radius: 10px;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
     width: 45%;
-    height: 88vh;
+    height: 87vh;
+
 }
 
 .character_container {
@@ -120,6 +114,9 @@ body {
 }
 
 .right-panel {
+    position: absolute;
+    top: 55px;
+    left: 640px;
     width: 45%;
     display: flex;
     flex-direction: column;
@@ -128,7 +125,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
-    height: 88vh;
+    height: 87vh;
 }
 
 .form-container {
@@ -153,7 +150,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 5px;
-    height: 20px;
+    height: 30px;
 }
 
 .form-container textarea {
@@ -164,4 +161,153 @@ body {
 #batch {
     width: 95%;
     height: 35px;
+}
+
+
+.table-container-list-batchmates {
+    position: relative;
+    top: 10px;
+    left: 28px;
+    margin-right: 1.25rem;
+    background-color: #d60a0a;
+    border-radius: 0.625rem;
+    box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+    width: 548px;
+    max-width: 37.5rem;
+    z-index: 3;
+}
+
+.table-container-list-batchmates table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.3125rem;
+}
+
+.table-container-list-batchmates table th,
+.table-container-list-batchmates table td {
+    padding: 0.75rem 0.5rem;
+    text-align: left;
+}
+
+.table-container-list-batchmates table th {
+    background-color: #ffffff;
+    border-bottom: 0.0625rem solid #ddd;
+    font-weight: bold;
+}
+
+.table-container-list-batchmates table tr:nth-child(even) {
+    background-color: #f5f8ff;
+}
+
+.table-container-list-batchmates .status {
+    padding: 0.1875rem 0.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    font-size: 0.875rem;
+}
+
+.table-container-list-batchmates .status.completed {
+    background-color: #d9eeda;
+    color: #4CAF50;
+    width: 8rem;
+}
+
+.table-container-list-batchmates .status.pending {
+    background-color: #ffeacc;
+    color: #FF9800;
+    width: 8rem;
+}
+
+.table-container-list-batchmates .edit-icon {
+    color: #2962FF;
+    cursor: pointer;
+}
+
+.edit-marks-input {
+    width: 20px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.timer-section {
+    position: relative;
+    width: 548px;
+    height: 87vh;
+    top: -148px;
+    left: 630px;
+    max-width: 37.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0.625rem;
+    box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
+    background-color: #2ead1a;
+    flex-direction: column;
+    z-index: 3;
+}
+
+.timer-section .timer-boxes {
+    margin-top: 10%;
+    display: flex;
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+}
+
+.timer-section .timer-boxes .timer-box {
+    width: 5rem;
+    height: 5rem;
+    background-color: #2962FF;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+}
+
+.timer-section .extend-time-btn {
+    background-color: #2962FF;
+    color: #ffffff;
+    border: none;
+    border-radius: 1.25rem;
+    font-size: 1.125rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 40%;
+    padding: 0.75rem 1.25rem;
+    font-weight: bold;
+    height: 3rem;
+}
+
+.timer-section .extend-time-btn:hover {
+    background-color: #0041f5;
+}
+
+.table-dark {
+    margin-bottom: 1rem;
+    border-bottom: none;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.25rem;
+}
+
+.action-buttons .action-btn {
+    background-color: #2962FF;
+    color: #ffffff;
+    border: none;
+    border-radius: 0.3125rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 0.75rem 1.5rem;
+    font-weight: bold;
+}
+
+.action-buttons .action-btn:hover {
+    background-color: #0041f5;
 }
