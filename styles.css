@@ -16,6 +16,7 @@ body {
     font-weight: 400;
     font-style: normal;
     font-variation-settings: "wdth"100;
+    width:100%;
 }
 
 .adminAssignTask_section {
@@ -251,7 +252,7 @@ body {
 }
 
 .timer-section {
-    position: fixed;
+    position:absolute;
     width: 547px;
     height: 87vh;
     top: 55px;
@@ -420,11 +421,12 @@ body {
     }
 
     99% {
+        transform: translateX(100%);
         opacity: 1;
     }
 
     100% {
-        transform: translateX(100%);
+        transform: translateX(0%);
         opacity: 0;
     }
 }
