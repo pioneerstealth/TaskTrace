@@ -72,6 +72,31 @@ function fetchStudents(batch) {
       }
     })
     .catch(console.error);
+  tableBody.innerHTML = ""; // Clear previous data
+  get(ref(db, `batches/${batch}`))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        const students = snapshot.val();
+        students.forEach((student) => {
+          if (student) {
+            const row = createStudentRow(student);
+            tableBody.appendChild(row);
+            addStatusButtonFunctionality(row);
+            addEditMarksFunctionality(row);
+            addViewImageFunctionality(
+              row,
+              student.imageUrl || "https://via.placeholder.com/50"
+            );
+          }
+        });
+        document.querySelectorAll(".status-btn").forEach((button) => {
+          button.addEventListener("click", completeTask);
+        });
+      } else {
+        console.log("No data available");
+      }
+    })
+    .catch(console.error);
 }
 
 function createStudentRow(student) {
@@ -163,6 +188,13 @@ function displayImagePopup(imageUrl) {
 }
 document.querySelector(".close").addEventListener("click", function () {
   document.getElementById("imagePopup").style.display = "none";
+});
+
+window.addEventListener("click", function (event) {
+  const popup = document.getElementById("imagePopup");
+  if (event.target === popup) {
+    popup.style.display = "none";
+  }
 });
 
 // function startTimer() {
