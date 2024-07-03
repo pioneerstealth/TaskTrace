@@ -16,6 +16,7 @@ body {
     font-weight: 400;
     font-style: normal;
     font-variation-settings: "wdth"100;
+    width: 100%;
 }
 
 .adminAssignTask_section {
@@ -251,7 +252,7 @@ body {
 }
 
 .timer-section {
-    position: fixed;
+    position: absolute;
     width: 547px;
     height: 87vh;
     top: 55px;
@@ -306,36 +307,6 @@ body {
     background-color: #0041f5;
 }
 
-.popup {
-    display: flex;
-    position: fixed;
-    z-index: 10;
-    left: 15%;
-    top: 25%;
-    width: 60%;
-    height: 60%;
-    overflow: auto;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.4);
-
-}
-
-.popup img {
-    margin: auto;
-    display: block;
-    max-width: 80%;
-    max-height: 80%;
-}
-
-.close {
-    position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-
-
-}
 
 /* The Modal (background) */
 .modal {
@@ -450,12 +421,12 @@ body {
     }
 
     99% {
-        opacity: 1;
         transform: translateX(100%);
+        opacity: 1;
     }
 
     100% {
-        transform: translateX(0);
+        transform: translateX(0%);
         opacity: 0;
     }
 }
