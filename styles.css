@@ -451,10 +451,11 @@ body {
 
     99% {
         opacity: 1;
+        transform: translateX(100%);
     }
 
     100% {
-        transform: translateX(100%);
+        transform: translateX(0);
         opacity: 0;
     }
 }
@@ -502,4 +503,40 @@ body {
 .scaleUpFromBottom {
     animation: scaleUpFromBottom 1s forwards ease-in-out;
     z-index: 5;
+}
+
+#papper {
+    animation: papper 1s infinite ease-in-out alternate;
+    transform-origin: bottom center;
+
+    transform-box: fill-box;
+}
+
+@keyframes papper {
+    form {
+        transform: rotateZ(0deg);
+    }
+
+    to {
+        transform: rotateZ(-2deg);
+    }
+
+}
+
+#Head {
+    animation: Head 1s infinite ease-in-out alternate;
+    transform-origin: bottom center;
+
+    transform-box: fill-box;
+}
+
+@keyframes Head {
+    form {
+        transform: rotateZ(0deg);
+    }
+
+    to {
+        transform: rotateZ(3deg);
+    }
+
 }
