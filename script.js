@@ -35,7 +35,6 @@ function fetchStudents(batch) {
                     if (student) {
                         const row = createStudentRow(student);
                         tableBody.appendChild(row);
-
                         addStatusButtonFunctionality(row);
                         addEditMarksFunctionality(row);
                         addViewImageFunctionality(row,student.imageUrl || 'https://via.placeholder.com/50');
@@ -137,9 +136,18 @@ function displayImagePopup(imageUrl) {
     popupImage.src = imageUrl;
     popup.style.display = 'block';
 }
+
 document.querySelector('.close').addEventListener('click', function() {
     document.getElementById('imagePopup').style.display = 'none';
 });
+
+window.addEventListener('click', function(event) {
+    const popup = document.getElementById('imagePopup');
+    if (event.target === popup) {
+        popup.style.display = 'none';
+    }
+});
+
 
 // function startTimer() {
 //     saveStartTimerBtn.disabled = true;
