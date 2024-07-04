@@ -23,7 +23,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: start;
-    width: 100%;
+    width: 98vw;
     max-height: fit-content;
 }
 
@@ -34,7 +34,7 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: #1756B3;
-    width: 100%;
+    width: 98vw;
     height: 37px;
 }
 
@@ -79,7 +79,7 @@ body {
 .left-panel {
     position: absolute;
     top: 55px;
-    left: 35px;
+    left: 30px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -87,7 +87,7 @@ body {
     background-color: #E3F2FD;
     border-radius: 10px;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
-    width: 49.37%;
+    width: 600px;
     height: 87vh;
 
 }
@@ -118,7 +118,8 @@ body {
     position: absolute;
     top: 55px;
     left: 640px;
-    width: 45%;
+    width: 547px;
+    margin-left: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -168,8 +169,8 @@ body {
 .table-container-list-batchmates {
     position: relative;
     top: 11px;
-    left: 28px;
-    margin-right: 1.25rem;
+    left: 20px;
+    /* margin-right: 1.25rem; */
     background-color: #E3F2FD;
     border-radius: 0.625rem;
     box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
@@ -257,6 +258,7 @@ body {
     height: 87vh;
     top: 55px;
     left: 640px;
+    margin-left: 10px;
     max-width: 37.5rem;
     display: flex;
     justify-content: center;
