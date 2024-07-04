@@ -50,30 +50,30 @@ body, html {
     /* Maintains aspect ratio */
 }
 
-.analytics{
+.analytics {
     width: 30px;
     position: absolute;
     right: 7%;
 }
 
-.user{
+#user {
     width: 30px;
     position: absolute;
-    right: 5%;
+    right: 10%;
 }
 
 .title {
     display: flex;
     align-items: center;
     font-size: 14px;
-    font-family: "Cinzel", serif;
+    font-family: "Merienda", cursive;
     font-optical-sizing: auto;
     font-weight: 700;
     font-style: normal;
     color: white;
     position: absolute;
     left: 5.5%;
-    top: 2%;
+    top: 1.8%;
 }
 
 .header .logo span:first-child {
@@ -91,21 +91,54 @@ body, html {
     width: 40px;
 }
 
+@keyframes fillAnimation {
+    0% {
+        background-position: 0% 100%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
+}
 
-.main-content .tasktrace{
+.user-info{
+    width: 250px;
+    height: 350px;
+    z-index: 2;
+    background-color: white;
+    position: absolute;
+    right: 5%;
+    top: 7%;
+    opacity: 0;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;
+}
+
+.main-content .tasktrace {
     font-family: "Merienda", cursive;
-  font-optical-sizing: auto;
-  font-weight: 700;
-  font-style: normal;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
     font-size: 3.8rem;
-    color: white;
+    color: transparent; /* Initially hidden */
     position: absolute;
     top: 17.8%;
     left: 12%;
-
+    background: linear-gradient(to left, white 50%, rgba(255, 255, 255, 0) 50%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    background-size: 200% 100%;
+    animation: fillAnimation 3s ease-in-out forwards;
+    animation-delay: 0.3s; /* Optional delay before the animation starts */
+    visibility: hidden; /* Initially hidden */
 }
 
-.stroke{
+.main-content .tasktrace.visible {
+    visibility: visible; /* Make visible when the animation completes */
+    color: white; /* Set final text color */
+    background: none; /* Remove background gradient */
+}
+
+.stroke {
     position: absolute;
     top: 18.2%;
     left: 12%;
@@ -115,10 +148,10 @@ body, html {
     font-size: 3.8rem;
     font-style: normal;
     color: transparent; /* No fill color */
-    -webkit-text-stroke: 1px rgb(255, 255, 255); 
+    -webkit-text-stroke: 1px rgb(255, 255, 255);
 }
 
-.main-content img{
+.main-content img {
     width: 500px;
     position: absolute;
     top: 20.2%;
@@ -126,8 +159,8 @@ body, html {
     -webkit-transform: scaleX(-1);
 }
 
-.batch-list{
-    /* border: 1px solid black; */
+.batch-list {
+    border: 1px solid rgb(255, 255, 255);
     padding: 13px 50px 13px 210px;
     position: absolute;
     text-decoration: none;
@@ -138,13 +171,14 @@ body, html {
     color: white;
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
     border-radius: 10px;
+    background-color: rgba(red, green, blue, alpha);
     left: 12%;
 }
 
-.assign-task{
+.assign-task {
     color: white;
     text-decoration: none;
-    /* border: .5px solid rgb(0, 0, 0); */
+    border: 1px solid rgb(255, 255, 255);
     padding: 13px 195px 13px 50px;
     font-family: "Merienda", cursive;
     font-optical-sizing: auto;
@@ -156,10 +190,10 @@ body, html {
     left: 12%;
 }
 
-.history{
+.history {
     color: white;
     text-decoration: none;
-    /* border: .5px solid rgb(0, 0, 0); */
+    border: 1px solid rgb(255, 255, 255);
     padding: 13px 50px 13px 230px;
     font-family: "Merienda", cursive;
     font-optical-sizing: auto;
