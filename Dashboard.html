@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="./assests/image/tasktrace_logo1.png"
+      type="image/png"
+    />
+    <link rel="stylesheet" href="./Dashboard.css" />
+    <title>TaskTrace</title>
+  </head>
+  <body>
+    <div class="navbar_Dashboard">
+      <div class="logo_title">
+        <div class="logo">
+          <img src="./assests/image/tasktrace_logo1.png" alt="logo" />
+        </div>
+        <div class="title">TaskTrace</div>
+      </div>
+      <div class="home_icon"></div>
+    </div>
+    <div class="Dashboard_section">
+      <div class="one">
+        <div class="dropdown">
+          <input type="checkbox" id="dropdown" />
+
+          <label class="dropdown__face" for="dropdown">
+            <div class="dropdown__text">Dropdown</div>
+
+            <div class="dropdown__arrow"></div>
+          </label>
+
+          <ul class="dropdown__items">
+            <li>🙂</li>
+            <li>😺</li>
+            <li>😽</li>
+            <li>😎</li>
+            <li>🤗</li>
+          </ul>
+          <svg>
+            <filter id="goo">
+              <feGaussianBlur
+                in="SourceGraphic"
+                stdDeviation="5"
+                result="blur"
+              />
+              <feColorMatrix
+                in="blur"
+                type="matrix"
+                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
+                result="goo"
+              />
+              <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+          </svg>
+        </div>
+        <div class="search-container">
+          <form class="Search_form" action="#">
+            <input
+              class="searchbox"
+              type="text"
+              placeholder="Search.."
+              name="search"
+            />
+            <button type="submit" class="search"></button>
+          </form>
+        </div>
+      </div>
+      <div class="two">
+        <div class="two_card" id="first_two"></div>
+        <div class="two_card" id="second_two"></div>
+        <div class="two_card" id="third_two"></div>
+      </div>
+      <div class="three">
+        <div class="three_card" id="first_three"></div>
+        <div class="three_card" id="second_three"></div>
+      </div>
+      <div class="four">
+        <div class="four_card" id="first_four"></div>
+        <div class="four_card" id="second_four"></div>
+      </div>
+      <div class="five">
+        <div class="five_card" id="first_five"></div>
+        <div class="five_card" id="second_five"></div>
+      </div>
+    </div>
+  </body>
+</html>
