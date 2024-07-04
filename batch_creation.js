@@ -180,19 +180,18 @@ function hideTableContainer() {
 
 // Populate table with data from Excel file
 function populateTable(data) {
+  console.trace('populatetable called');
   const tableBody = document.getElementById('tableBody');
-  const noBatchesRow = document.getElementById('noBatchesRow');
   const tableHead = document.querySelector('.table_head');
 
-  if (tableBody && noBatchesRow && tableHead) {
+  if (tableBody && tableHead) {
     tableBody.innerHTML = '';
 
     if (data.length === 0) {
-      noBatchesRow.style.display = 'table-row';
+      tableBody.innerHTML = '<tr><td colspan="3" style="background-color: #ffffff;">No batches selected yet</td></tr>';
       tableHead.style.display = 'none';
       document.getElementById('saveButton').style.display = 'none';
     } else {
-      noBatchesRow.style.display = 'none';
       tableHead.style.display = 'table-header-group';
 
       data.forEach((row, index) => {
@@ -231,11 +230,8 @@ function populateTable(data) {
   }
 }
 
-// Clear table data
-// function clearTable() {
-//   const tableBody = document.getElementById('tableBody');
-//   tableBody.innerHTML = '';
-// }
+
+
 
 async function updateMember(memberId, memberName) {
   const newMemberName = prompt('Enter new member name:', memberName);
@@ -375,6 +371,8 @@ document.getElementById('batchList').addEventListener('click', async function (e
 
 // Function to fetch batch details from Firestore
 async function fetchBatchDetails(batchName) {
+  console.trace('fetchBatchdetails called');
+  
   try {
     const batchQuery = query(collection(db, 'batches'), where('batchName', '==', batchName));
     const batchSnapshot = await getDocs(batchQuery);
@@ -397,46 +395,42 @@ async function fetchBatchDetails(batchName) {
 
 // Function to clear the table
 function clearTable() {
-  console.log('Clearing table...');
+  console.trace('Clearing table...');
 
-  // Retrieve elements
   const tableBody = document.getElementById('tableBody');
-  const noBatchesRow = document.getElementById('noBatchesRow');
   const tableHead = document.querySelector('.table_head');
-  console.log("clear table :"+tableBody)
-  console.log("clear table :"+noBatchesRow)
-  console.log("clear table :"+tableHead)
-
-  // Check if all required elements exist
-  if (tableBody && noBatchesRow && tableHead) {
+  
+  if (tableBody && tableHead) {
     console.log('Elements found, clearing table...');
 
-    // Clear table body content
-    tableBody.innerHTML = '';
+    // Clear table body using removeChild method
+    while (tableBody.firstChild) {
+      tableBody.removeChild(tableBody.firstChild);
+    }
 
-    // Hide "No Batches" row
-    noBatchesRow.style.display = 'none';
+    console.log('Table body after clearing:', tableBody.innerHTML);
 
     // Hide table head
     tableHead.style.display = 'none';
+    console.log('Table head display style set to none.');
   } else {
     console.log('One or more elements not found.');
   }
 }
 
 
+
 // Function to update the table with batch member details
 function updateTable(members) {
+  console.trace('updateTable called');
   const tableBody = document.getElementById('tableBody');
-  const noBatchesRow = document.getElementById('noBatchesRow');
   const tableHead = document.querySelector('.table_head');
 
-  // Clear existing table content
   clearTable();
 
-  if (tableBody && noBatchesRow && tableHead) {
+  if (tableBody && tableHead) {
     if (members.length === 0) {
-      noBatchesRow.style.display = 'table-row';
+      tableBody.innerHTML = '<tr><td colspan="3" style="background-color: #ffffff;">No batches selected yet</td></tr>';
     } else {
       tableHead.style.display = 'table-header-group';
       members.forEach((member) => {
@@ -470,7 +464,6 @@ function updateTable(members) {
     }
   }
 }
-
 
 
 // Event listener for batch selection (example scenario)
