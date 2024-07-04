@@ -513,3 +513,117 @@ body {
     }
 
 }
+
+
+
+/* Media query for responsiveness */
+@media only screen and (max-width: 1052px) {
+    .navbar_adminAssignTask {
+        width: 100%;
+        max-width: 100%;
+    }}
+@media only screen and (max-width: 1024px) {
+    .navbar_adminAssignTask {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .right-panel {
+        position: static;
+        width: 100%;
+        left: auto;
+        margin-left: 0px;
+        top: 0;
+    }
+
+    .left-panel {
+        position: static;
+        top: 0;
+        left: 0;
+        margin-top: 650px; 
+        height:380px;
+        margin-left: 200px;
+        
+    }
+    .timer-section {
+          margin-left: -450px;
+          height: 250px;
+          margin-top: 50px;
+    }
+    .table-container-list-batchmates {
+        margin-left: 150px;
+        margin-top: -600px;
+      
+    }
+    .form-container{
+        margin-top: -4700px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .navbar_adminAssignTask {
+        width: 100%;
+        max-width: 100%;
+    }
+    .logo_title {
+        margin-left: 10px; 
+    }
+    .table-container-list-batchmates{
+     left: -85px;
+    }
+    .timer-section {
+     margin-left: -560px;
+  }
+  .left-panel {
+  margin-left:70px;
+    
+}
+}
+@media only screen and (max-width: 680px) {
+    .navbar_adminAssignTask {
+        height: 50px;
+        width:100%;
+        position: fixed;
+    }
+    .table-container-list-batchmates{
+        margin-left: 150px;
+       }
+}
+@media only screen and (max-width: 480px) {
+    .navbar_adminAssignTask {
+        height: 50px;
+        width:100%;
+        position: fixed;
+    }
+
+    .adminAssignTask_section {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: stretch; 
+    }
+
+    .navbar_adminAssignTask {
+        flex: 0 0 auto; 
+    }
+
+    .right-panel,
+    .left-panel {
+        width: 100%;
+        max-width: 100%;
+        left: 0;
+        margin-left: 0;
+        top: 0;
+    }
+
+    .left-panel {
+        top: 50px; 
+    }
+    .table-container-list-batchmates{
+        margin-left: 100px;
+       }
+       .timer-section {
+        margin-left: -600px;
+       
+  }
+}
