@@ -224,11 +224,103 @@ svg {
 }
 
 #first_three {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0rem 2rem 0rem 2rem;
     width: 650px;
 }
 
+.title_togle {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.switch-button {
+    background: rgba(58, 115, 212, 0.56);
+    border-radius: 7.5px;
+    /* 50% of original height */
+    overflow: hidden;
+    width: 86px;
+    /* 35% of original width + 2% */
+    text-align: center;
+    font-size: 9px;
+    /* Adjusted for smaller size */
+    letter-spacing: 1px;
+    color: #ffffff;
+    position: relative;
+    padding-right: 43px;
+    /* 35% of original width + 2% */
+}
+
+.switch-button:before {
+    content: "Line";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 43px;
+    /* 35% of original width + 2% */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.switch_button_checkbox {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+}
+
+.switch_button_checkbox:checked+.switch-button-label:before {
+    transform: translateX(43px);
+    /* 35% of original width + 2% */
+    transition: transform 300ms linear;
+}
+
+.switch_button_checkbox+.switch-button-label {
+    position: relative;
+    padding: 3.75px 0;
+    /* 50% of original height */
+    display: block;
+    user-select: none;
+    pointer-events: none;
+}
+
+.switch_button_checkbox+.switch-button-label:before {
+    content: "";
+    background: #fff;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 7.5px;
+    /* 50% of original height */
+    transform: translateX(0);
+    transition: transform 300ms;
+}
+
+.switch_button_checkbox+.switch-button-label .switch-button-label-span {
+    position: relative;
+}
+
+
+
+
 #second_three {
     width: 420px;
+    overflow: auto;
+    /* Adds scrollbars only when necessary */
 }
 
 .four {
@@ -246,9 +338,15 @@ svg {
 
 #first_four {
     width: 420px;
+    overflow: auto;
+    /* Adds scrollbars only when necessary */
 }
 
 #second_four {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0rem 2rem 0rem 2rem;
     width: 650px;
 }
 
@@ -266,9 +364,15 @@ svg {
 }
 
 #first_five {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0rem 2rem 0rem 2rem;
     width: 650px;
 }
 
 #second_five {
     width: 420px;
+    overflow: auto;
+    /* Adds scrollbars only when necessary */
 }
