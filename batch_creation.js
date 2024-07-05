@@ -78,7 +78,7 @@ document.getElementById('fileInput').addEventListener('change', function (event)
 });
 
 // Event listener for Change Batch Name button
-document.getElementById('changeBatchNameBtn').addEventListener('click', function () {
+document.getElementById('changeBatchNameBtn').addEventListener('click', async function () {
   const batchNameDiv = document.getElementById('batchNameDisplay');
   const currentBatchName = batchNameDiv.textContent.replace('Batch Name: ', '');
   const inputField = document.createElement('input');
@@ -97,15 +97,50 @@ document.getElementById('changeBatchNameBtn').addEventListener('click', function
   // Event listener for Save button in batch name change input
   submitButton.addEventListener('click', async function () {
     const newBatchName = inputField.value.trim();
+
     if (newBatchName !== '') {
+      // Check if the new batch name already exists in Firestore
+      const batchQuery = await getDocs(query(collection(db, 'batches'), where('batchName', '==', newBatchName)));
+      const existingBatch = batchQuery.docs.length > 0;
+
+      if (existingBatch) {
+        showMessage('Batch name already exists. Please choose a different name.', 'error');
+        return;
+      }
+
+      // Update batch name in UI and Firestore
       batchNameDiv.textContent = `Batch Name: ${newBatchName}`;
       showMessage('Batch name changed successfully!', 'success');
+      await updateBatchNameInFirestore(currentBatchName, newBatchName);
     } else {
       batchNameDiv.textContent = `Batch Name: ${currentBatchName}`;
       showMessage('Batch name cannot be empty!', 'error');
     }
   });
 });
+
+async function updateBatchNameInFirestore(oldBatchName, newBatchName) {
+  try {
+    const batchQuery = query(collection(db, 'batches'), where('batchName', '==', oldBatchName));
+    const batchSnapshot = await getDocs(batchQuery);
+
+    if (!batchSnapshot.empty) {
+      batchSnapshot.forEach(async (doc) => {
+        const batchRef = doc.ref;
+        await updateDoc(batchRef, {
+          batchName: newBatchName
+        });
+      });}
+    // } else {
+    //   console.error('Batch not found for:', oldBatchName);
+    //   showMessage('Batch not found!', 'error');
+    // }
+  } catch (error) {
+    console.error('Error updating batch name in Firestore:', error);
+    showMessage('Error updating batch name: ' + error.message, 'error');
+  }
+}
+
 
 // Event listener for Save button to save batch data to Firestore
 document.getElementById('saveButton').addEventListener('click', async function () {
@@ -125,6 +160,15 @@ document.getElementById('saveButton').addEventListener('click', async function (
   try {
     const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
 
+    // Check if the batch name already exists in Firestore
+    const batchQuery = await getDocs(query(collection(db, 'batches'), where('batchName', '==', batchName)));
+    const existingBatch = batchQuery.docs.length > 0;
+
+    if (existingBatch) {
+      showMessage('Batch name already exists. Please choose a different name.', 'error');
+      return;
+    }
+
     // Add batch data to Firestore
     await addDoc(collection(db, 'batches'), {
       batchName: batchName,
@@ -138,6 +182,7 @@ document.getElementById('saveButton').addEventListener('click', async function (
     showMessage('Error saving batch: ' + error.message, 'error');
   }
 });
+
 
 // Event listener for Delete Batch button
 document.getElementById('deleteBatchBtn').addEventListener('click', async function () {
@@ -180,11 +225,7 @@ function populateTable(data) {
   if (tableBody && tableHead) {
     tableBody.innerHTML = '';
 
-    if (data.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="3" style="background-color: #ffffff;">No batches selected yet</td></tr>';
-      tableHead.style.display = 'none';
-      document.getElementById('saveButton').style.display = 'none';
-    } else {
+    
       tableHead.style.display = 'table-header-group';
 
       data.forEach((row, index) => {
@@ -221,31 +262,56 @@ function populateTable(data) {
       document.getElementById('saveButton').style.display = 'block';
     }
   }
-}
 
 
 
 
-async function updateMember(memberId, memberName) {
-  const newMemberName = prompt('Enter new member name:', memberName);
-  if (newMemberName) {
+  async function updateMember(memberId, memberName) {
     const tableBody = document.getElementById('tableBody').children;
-
-    for (let i = 0; i < tableBody.length; i++) {
-      const row = tableBody[i];
-      if (row.children[0].textContent === memberId.toString()) {
-        row.children[1].textContent = newMemberName;
-
+  
+    // Find the row corresponding to the memberId
+    const rowToUpdate = Array.from(tableBody).find(row => row.children[0].textContent === memberId.toString());
+  
+    if (!rowToUpdate) {
+      showMessage('Member not found!', 'error');
+      return;
+    }
+  
+    // Create an input field for the new member name
+    const nameCell = rowToUpdate.children[1]; // Assuming the name is in the second column
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.value = memberName;
+    inputField.classList.add('member-name-input');
+  
+    const submitButton = document.createElement('button');
+    submitButton.textContent = 'Save';
+    submitButton.classList.add('save-button');
+  
+    // Clear the existing content in the name cell and append the input field and submit button
+    nameCell.innerHTML = '';
+    nameCell.appendChild(inputField);
+    nameCell.appendChild(submitButton);
+  
+    // Event listener for Save button in member name change input
+    submitButton.addEventListener('click', async function () {
+      const newMemberName = inputField.value.trim();
+      if (newMemberName !== '') {
+        nameCell.innerHTML = `${newMemberName}`;
+  
         // Update member name in Firestore for the current batch
         const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
         await updateMemberInFirestore(batchName, memberId, newMemberName);
-
+  
         showMessage('Member updated successfully!', 'success');
-        break;
+      } else {
+        nameCell.innerHTML = `${memberName}`;
+        showMessage('Member name cannot be empty!', 'error');
       }
-    }
+    });
   }
-}
+  
+  
 
 async function updateMemberInFirestore(batchName, memberId, newMemberName) {
   try {
