@@ -308,8 +308,8 @@ td .remove {
   border: 1px solid #ddebff;
   padding: 10px;
   position: absolute;
-  top: 50px; 
-  right: 10px; 
+  top: 90px; 
+  
   width: 200px; 
   z-index: 1000;
 }

@@ -77,7 +77,7 @@ document.getElementById('fileInput').addEventListener('change', function (event)
 });
 
 // Event listener for Change Batch Name button
-document.getElementById('changeBatchNameBtn').addEventListener('click', function () {
+document.getElementById('changeBatchNameBtn').addEventListener('click', async function () {
   const batchNameDiv = document.getElementById('batchNameDisplay');
   const currentBatchName = batchNameDiv.textContent.replace('Batch Name: ', '');
   const inputField = document.createElement('input');
@@ -96,15 +96,50 @@ document.getElementById('changeBatchNameBtn').addEventListener('click', function
   // Event listener for Save button in batch name change input
   submitButton.addEventListener('click', async function () {
     const newBatchName = inputField.value.trim();
+
     if (newBatchName !== '') {
+      // Check if the new batch name already exists in Firestore
+      const batchQuery = await getDocs(query(collection(db, 'batches'), where('batchName', '==', newBatchName)));
+      const existingBatch = batchQuery.docs.length > 0;
+
+      if (existingBatch) {
+        showMessage('Batch name already exists. Please choose a different name.', 'error');
+        return;
+      }
+
+      // Update batch name in UI and Firestore
       batchNameDiv.textContent = `Batch Name: ${newBatchName}`;
       showMessage('Batch name changed successfully!', 'success');
+      await updateBatchNameInFirestore(currentBatchName, newBatchName);
     } else {
       batchNameDiv.textContent = `Batch Name: ${currentBatchName}`;
       showMessage('Batch name cannot be empty!', 'error');
     }
   });
 });
+
+async function updateBatchNameInFirestore(oldBatchName, newBatchName) {
+  try {
+    const batchQuery = query(collection(db, 'batches'), where('batchName', '==', oldBatchName));
+    const batchSnapshot = await getDocs(batchQuery);
+
+    if (!batchSnapshot.empty) {
+      batchSnapshot.forEach(async (doc) => {
+        const batchRef = doc.ref;
+        await updateDoc(batchRef, {
+          batchName: newBatchName
+        });
+      });}
+    // } else {
+    //   console.error('Batch not found for:', oldBatchName);
+    //   showMessage('Batch not found!', 'error');
+    // }
+  } catch (error) {
+    console.error('Error updating batch name in Firestore:', error);
+    showMessage('Error updating batch name: ' + error.message, 'error');
+  }
+}
+
 
 // Event listener for Save button to save batch data to Firestore
 document.getElementById('saveButton').addEventListener('click', async function () {
@@ -124,6 +159,15 @@ document.getElementById('saveButton').addEventListener('click', async function (
   try {
     const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
 
+    // Check if the batch name already exists in Firestore
+    const batchQuery = await getDocs(query(collection(db, 'batches'), where('batchName', '==', batchName)));
+    const existingBatch = batchQuery.docs.length > 0;
+
+    if (existingBatch) {
+      showMessage('Batch name already exists. Please choose a different name.', 'error');
+      return;
+    }
+
     // Add batch data to Firestore
     await addDoc(collection(db, 'batches'), {
       batchName: batchName,
@@ -137,6 +181,7 @@ document.getElementById('saveButton').addEventListener('click', async function (
     showMessage('Error saving batch: ' + error.message, 'error');
   }
 });
+
 
 // Event listener for Delete Batch button
 document.getElementById('deleteBatchBtn').addEventListener('click', async function () {
@@ -171,12 +216,12 @@ document.getElementById('deleteBatchBtn').addEventListener('click', async functi
 });
 
 // Hide table container
-function hideTableContainer() {
-  const tableContainer = document.getElementById('tableContainer');
-  if (tableContainer) {
-    tableContainer.style.display = 'none';
-  }
-}
+// function hideTableContainer() {
+//   const tableContainer = document.getElementById('tableContainer');
+//   if (tableContainer) {
+//     tableContainer.style.display = 'none';
+//   }
+// }
 
 // Populate table with data from Excel file
 function populateTable(data) {
@@ -187,11 +232,7 @@ function populateTable(data) {
   if (tableBody && tableHead) {
     tableBody.innerHTML = '';
 
-    if (data.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="3" style="background-color: #ffffff;">No batches selected yet</td></tr>';
-      tableHead.style.display = 'none';
-      document.getElementById('saveButton').style.display = 'none';
-    } else {
+    
       tableHead.style.display = 'table-header-group';
 
       data.forEach((row, index) => {
@@ -228,7 +269,7 @@ function populateTable(data) {
       document.getElementById('saveButton').style.display = 'block';
     }
   }
-}
+
 
 
 
