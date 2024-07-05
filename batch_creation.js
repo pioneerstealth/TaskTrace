@@ -273,27 +273,52 @@ function populateTable(data) {
 
 
 
-
-async function updateMember(memberId, memberName) {
-  const newMemberName = prompt('Enter new member name:', memberName);
-  if (newMemberName) {
+  async function updateMember(memberId, memberName) {
     const tableBody = document.getElementById('tableBody').children;
-
-    for (let i = 0; i < tableBody.length; i++) {
-      const row = tableBody[i];
-      if (row.children[0].textContent === memberId.toString()) {
-        row.children[1].textContent = newMemberName;
-
+  
+    // Find the row corresponding to the memberId
+    const rowToUpdate = Array.from(tableBody).find(row => row.children[0].textContent === memberId.toString());
+  
+    if (!rowToUpdate) {
+      showMessage('Member not found!', 'error');
+      return;
+    }
+  
+    // Create an input field for the new member name
+    const nameCell = rowToUpdate.children[1]; // Assuming the name is in the second column
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.value = memberName;
+    inputField.classList.add('member-name-input');
+  
+    const submitButton = document.createElement('button');
+    submitButton.textContent = 'Save';
+    submitButton.classList.add('save-button');
+  
+    // Clear the existing content in the name cell and append the input field and submit button
+    nameCell.innerHTML = '';
+    nameCell.appendChild(inputField);
+    nameCell.appendChild(submitButton);
+  
+    // Event listener for Save button in member name change input
+    submitButton.addEventListener('click', async function () {
+      const newMemberName = inputField.value.trim();
+      if (newMemberName !== '') {
+        nameCell.innerHTML = `${newMemberName}`;
+  
         // Update member name in Firestore for the current batch
         const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
         await updateMemberInFirestore(batchName, memberId, newMemberName);
-
+  
         showMessage('Member updated successfully!', 'success');
-        break;
+      } else {
+        nameCell.innerHTML = `${memberName}`;
+        showMessage('Member name cannot be empty!', 'error');
       }
-    }
+    });
   }
-}
+  
+  
 
 async function updateMemberInFirestore(batchName, memberId, newMemberName) {
   try {
