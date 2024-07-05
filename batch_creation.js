@@ -163,7 +163,7 @@ document.getElementById('deleteBatchBtn').addEventListener('click', async functi
     showMessage('Batch deleted successfully!', 'success');
     clearTable();
     document.getElementById('batchNameDisplay').textContent = 'Batch Name: Not Set';
-    hideTableContainer();
+    // hideTableContainer();
   } catch (error) {
     console.error('Error deleting batch: ', error);
     showMessage('Error deleting batch: ' + error.message, 'error');
@@ -369,7 +369,6 @@ document.getElementById('batchList').addEventListener('click', async function (e
 });
 
 
-// Function to fetch batch details from Firestore
 async function fetchBatchDetails(batchName) {
   console.trace('fetchBatchdetails called');
   
@@ -393,6 +392,7 @@ async function fetchBatchDetails(batchName) {
   }
 }
 
+
 // Function to clear the table
 function clearTable() {
   console.trace('Clearing table...');
@@ -408,15 +408,13 @@ function clearTable() {
       tableBody.removeChild(tableBody.firstChild);
     }
 
-    console.log('Table body after clearing:', tableBody.innerHTML);
-
     // Hide table head
     tableHead.style.display = 'none';
-    console.log('Table head display style set to none.');
   } else {
     console.log('One or more elements not found.');
   }
 }
+
 
 
 
@@ -426,7 +424,7 @@ function updateTable(members) {
   const tableBody = document.getElementById('tableBody');
   const tableHead = document.querySelector('.table_head');
 
-  clearTable();
+  clearTable(); // Clear table before updating
 
   if (tableBody && tableHead) {
     if (members.length === 0) {
