@@ -71,6 +71,7 @@ document.getElementById('fileInput').addEventListener('change', function (event)
 
     populateTable(jsonData); // Populate table with data from Excel file
     document.getElementById('saveButton').style.display = 'block'; // Display save button
+    document.getElementById('fileInput').value = '';
   };
 
   reader.readAsArrayBuffer(file);
@@ -169,14 +170,6 @@ document.getElementById('deleteBatchBtn').addEventListener('click', async functi
     showMessage('Error deleting batch: ' + error.message, 'error');
   }
 });
-
-// Hide table container
-function hideTableContainer() {
-  const tableContainer = document.getElementById('tableContainer');
-  if (tableContainer) {
-    tableContainer.style.display = 'none';
-  }
-}
 
 // Populate table with data from Excel file
 function populateTable(data) {
