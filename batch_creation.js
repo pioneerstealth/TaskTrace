@@ -1,7 +1,21 @@
 // Import Firebase and Firestore
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, query, where, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  query,
+  where,
+  doc,
+  updateDoc,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -11,7 +25,7 @@ const firebaseConfig = {
   storageBucket: "tasktrace-v2.appspot.com",
   messagingSenderId: "863318084099",
   appId: "1:863318084099:web:6a9abab8d8893caaf9dc36",
-  measurementId: "G-59DHK1FJ88"
+  measurementId: "G-59DHK1FJ88",
 };
 
 // Initialize Firebase app
@@ -25,303 +39,325 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
     // Retrieve user document from Firestore
-    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-    if (userDoc.exists() && userDoc.data().role === 'admin') {
+    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+    if (userDoc.exists() && userDoc.data().role === "admin") {
       enableBatchCreation();
     } else {
       // Redirect to login/signup page if user is not admin
-      window.location.href = 'login_signup.html';
+      window.location.href = "login_signup.html";
     }
   } else {
     // Redirect to login/signup page if no user is authenticated
-    window.location.href = 'login_signup.html';
+    window.location.href = "login_signup.html";
   }
 });
 
 // Enable batch creation button for admin users
 function enableBatchCreation() {
-  document.getElementById('createBatchButton').disabled = false;
+  document.getElementById("createBatchButton").disabled = false;
 }
 
 // Event listener for Create Batch button
-document.getElementById('createBatchButton').addEventListener('click', function () {
-  document.getElementById('fileInput').click(); // Trigger file input click event
-  showTableContainer(); // Show table container after selecting file
-});
+document
+  .getElementById("createBatchButton")
+  .addEventListener("click", function () {
+    document.getElementById("fileInput").click(); // Trigger file input click event
+    showTableContainer(); // Show table container after selecting file
+  });
 
 // Show table container
 function showTableContainer() {
-  const tableContainer = document.getElementById('tableContainer');
+  const tableContainer = document.getElementById("tableContainer");
   if (tableContainer) {
-    tableContainer.style.display = 'block';
+    tableContainer.style.display = "block";
   }
 }
 
 // Event listener for file input change
-document.getElementById('fileInput').addEventListener('change', function (event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
+document
+  .getElementById("fileInput")
+  .addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
 
-  reader.onload = function (e) {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    reader.onload = function (e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    populateTable(jsonData); // Populate table with data from Excel file
-    document.getElementById('saveButton').style.display = 'block'; // Display save button
-    document.getElementById('fileInput').value = '';
-  };
+      populateTable(jsonData); // Populate table with data from Excel file
+      document.getElementById("saveButton").style.display = "block"; // Display save button
+      document.getElementById("fileInput").value = "";
+    };
 
-  reader.readAsArrayBuffer(file);
-});
+    reader.readAsArrayBuffer(file);
+  });
 
 // Event listener for Change Batch Name button
-document.getElementById('changeBatchNameBtn').addEventListener('click', async function () {
-  const batchNameDiv = document.getElementById('batchNameDisplay');
-  const currentBatchName = batchNameDiv.textContent.replace('Batch Name: ', '');
-  const inputField = document.createElement('input');
-  inputField.type = 'text';
-  inputField.value = currentBatchName;
-  inputField.classList.add('batch-name-input');
+document
+  .getElementById("changeBatchNameBtn")
+  .addEventListener("click", async function () {
+    const batchNameDiv = document.getElementById("batchNameDisplay");
+    const currentBatchName = batchNameDiv.textContent.replace(
+      "Batch Name: ",
+      ""
+    );
+    const inputField = document.createElement("input");
+    inputField.type = "text";
+    inputField.value = currentBatchName;
+    inputField.classList.add("batch-name-input");
 
-  const submitButton = document.createElement('button');
-  submitButton.textContent = 'Save';
-  submitButton.classList.add('save-button');
+    const submitButton = document.createElement("button");
+    submitButton.textContent = "Save";
+    submitButton.classList.add("save-button");
 
-  batchNameDiv.textContent = '';
-  batchNameDiv.appendChild(inputField);
-  batchNameDiv.appendChild(submitButton);
+    batchNameDiv.textContent = "";
+    batchNameDiv.appendChild(inputField);
+    batchNameDiv.appendChild(submitButton);
 
-  // Event listener for Save button in batch name change input
-  submitButton.addEventListener('click', async function () {
-    const newBatchName = inputField.value.trim();
+    // Event listener for Save button in batch name change input
+    submitButton.addEventListener("click", function () {
+      const newBatchName = inputField.value.trim();
 
-    if (newBatchName !== '') {
-      // Check if the new batch name already exists in Firestore
-      const batchQuery = await getDocs(query(collection(db, 'batches'), where('batchName', '==', newBatchName)));
-      const existingBatch = batchQuery.docs.length > 0;
+      if (newBatchName !== "") {
+        // Check if the new batch name already exists in Firestore
+        getDocs(
+          query(
+            collection(db, "batches"),
+            where("batchName", "==", newBatchName)
+          )
+        )
+          .then((batchQuery) => {
+            const existingBatch = batchQuery.docs.length > 0;
 
-      if (existingBatch) {
-        showMessage('Batch name already exists. Please choose a different name.', 'error');
+            if (existingBatch) {
+              showMessage(
+                "Batch name already exists. Please choose a different name.",
+                "error"
+              );
+            } else {
+              // Update batch name in UI
+              batchNameDiv.textContent = `Batch Name: ${newBatchName}`;
+              showMessage("Batch name changed successfully!", "success");
+            }
+          })
+          .catch((error) => {
+            console.error("Error checking batch name: ", error);
+            showMessage("Error checking batch name: " + error.message, "error");
+          });
+      } else {
+        showMessage("Batch name cannot be empty!", "error");
+      }
+    });
+  });
+
+// Event listener for Save button to save batch data to Firestore
+document
+  .getElementById("saveButton")
+  .addEventListener("click", async function () {
+    const tableData = [];
+    const tableBody = document.getElementById("tableBody").children;
+
+    // Iterate through table rows to collect member data
+    for (let i = 0; i < tableBody.length; i++) {
+      const row = tableBody[i];
+      const rowData = {
+        id: row.children[0].textContent,
+        name: row.children[1].textContent,
+      };
+      tableData.push(rowData);
+    }
+
+    try {
+      let batchName = document
+        .getElementById("batchNameDisplay")
+        .textContent.replace("Batch Name: ", "");
+
+      // Convert batchName to lowercase for case insensitivity
+      batchName = batchName.toLowerCase();
+
+      // Check if the batch name is "not set" (case insensitive)
+      if (batchName === "not set") {
+        showMessage("Please choose a different batch name.", "error");
         return;
       }
 
-      // Update batch name in UI and Firestore
-      batchNameDiv.textContent = `Batch Name: ${newBatchName}`;
-      showMessage('Batch name changed successfully!', 'success');
-      await updateBatchNameInFirestore(currentBatchName, newBatchName);
-    } else {
-      batchNameDiv.textContent = `Batch Name: ${currentBatchName}`;
-      showMessage('Batch name cannot be empty!', 'error');
+      // Check if the batch name already exists in Firestore
+      const batchQuery = await getDocs(
+        query(
+          collection(db, "batches"),
+          where("batchName", "==", batchName),
+          where("createdBy", "==", currentUser.uid)
+        )
+      );
+      const existingBatch = batchQuery.docs.length > 0;
+
+      // If batch exists and it's created by the current user
+      if (existingBatch) {
+        showMessage(
+          "Batch name already exists. Please choose a different name.",
+          "error"
+        );
+        return;
+      }
+
+      // If batch name doesn't exist or it's created by a different user, save the batch
+      await addDoc(collection(db, "batches"), {
+        batchName: batchName,
+        members: tableData,
+        createdBy: currentUser.uid,
+      });
+
+      showMessage("Batch saved successfully!", "success");
+    } catch (error) {
+      console.error("Error saving batch: ", error);
+      showMessage("Error saving batch: " + error.message, "error");
     }
   });
-});
-
-async function updateBatchNameInFirestore(oldBatchName, newBatchName) {
-  try {
-    const batchQuery = query(collection(db, 'batches'), where('batchName', '==', oldBatchName));
-    const batchSnapshot = await getDocs(batchQuery);
-
-    if (!batchSnapshot.empty) {
-      batchSnapshot.forEach(async (doc) => {
-        const batchRef = doc.ref;
-        await updateDoc(batchRef, {
-          batchName: newBatchName
-        });
-      });}
-    // } else {
-    //   console.error('Batch not found for:', oldBatchName);
-    //   showMessage('Batch not found!', 'error');
-    // }
-  } catch (error) {
-    console.error('Error updating batch name in Firestore:', error);
-    showMessage('Error updating batch name: ' + error.message, 'error');
-  }
-}
-
-
-// Event listener for Save button to save batch data to Firestore
-document.getElementById('saveButton').addEventListener('click', async function () {
-  const tableData = [];
-  const tableBody = document.getElementById('tableBody').children;
-
-  // Iterate through table rows to collect member data
-  for (let i = 0; i < tableBody.length; i++) {
-    const row = tableBody[i];
-    const rowData = {
-      id: row.children[0].textContent,
-      name: row.children[1].textContent
-    };
-    tableData.push(rowData);
-  }
-
-  try {
-    const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
-
-    // Check if the batch name already exists in Firestore
-    const batchQuery = await getDocs(query(
-      collection(db, 'batches'), 
-      where('batchName', '==', batchName), 
-      where('createdBy', '==', currentUser.uid)
-    ));
-    const existingBatch = batchQuery.docs.length > 0;
-
-    // If batch exists and it's created by the current user
-    if (existingBatch) {
-      showMessage('Batch name already exists. Please choose a different name.', 'error');
-      return;
-    }
-
-    // If batch name doesn't exist or it's created by a different user, save the batch
-    await addDoc(collection(db, 'batches'), {
-      batchName: batchName,
-      members: tableData,
-      createdBy: currentUser.uid,
-    });
-
-    showMessage('Batch saved successfully!', 'success');
-  } catch (error) {
-    console.error('Error saving batch: ', error);
-    showMessage('Error saving batch: ' + error.message, 'error');
-  }
-});
-
-
 
 // Event listener for Delete Batch button
-document.getElementById('deleteBatchBtn').addEventListener('click', async function () {
-  const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
+document
+  .getElementById("deleteBatchBtn")
+  .addEventListener("click", async function () {
+    const batchName = document
+      .getElementById("batchNameDisplay")
+      .textContent.replace("Batch Name: ", "");
 
-  try {
-    // Query Firestore for batches with batchName and createdBy current user
-    const batchQuery = await getDocs(query(collection(db, 'batches'),
-      where('batchName', '==', batchName),
-      where('createdBy', '==', currentUser.uid)
-    ));
+    try {
+      // Query Firestore for batches with batchName and createdBy current user
+      const batchQuery = await getDocs(
+        query(
+          collection(db, "batches"),
+          where("batchName", "==", batchName),
+          where("createdBy", "==", currentUser.uid)
+        )
+      );
 
-    const batchDocs = batchQuery.docs;
-    if (batchDocs.length === 0) {
-      showMessage('Batch not found!', 'error');
-      return;
+      const batchDocs = batchQuery.docs;
+      if (batchDocs.length === 0) {
+        showMessage("Batch not found!", "error");
+        return;
+      }
+
+      // Delete batch document(s) from Firestore
+      for (const doc of batchDocs) {
+        await deleteDoc(doc.ref);
+      }
+
+      showMessage("Batch deleted successfully!", "success");
+      clearTable();
+      document.getElementById("batchNameDisplay").textContent =
+        "Batch Name: Not Set";
+      // hideTableContainer();
+    } catch (error) {
+      console.error("Error deleting batch: ", error);
+      showMessage("Error deleting batch: " + error.message, "error");
     }
-
-    // Delete batch document(s) from Firestore
-    for (const doc of batchDocs) {
-      await deleteDoc(doc.ref);
-    }
-
-    showMessage('Batch deleted successfully!', 'success');
-    clearTable();
-    document.getElementById('batchNameDisplay').textContent = 'Batch Name: Not Set';
-    // hideTableContainer();
-  } catch (error) {
-    console.error('Error deleting batch: ', error);
-    showMessage('Error deleting batch: ' + error.message, 'error');
-  }
-});
+  });
 
 // Populate table with data from Excel file
 function populateTable(data) {
-  console.trace('populatetable called');
-  const tableBody = document.getElementById('tableBody');
-  const tableHead = document.querySelector('.table_head');
+  console.trace("populatetable called");
+  const tableBody = document.getElementById("tableBody");
+  const tableHead = document.querySelector(".table_head");
 
   if (tableBody && tableHead) {
-    tableBody.innerHTML = '';
+    tableBody.innerHTML = "";
 
-    
-      tableHead.style.display = 'table-header-group';
+    tableHead.style.display = "table-header-group";
 
-      data.forEach((row, index) => {
-        if (index === 0) return;
+    data.forEach((row, index) => {
+      if (index === 0) return;
 
-        const tr = document.createElement('tr');
+      const tr = document.createElement("tr");
 
-        const tdId = document.createElement('td');
-        tdId.textContent = row[0];
-        tr.appendChild(tdId);
+      const tdId = document.createElement("td");
+      tdId.textContent = row[0];
+      tr.appendChild(tdId);
 
-        const tdName = document.createElement('td');
-        tdName.textContent = row[1];
-        tr.appendChild(tdName);
+      const tdName = document.createElement("td");
+      tdName.textContent = row[1];
+      tr.appendChild(tdName);
 
-        const tdAction = document.createElement('td');
+      const tdAction = document.createElement("td");
 
-        const editButton = document.createElement('button');
-        editButton.classList.add('edit');
-        editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
-        editButton.addEventListener('click', () => updateMember(row[0], row[1]));
-        tdAction.appendChild(editButton);
+      const editButton = document.createElement("button");
+      editButton.classList.add("edit");
+      editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
+      editButton.addEventListener("click", () => updateMember(row[0], row[1]));
+      tdAction.appendChild(editButton);
 
-        const removeButton = document.createElement('button');
-        removeButton.classList.add('remove');
-        removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
-        removeButton.addEventListener('click', () => removeMember(row[0]));
-        tdAction.appendChild(removeButton);
+      const removeButton = document.createElement("button");
+      removeButton.classList.add("remove");
+      removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
+      removeButton.addEventListener("click", () => removeMember(row[0]));
+      tdAction.appendChild(removeButton);
 
-        tr.appendChild(tdAction);
-        tableBody.appendChild(tr);
-      });
-
-      document.getElementById('saveButton').style.display = 'block';
-    }
-  }
-
-
-
-
-  async function updateMember(memberId, memberName) {
-    const tableBody = document.getElementById('tableBody').children;
-  
-    // Find the row corresponding to the memberId
-    const rowToUpdate = Array.from(tableBody).find(row => row.children[0].textContent === memberId.toString());
-  
-    if (!rowToUpdate) {
-      showMessage('Member not found!', 'error');
-      return;
-    }
-  
-    // Create an input field for the new member name
-    const nameCell = rowToUpdate.children[1]; // Assuming the name is in the second column
-    const inputField = document.createElement('input');
-    inputField.type = 'text';
-    inputField.value = memberName;
-    inputField.classList.add('member-name-input');
-  
-    const submitButton = document.createElement('button');
-    submitButton.textContent = 'Save';
-    submitButton.classList.add('save-button');
-  
-    // Clear the existing content in the name cell and append the input field and submit button
-    nameCell.innerHTML = '';
-    nameCell.appendChild(inputField);
-    nameCell.appendChild(submitButton);
-  
-    // Event listener for Save button in member name change input
-    submitButton.addEventListener('click', async function () {
-      const newMemberName = inputField.value.trim();
-      if (newMemberName !== '') {
-        nameCell.innerHTML = `${newMemberName}`;
-  
-        // Update member name in Firestore for the current batch
-        const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
-        await updateMemberInFirestore(batchName, memberId, newMemberName);
-  
-        showMessage('Member updated successfully!', 'success');
-      } else {
-        nameCell.innerHTML = `${memberName}`;
-        showMessage('Member name cannot be empty!', 'error');
-      }
+      tr.appendChild(tdAction);
+      tableBody.appendChild(tr);
     });
+
+    document.getElementById("saveButton").style.display = "block";
   }
-  
-  
+}
+
+async function updateMember(memberId, memberName) {
+  const tableBody = document.getElementById("tableBody").children;
+
+  // Find the row corresponding to the memberId
+  const rowToUpdate = Array.from(tableBody).find(
+    (row) => row.children[0].textContent === memberId.toString()
+  );
+
+  if (!rowToUpdate) {
+    showMessage("Member not found!", "error");
+    return;
+  }
+
+  // Create an input field for the new member name
+  const nameCell = rowToUpdate.children[1]; // Assuming the name is in the second column
+  const inputField = document.createElement("input");
+  inputField.type = "text";
+  inputField.value = memberName;
+  inputField.classList.add("member-name-input");
+
+  const submitButton = document.createElement("button");
+  submitButton.textContent = "Save";
+  submitButton.classList.add("save-button");
+
+  // Clear the existing content in the name cell and append the input field and submit button
+  nameCell.innerHTML = "";
+  nameCell.appendChild(inputField);
+  nameCell.appendChild(submitButton);
+
+  // Event listener for Save button in member name change input
+  submitButton.addEventListener("click", async function () {
+    const newMemberName = inputField.value.trim();
+    if (newMemberName !== "") {
+      nameCell.innerHTML = `${newMemberName}`;
+
+      // Update member name in Firestore for the current batch
+      const batchName = document
+        .getElementById("batchNameDisplay")
+        .textContent.replace("Batch Name: ", "");
+      await updateMemberInFirestore(batchName, memberId, newMemberName);
+
+      showMessage("Member updated successfully!", "success");
+    } else {
+      nameCell.innerHTML = `${memberName}`;
+      showMessage("Member name cannot be empty!", "error");
+    }
+  });
+}
 
 async function updateMemberInFirestore(batchName, memberId, newMemberName) {
   try {
-    const batchQuery = query(collection(db, 'batches'), where('batchName', '==', batchName));
+    const batchQuery = query(
+      collection(db, "batches"),
+      where("batchName", "==", batchName)
+    );
     const batchSnapshot = await getDocs(batchQuery);
 
     if (!batchSnapshot.empty) {
@@ -330,7 +366,7 @@ async function updateMemberInFirestore(batchName, memberId, newMemberName) {
         const batchData = doc.data();
 
         // Update member in the 'members' array
-        const updatedMembers = batchData.members.map(member => {
+        const updatedMembers = batchData.members.map((member) => {
           if (member.id === memberId) {
             return { id: memberId, name: newMemberName };
           } else {
@@ -339,21 +375,21 @@ async function updateMemberInFirestore(batchName, memberId, newMemberName) {
         });
 
         await updateDoc(batchRef, {
-          members: updatedMembers
+          members: updatedMembers,
         });
       });
     } else {
-      console.error('Batch not found for:', batchName);
-      showMessage('Batch not found!', 'error');
+      console.error("Batch not found for:", batchName);
+      showMessage("Batch not found!", "error");
     }
   } catch (error) {
-    console.error('Error updating member in Firestore:', error);
-    showMessage('Error updating member: ' + error.message, 'error');
+    console.error("Error updating member in Firestore:", error);
+    showMessage("Error updating member: " + error.message, "error");
   }
 }
 
 async function removeMember(memberId) {
-  const tableBody = document.getElementById('tableBody');
+  const tableBody = document.getElementById("tableBody");
   const rows = Array.from(tableBody.children);
 
   for (let i = 0; i < rows.length; i++) {
@@ -362,10 +398,12 @@ async function removeMember(memberId) {
       tableBody.removeChild(row);
 
       // Remove member from Firestore for the current batch
-      const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
+      const batchName = document
+        .getElementById("batchNameDisplay")
+        .textContent.replace("Batch Name: ", "");
       await removeMemberFromFirestore(batchName, memberId);
 
-      showMessage('Member removed successfully!', 'success');
+      showMessage("Member removed successfully!", "success");
       break;
     }
   }
@@ -373,7 +411,10 @@ async function removeMember(memberId) {
 
 async function removeMemberFromFirestore(batchName, memberId) {
   try {
-    const batchQuery = query(collection(db, 'batches'), where('batchName', '==', batchName));
+    const batchQuery = query(
+      collection(db, "batches"),
+      where("batchName", "==", batchName)
+    );
     const batchSnapshot = await getDocs(batchQuery);
 
     if (!batchSnapshot.empty) {
@@ -382,91 +423,99 @@ async function removeMemberFromFirestore(batchName, memberId) {
         const batchData = doc.data();
 
         // Filter out the member to be removed
-        const updatedMembers = batchData.members.filter(member => member.id !== memberId);
+        const updatedMembers = batchData.members.filter(
+          (member) => member.id !== memberId
+        );
 
         await updateDoc(batchRef, {
-          members: updatedMembers
+          members: updatedMembers,
         });
       });
     } else {
-      console.error('Batch not found for:', batchName);
-      showMessage('Batch not found!', 'error');
+      console.error("Batch not found for:", batchName);
+      showMessage("Batch not found!", "error");
     }
   } catch (error) {
-    console.error('Error removing member from Firestore:', error);
-    showMessage('Error removing member: ' + error.message, 'error');
+    console.error("Error removing member from Firestore:", error);
+    showMessage("Error removing member: " + error.message, "error");
   }
 }
-
 
 // Display message to user
 function showMessage(message, type) {
-  const messageDiv = document.getElementById('messageDiv');
-  const messageText = document.getElementById('messageText');
-  const closeMessageBtn = document.getElementById('closeMessageBtn');
+  const messageDiv = document.getElementById("messageDiv");
+  const messageText = document.getElementById("messageText");
 
   messageText.textContent = message;
   messageDiv.className = `messageDiv ${type}`;
-  messageDiv.style.display = 'block';
+  messageDiv.style.display = "block";
 
-  closeMessageBtn.addEventListener('click', function () {
-    messageDiv.style.display = 'none';
-  });
+  // Automatically hide the message after 5 seconds
+  setTimeout(function () {
+    messageDiv.style.display = "none";
+  }, 3000); // 5000 milliseconds = 5 seconds
 }
 
 // Event listener for toggle icon
-document.getElementById('toggleBatchList').addEventListener('click', function () {
-  const batchListContainer = document.getElementById('batchListContainer');
-  if (batchListContainer.style.display === 'none') {
-    batchListContainer.style.display = 'block';
-    populateBatchList(); // Populate batch list when toggled
-  } else {
-    batchListContainer.style.display = 'none';
-  }
-});
+document
+  .getElementById("toggleBatchList")
+  .addEventListener("click", function () {
+    const batchListContainer = document.getElementById("batchListContainer");
+    if (batchListContainer.style.display === "none") {
+      batchListContainer.style.display = "block";
+      populateBatchList(); // Populate batch list when toggled
+    } else {
+      batchListContainer.style.display = "none";
+    }
+  });
 // Event listener for batch list items
-document.getElementById('batchList').addEventListener('click', async function (event) {
-  if (event.target.tagName === 'LI') {
-    const batchName = event.target.textContent.trim();
-    document.getElementById('batchNameDisplay').textContent = `Batch Name: ${batchName}`;
-    await fetchBatchDetails(batchName); // Fetch and display batch details
-  }
-});
-
+document
+  .getElementById("batchList")
+  .addEventListener("click", async function (event) {
+    if (event.target.tagName === "LI") {
+      const batchName = event.target.textContent.trim();
+      document.getElementById(
+        "batchNameDisplay"
+      ).textContent = `Batch Name: ${batchName}`;
+      await fetchBatchDetails(batchName); // Fetch and display batch details
+    }
+  });
 
 async function fetchBatchDetails(batchName) {
-  console.trace('fetchBatchdetails called');
-  
+  console.trace("fetchBatchdetails called");
+
   try {
-    const batchQuery = query(collection(db, 'batches'), where('batchName', '==', batchName));
+    const batchQuery = query(
+      collection(db, "batches"),
+      where("batchName", "==", batchName)
+    );
     const batchSnapshot = await getDocs(batchQuery);
 
     if (!batchSnapshot.empty) {
-      batchSnapshot.forEach(doc => {
+      batchSnapshot.forEach((doc) => {
         const batchData = doc.data();
-        console.log(batchData)
+        console.log(batchData);
         updateTable(batchData.members); // Update table with batch members
       });
     } else {
-      showMessage('Batch not found!', 'error');
+      showMessage("Batch not found!", "error");
       clearTable(); // Clear table if batch not found
     }
   } catch (error) {
-    showMessage('Error fetching batch details: ' + error.message, 'error');
+    showMessage("Error fetching batch details: " + error.message, "error");
     clearTable(); // Clear table on error
   }
 }
 
-
 // Function to clear the table
 function clearTable() {
-  console.trace('Clearing table...');
+  console.trace("Clearing table...");
 
-  const tableBody = document.getElementById('tableBody');
-  const tableHead = document.querySelector('.table_head');
-  
+  const tableBody = document.getElementById("tableBody");
+  const tableHead = document.querySelector(".table_head");
+
   if (tableBody && tableHead) {
-    console.log('Elements found, clearing table...');
+    console.log("Elements found, clearing table...");
 
     // Clear table body using removeChild method
     while (tableBody.firstChild) {
@@ -474,51 +523,51 @@ function clearTable() {
     }
 
     // Hide table head
-    tableHead.style.display = 'none';
+    tableHead.style.display = "none";
   } else {
-    console.log('One or more elements not found.');
+    console.log("One or more elements not found.");
   }
 }
 
-
-
-
 // Function to update the table with batch member details
 function updateTable(members) {
-  console.trace('updateTable called');
-  const tableBody = document.getElementById('tableBody');
-  const tableHead = document.querySelector('.table_head');
+  console.trace("updateTable called");
+  const tableBody = document.getElementById("tableBody");
+  const tableHead = document.querySelector(".table_head");
 
   clearTable(); // Clear table before updating
 
   if (tableBody && tableHead) {
     if (members.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="3" style="background-color: #ffffff;">No batches selected yet</td></tr>';
+      tableBody.innerHTML =
+        '<tr><td colspan="3" style="background-color: #ffffff;">No batches selected yet</td></tr>';
     } else {
-      tableHead.style.display = 'table-header-group';
+      tableHead.style.display = "table-header-group";
       members.forEach((member) => {
-        const tr = document.createElement('tr');
+        const tr = document.createElement("tr");
 
-        const tdId = document.createElement('td');
+        const tdId = document.createElement("td");
         tdId.textContent = member.id;
         tr.appendChild(tdId);
 
-        const tdName = document.createElement('td');
+        const tdName = document.createElement("td");
         tdName.textContent = member.name;
         tr.appendChild(tdName);
 
-        const tdAction = document.createElement('td');
+        const tdAction = document.createElement("td");
 
-        const editButton = document.createElement('button');
-        editButton.classList.add('edit');
+        const editButton = document.createElement("button");
+        editButton.classList.add("edit");
         editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
-        editButton.addEventListener('click', () => updateMember(member.id, member.name));
+        editButton.addEventListener("click", () =>
+          updateMember(member.id, member.name)
+        );
         tdAction.appendChild(editButton);
 
-        const removeButton = document.createElement('button');
-        removeButton.classList.add('remove');
+        const removeButton = document.createElement("button");
+        removeButton.classList.add("remove");
         removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
-        removeButton.addEventListener('click', () => removeMember(member.id));
+        removeButton.addEventListener("click", () => removeMember(member.id));
         tdAction.appendChild(removeButton);
 
         tr.appendChild(tdAction);
@@ -528,14 +577,13 @@ function updateTable(members) {
   }
 }
 
-
 // Event listener for batch selection (example scenario)
-document.addEventListener('DOMContentLoaded', async () => {
-  const batchList = document.getElementById('batchList');
+document.addEventListener("DOMContentLoaded", async () => {
+  const batchList = document.getElementById("batchList");
 
   // Example event handler for batch selection
-  batchList.addEventListener('click', async (event) => {
-    if (event.target.tagName === 'LI') {
+  batchList.addEventListener("click", async (event) => {
+    if (event.target.tagName === "LI") {
       const batchName = event.target.textContent.trim(); // Extract batch name from list item
 
       // Fetch and update batch details
@@ -544,37 +592,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
-
-
-
-
 // Function to populate the batch list
 async function populateBatchList() {
-  const batchList = document.getElementById('batchList');
-  batchList.innerHTML = '';
+  const batchList = document.getElementById("batchList");
+  batchList.innerHTML = "";
 
   try {
     // Fetch batches from Firestore
-    const batchQuery = await getDocs(query(collection(db, 'batches'), where('createdBy', '==', currentUser.uid)));
+    const batchQuery = await getDocs(
+      query(
+        collection(db, "batches"),
+        where("createdBy", "==", currentUser.uid)
+      )
+    );
     const batchDocs = batchQuery.docs;
 
     if (batchDocs.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = 'No batches found';
+      const li = document.createElement("li");
+      li.textContent = "No batches found";
       batchList.appendChild(li);
       return;
     }
 
     batchDocs.forEach((batchDoc) => {
       const batchData = batchDoc.data();
-      const li = document.createElement('li');
+      const li = document.createElement("li");
       li.textContent = batchData.batchName;
       batchList.appendChild(li);
     });
   } catch (error) {
-    console.error('Error fetching batches: ', error);
-    const li = document.createElement('li');
-    li.textContent = 'Error fetching batches';
+    console.error("Error fetching batches: ", error);
+    const li = document.createElement("li");
+    li.textContent = "Error fetching batches";
     batchList.appendChild(li);
   }
 }

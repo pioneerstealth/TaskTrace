@@ -85,12 +85,13 @@ body {
   border-radius: 4px;
   color: #1756b3;
   font-size: 12px;
-  margin-top: -5px;
+  margin-top: 3px;
+  height: 20px;
 }
 
 .home_logo img {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   margin-top: 5px;
 }
 
@@ -282,6 +283,9 @@ td .remove {
 .messageDiv button:focus {
   outline: none;
 }
+
+
+
 
 .batch-name-input {
   width: 200px;
