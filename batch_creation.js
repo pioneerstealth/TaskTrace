@@ -161,15 +161,20 @@ document.getElementById('saveButton').addEventListener('click', async function (
     const batchName = document.getElementById('batchNameDisplay').textContent.replace('Batch Name: ', '');
 
     // Check if the batch name already exists in Firestore
-    const batchQuery = await getDocs(query(collection(db, 'batches'), where('batchName', '==', batchName)));
+    const batchQuery = await getDocs(query(
+      collection(db, 'batches'), 
+      where('batchName', '==', batchName), 
+      where('createdBy', '==', currentUser.uid)
+    ));
     const existingBatch = batchQuery.docs.length > 0;
 
+    // If batch exists and it's created by the current user
     if (existingBatch) {
       showMessage('Batch name already exists. Please choose a different name.', 'error');
       return;
     }
 
-    // Add batch data to Firestore
+    // If batch name doesn't exist or it's created by a different user, save the batch
     await addDoc(collection(db, 'batches'), {
       batchName: batchName,
       members: tableData,
@@ -182,6 +187,7 @@ document.getElementById('saveButton').addEventListener('click', async function (
     showMessage('Error saving batch: ' + error.message, 'error');
   }
 });
+
 
 
 // Event listener for Delete Batch button
