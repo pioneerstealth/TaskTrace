@@ -296,26 +296,28 @@ td .remove {
 
 .save-button {
   padding: 5px 10px;
-  background-color: #007bff;
+  background-color: #0056b3;
   color: #fff;
   border: none;
   cursor: pointer;
   font-size: 14px;
+  border-radius: 5px;
 }
 
-.save-button:hover {
-  background-color: #0056b3;
-}
 
 .batch-list {
   background-color: #1756b3;
   border: 1px solid #ddebff;
   padding: 10px;
   position: absolute;
-  top: 90px; 
-  
-  width: 200px; 
+  top: 90px;
+  width: 200px;
   z-index: 1000;
+  display: none; /* Initially hide the batch list */
+}
+
+.batch-list.active {
+  display: block; /* Show batch list when active class is applied */
 }
 
 .batch-list ul {

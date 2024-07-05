@@ -392,21 +392,31 @@ async function removeMember(memberId) {
   const tableBody = document.getElementById("tableBody");
   const rows = Array.from(tableBody.children);
 
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    if (row.children[0].textContent === memberId.toString()) {
-      tableBody.removeChild(row);
-
-      // Remove member from Firestore for the current batch
-      const batchName = document
-        .getElementById("batchNameDisplay")
-        .textContent.replace("Batch Name: ", "");
-      await removeMemberFromFirestore(batchName, memberId);
-
-      showMessage("Member removed successfully!", "success");
-      break;
-    }
+  // Remove the member row from the DOM
+  const rowIndex = rows.findIndex(
+    (row) => row.children[0].textContent === memberId.toString()
+  );
+  if (rowIndex === -1) {
+    showMessage("Member not found!", "error");
+    return;
   }
+  tableBody.removeChild(rows[rowIndex]);
+
+  // Update the remaining rows' IDs
+  for (let i = rowIndex; i < rows.length; i++) {
+    const row = rows[i];
+    const idCell = row.children[0];
+    const newId = parseInt(idCell.textContent) - 1;
+    idCell.textContent = newId.toString();
+  }
+
+  // Remove the member from Firestore and update IDs
+  const batchName = document
+    .getElementById("batchNameDisplay")
+    .textContent.replace("Batch Name: ", "");
+  await removeMemberFromFirestore(batchName, memberId);
+
+  showMessage("Member removed successfully!", "success");
 }
 
 async function removeMemberFromFirestore(batchName, memberId) {
@@ -422,14 +432,21 @@ async function removeMemberFromFirestore(batchName, memberId) {
         const batchRef = doc.ref;
         const batchData = doc.data();
 
-        // Filter out the member to be removed
-        const updatedMembers = batchData.members.filter(
-          (member) => member.id !== memberId
-        );
+        // Filter out the member to be removed and update IDs
+        let memberRemoved = false;
+        const updatedMembers = batchData.members
+          .filter((member) => {
+            if (member.id === memberId) {
+              memberRemoved = true;
+              return false;
+            }
+            return true;
+          })
+          .map((member, index) => ({ id: index + 1, name: member.name }));
 
-        await updateDoc(batchRef, {
-          members: updatedMembers,
-        });
+        if (memberRemoved) {
+          await updateDoc(batchRef, { members: updatedMembers });
+        }
       });
     } else {
       console.error("Batch not found for:", batchName);
@@ -440,6 +457,7 @@ async function removeMemberFromFirestore(batchName, memberId) {
     showMessage("Error removing member: " + error.message, "error");
   }
 }
+
 
 // Display message to user
 function showMessage(message, type) {
@@ -459,7 +477,7 @@ function showMessage(message, type) {
 // Event listener for toggle icon
 document
   .getElementById("toggleBatchList")
-  .addEventListener("click", function () {
+  .addEventListener("click", function (event) {
     const batchListContainer = document.getElementById("batchListContainer");
     if (batchListContainer.style.display === "none") {
       batchListContainer.style.display = "block";
@@ -467,7 +485,9 @@ document
     } else {
       batchListContainer.style.display = "none";
     }
+    event.stopPropagation(); // Stop the event from propagating to the document
   });
+
 // Event listener for batch list items
 document
   .getElementById("batchList")
@@ -479,7 +499,23 @@ document
       ).textContent = `Batch Name: ${batchName}`;
       await fetchBatchDetails(batchName); // Fetch and display batch details
     }
+    event.stopPropagation(); // Stop the event from propagating to the document
   });
+
+// Hide batch list when clicking outside of it
+document.addEventListener("click", function (event) {
+  const batchListContainer = document.getElementById("batchListContainer");
+  const toggleBatchListButton = document.getElementById("toggleBatchList");
+
+  // Check if the click happened outside the batch list container and the toggle button
+  if (
+    !batchListContainer.contains(event.target) &&
+    event.target !== toggleBatchListButton
+  ) {
+    batchListContainer.style.display = "none";
+  }
+});
+
 
 async function fetchBatchDetails(batchName) {
   console.trace("fetchBatchdetails called");
