@@ -169,13 +169,14 @@ document
     // Event listener for Save button in batch name change input
     submitButton.addEventListener("click", function () {
       const newBatchName = inputField.value.trim();
+      const newBatchNameLowerCase = newBatchName.toLowerCase();
 
       if (newBatchName !== "") {
         // Check if the new batch name already exists in Firestore
         getDocs(
           query(
             collection(db, "batches"),
-            where("batchName", "==", newBatchName)
+            where("batchName", "==", newBatchNameLowerCase)
           )
         )
           .then((batchQuery) => {
@@ -621,7 +622,7 @@ function clearTable() {
   }
 }
 
-// Function to update the table with batch member details
+
 // Function to update the table with batch member details
 function updateTable(members) {
   console.trace("updateTable called");
