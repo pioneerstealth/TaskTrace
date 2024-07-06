@@ -74,26 +74,75 @@ function showTableContainer() {
 }
 
 // Event listener for file input change
-document
-  .getElementById("fileInput")
-  .addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
 
-    reader.onload = function (e) {
+
+document.getElementById("fileInput").addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: "array" });
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-      populateTable(jsonData); // Populate table with data from Excel file
+      // Remove the first row from jsonData
+      const jsonDataWithoutHeader = jsonData.slice(1);
+
+      displayExcelData(jsonDataWithoutHeader); // Display Excel data in the table
       document.getElementById("saveButton").style.display = "block"; // Display save button
       document.getElementById("fileInput").value = "";
-    };
+  };
 
-    reader.readAsArrayBuffer(file);
+  reader.readAsArrayBuffer(file);
+});
+
+function displayExcelData(data) {
+  const tableBody = document.getElementById("tableBody");
+  tableBody.innerHTML = ""; // Clear previous data
+
+  let serialNumber = 1;
+  data.forEach(row => {
+      const tr = document.createElement("tr");
+
+      // Add serial number
+      const serialTd = document.createElement("td");
+      serialTd.textContent = serialNumber++;
+      tr.appendChild(serialTd);
+
+      // Add each cell value
+      for (let cellValue of row) {
+          const td = document.createElement("td");
+          td.textContent = cellValue;
+          tr.appendChild(td);
+      }
+
+      // Add edit and delete icons
+      
+      const tdAction = document.createElement("td");
+
+      const editButton = document.createElement("button");
+      editButton.classList.add("edit");
+      editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
+      editButton.addEventListener("click", () =>
+        updateMember(member.id, member.name)
+      );
+      tdAction.appendChild(editButton);
+
+      const removeButton = document.createElement("button");
+      removeButton.classList.add("remove");
+      removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
+      removeButton.addEventListener("click", () => removeMember(member.id));
+      tdAction.appendChild(removeButton);
+
+      tr.appendChild(tdAction);
+      tableBody.appendChild(tr);
+  
   });
+}
+
+
 
 // Event listener for Change Batch Name button
 document
@@ -154,68 +203,64 @@ document
   });
 
 // Event listener for Save button to save batch data to Firestore
-document
-  .getElementById("saveButton")
-  .addEventListener("click", async function () {
-    const tableData = [];
-    const tableBody = document.getElementById("tableBody").children;
+document.getElementById("saveButton").addEventListener("click", async function () {
+  const tableData = [];
+  const tableBody = document.getElementById("tableBody").children;
 
-    // Iterate through table rows to collect member data
-    for (let i = 0; i < tableBody.length; i++) {
-      const row = tableBody[i];
-      const rowData = {
-        id: row.children[0].textContent,
-        name: row.children[1].textContent,
-      };
-      tableData.push(rowData);
+  // Iterate through table rows to collect member data
+  for (let i = 0; i < tableBody.length; i++) {
+    const row = tableBody[i];
+    const rowData = {
+      id: row.children[1].textContent.trim(), // Assuming id is in the first column (index 0)
+      name: row.children[2].textContent.trim(),
+      email: row.children[3].textContent.trim(),
+    };
+    tableData.push(rowData);
+  }
+
+  try {
+    let batchName = document
+      .getElementById("batchNameDisplay")
+      .textContent.replace("Batch Name: ", "");
+
+    // Convert batchName to lowercase for case insensitivity
+    batchName = batchName.toLowerCase().trim();
+
+    // Check if the batch name is "not set" (case insensitive)
+    if (batchName === "not set") {
+      showMessage("Please choose a different batch name.", "error");
+      return;
     }
 
-    try {
-      let batchName = document
-        .getElementById("batchNameDisplay")
-        .textContent.replace("Batch Name: ", "");
+    // Check if the batch name already exists in Firestore for the current user
+    const batchQuerySnapshot = await getDocs(
+      query(
+        collection(db, "batches"),
+        where("batchName", "==", batchName),
+        where("createdBy", "==", currentUser.uid)
+      )
+    );
 
-      // Convert batchName to lowercase for case insensitivity
-      batchName = batchName.toLowerCase();
-
-      // Check if the batch name is "not set" (case insensitive)
-      if (batchName === "not set") {
-        showMessage("Please choose a different batch name.", "error");
-        return;
-      }
-
-      // Check if the batch name already exists in Firestore
-      const batchQuery = await getDocs(
-        query(
-          collection(db, "batches"),
-          where("batchName", "==", batchName),
-          where("createdBy", "==", currentUser.uid)
-        )
-      );
-      const existingBatch = batchQuery.docs.length > 0;
-
-      // If batch exists and it's created by the current user
-      if (existingBatch) {
-        showMessage(
-          "Batch name already exists. Please choose a different name.",
-          "error"
-        );
-        return;
-      }
-
-      // If batch name doesn't exist or it's created by a different user, save the batch
-      await addDoc(collection(db, "batches"), {
-        batchName: batchName,
-        members: tableData,
-        createdBy: currentUser.uid,
-      });
-
-      showMessage("Batch saved successfully!", "success");
-    } catch (error) {
-      console.error("Error saving batch: ", error);
-      showMessage("Error saving batch: " + error.message, "error");
+    if (!batchQuerySnapshot.empty) {
+      showMessage("Batch name already exists. Please choose a different name.", "error");
+      return;
     }
-  });
+
+    // Save the batch with its members data
+    await addDoc(collection(db, "batches"), {
+      batchName: batchName,
+      members: tableData,
+      createdBy: currentUser.uid,
+    });
+
+    showMessage("Batch saved successfully!", "success");
+  } catch (error) {
+    console.error("Error saving batch: ", error);
+    showMessage("Error saving batch: " + error.message, "error");
+  }
+});
+
+
 
 // Event listener for Delete Batch button
 document
@@ -258,57 +303,57 @@ document
   });
 
 // Populate table with data from Excel file
-function populateTable(data) {
-  console.trace("populatetable called");
-  const tableBody = document.getElementById("tableBody");
-  const tableHead = document.querySelector(".table_head");
+// function populateTable(data) {
+//   console.trace("populatetable called");
+//   const tableBody = document.getElementById("tableBody");
+//   const tableHead = document.querySelector(".table_head");
 
-  if (tableBody && tableHead) {
-    tableBody.innerHTML = "";
+//   if (tableBody && tableHead) {
+//     tableBody.innerHTML = "";
 
-    tableHead.style.display = "table-header-group";
+//     tableHead.style.display = "table-header-group";
 
-    data.forEach((row, index) => {
-      if (index === 0) return;
+//     data.forEach((row, index) => {
+//       if (index === 0) return;
 
-      const tr = document.createElement("tr");
+//       const tr = document.createElement("tr");
 
-      const tdId = document.createElement("td");
-      tdId.textContent = row[0];
-      tr.appendChild(tdId);
+//       const tdId = document.createElement("td");
+//       tdId.textContent = row[0];
+//       tr.appendChild(tdId);
 
-      const tdName = document.createElement("td");
-      tdName.textContent = row[1];
-      tr.appendChild(tdName);
+//       const tdName = document.createElement("td");
+//       tdName.textContent = row[1];
+//       tr.appendChild(tdName);
 
-      const tdAction = document.createElement("td");
+//       const tdAction = document.createElement("td");
 
-      const editButton = document.createElement("button");
-      editButton.classList.add("edit");
-      editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
-      editButton.addEventListener("click", () => updateMember(row[0], row[1]));
-      tdAction.appendChild(editButton);
+//       const editButton = document.createElement("button");
+//       editButton.classList.add("edit");
+//       editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
+//       editButton.addEventListener("click", () => updateMember(row[0], row[1]));
+//       tdAction.appendChild(editButton);
 
-      const removeButton = document.createElement("button");
-      removeButton.classList.add("remove");
-      removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
-      removeButton.addEventListener("click", () => removeMember(row[0]));
-      tdAction.appendChild(removeButton);
+//       const removeButton = document.createElement("button");
+//       removeButton.classList.add("remove");
+//       removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
+//       removeButton.addEventListener("click", () => removeMember(row[0]));
+//       tdAction.appendChild(removeButton);
 
-      tr.appendChild(tdAction);
-      tableBody.appendChild(tr);
-    });
+//       tr.appendChild(tdAction);
+//       tableBody.appendChild(tr);
+//     });
 
-    document.getElementById("saveButton").style.display = "block";
-  }
-}
+//     document.getElementById("saveButton").style.display = "block";
+//   }
+// }
 
 async function updateMember(memberId, memberName) {
   const tableBody = document.getElementById("tableBody").children;
 
   // Find the row corresponding to the memberId
   const rowToUpdate = Array.from(tableBody).find(
-    (row) => row.children[0].textContent === memberId.toString()
+    (row) => row.children[1].textContent === memberId.toString()
   );
 
   if (!rowToUpdate) {
@@ -316,29 +361,33 @@ async function updateMember(memberId, memberName) {
     return;
   }
 
-  // Create an input field for the new member name
-  const nameCell = rowToUpdate.children[1]; // Assuming the name is in the second column
+  const nameCell = rowToUpdate.children[2];
+  const emailCell = rowToUpdate.children[3]; 
   const inputField = document.createElement("input");
   inputField.type = "text";
   inputField.value = memberName;
   inputField.classList.add("member-name-input");
 
+
   const submitButton = document.createElement("button");
   submitButton.textContent = "Save";
   submitButton.classList.add("save-button");
 
-  // Clear the existing content in the name cell and append the input field and submit button
+  // Clear the existing content in the name and email cells and append the input fields and submit button
   nameCell.innerHTML = "";
   nameCell.appendChild(inputField);
+
   nameCell.appendChild(submitButton);
 
   // Event listener for Save button in member name change input
   submitButton.addEventListener("click", async function () {
     const newMemberName = inputField.value.trim();
+   
     if (newMemberName !== "") {
       nameCell.innerHTML = `${newMemberName}`;
+     
 
-      // Update member name in Firestore for the current batch
+      // Update member name and email in Firestore for the current batch
       const batchName = document
         .getElementById("batchNameDisplay")
         .textContent.replace("Batch Name: ", "");
@@ -347,6 +396,7 @@ async function updateMember(memberId, memberName) {
       showMessage("Member updated successfully!", "success");
     } else {
       nameCell.innerHTML = `${memberName}`;
+     
       showMessage("Member name cannot be empty!", "error");
     }
   });
@@ -368,7 +418,11 @@ async function updateMemberInFirestore(batchName, memberId, newMemberName) {
         // Update member in the 'members' array
         const updatedMembers = batchData.members.map((member) => {
           if (member.id === memberId) {
-            return { id: memberId, name: newMemberName };
+            return { 
+              id: memberId, 
+              name: newMemberName, 
+             
+            };
           } else {
             return member;
           }
@@ -388,13 +442,16 @@ async function updateMemberInFirestore(batchName, memberId, newMemberName) {
   }
 }
 
+
+
+
 async function removeMember(memberId) {
   const tableBody = document.getElementById("tableBody");
   const rows = Array.from(tableBody.children);
 
   // Remove the member row from the DOM
   const rowIndex = rows.findIndex(
-    (row) => row.children[0].textContent === memberId.toString()
+    (row) => row.children[1].textContent === memberId.toString()
   );
   if (rowIndex === -1) {
     showMessage("Member not found!", "error");
@@ -442,7 +499,7 @@ async function removeMemberFromFirestore(batchName, memberId) {
             }
             return true;
           })
-          .map((member, index) => ({ id: index + 1, name: member.name }));
+          .map((member, index) => ({ id: index + 1, name: member.name, email: member.email }));
 
         if (memberRemoved) {
           await updateDoc(batchRef, { members: updatedMembers });
@@ -457,6 +514,7 @@ async function removeMemberFromFirestore(batchName, memberId) {
     showMessage("Error removing member: " + error.message, "error");
   }
 }
+
 
 
 // Display message to user
@@ -559,12 +617,13 @@ function clearTable() {
     }
 
     // Hide table head
-    tableHead.style.display = "none";
+    // tableHead.style.display = "none";
   } else {
     console.log("One or more elements not found.");
   }
 }
 
+// Function to update the table with batch member details
 // Function to update the table with batch member details
 function updateTable(members) {
   console.trace("updateTable called");
@@ -576,11 +635,16 @@ function updateTable(members) {
   if (tableBody && tableHead) {
     if (members.length === 0) {
       tableBody.innerHTML =
-        '<tr><td colspan="3" style="background-color: #ffffff;">No batches selected yet</td></tr>';
+        '<tr><td colspan="4" style="background-color: #ffffff;">No batches selected yet</td></tr>';
     } else {
       tableHead.style.display = "table-header-group";
+      let serialNumber = 1;
       members.forEach((member) => {
         const tr = document.createElement("tr");
+
+        const tdSerial = document.createElement("td");
+        tdSerial.textContent = serialNumber++;
+        tr.appendChild(tdSerial);
 
         const tdId = document.createElement("td");
         tdId.textContent = member.id;
@@ -590,13 +654,17 @@ function updateTable(members) {
         tdName.textContent = member.name;
         tr.appendChild(tdName);
 
+        const tdEmail = document.createElement("td");
+        tdEmail.textContent = member.email;
+        tr.appendChild(tdEmail);
+
         const tdAction = document.createElement("td");
 
         const editButton = document.createElement("button");
         editButton.classList.add("edit");
         editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
         editButton.addEventListener("click", () =>
-          updateMember(member.id, member.name)
+          updateMember(member.id, member.name, member.email)
         );
         tdAction.appendChild(editButton);
 
@@ -612,6 +680,7 @@ function updateTable(members) {
     }
   }
 }
+
 
 // Event listener for batch selection (example scenario)
 document.addEventListener("DOMContentLoaded", async () => {
