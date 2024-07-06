@@ -420,8 +420,8 @@ async function updateMemberInFirestore(batchName, memberId, newMemberName) {
           if (member.id === memberId) {
             return { 
               id: memberId, 
-              name: newMemberName, 
-             
+              name: newMemberName,
+              email: member.email // Preserve existing email
             };
           } else {
             return member;
@@ -432,6 +432,8 @@ async function updateMemberInFirestore(batchName, memberId, newMemberName) {
           members: updatedMembers,
         });
       });
+
+      showMessage("Member updated successfully!", "success");
     } else {
       console.error("Batch not found for:", batchName);
       showMessage("Batch not found!", "error");
@@ -445,13 +447,13 @@ async function updateMemberInFirestore(batchName, memberId, newMemberName) {
 
 
 
-async function removeMember(memberId) {
+async function removeMember(id) {
   const tableBody = document.getElementById("tableBody");
   const rows = Array.from(tableBody.children);
 
   // Remove the member row from the DOM
   const rowIndex = rows.findIndex(
-    (row) => row.children[1].textContent === memberId.toString()
+    (row) => row.children[1].textContent === id.toString()
   );
   if (rowIndex === -1) {
     showMessage("Member not found!", "error");
@@ -471,12 +473,13 @@ async function removeMember(memberId) {
   const batchName = document
     .getElementById("batchNameDisplay")
     .textContent.replace("Batch Name: ", "");
-  await removeMemberFromFirestore(batchName, memberId);
+  await removeMemberFromFirestore(batchName, id);
 
   showMessage("Member removed successfully!", "success");
 }
 
-async function removeMemberFromFirestore(batchName, memberId) {
+
+async function removeMemberFromFirestore(batchName, id) {
   try {
     const batchQuery = query(
       collection(db, "batches"),
@@ -489,22 +492,15 @@ async function removeMemberFromFirestore(batchName, memberId) {
         const batchRef = doc.ref;
         const batchData = doc.data();
 
-        // Filter out the member to be removed and update IDs
-        let memberRemoved = false;
+        // Filter out the member to be removed from the 'members' array
         const updatedMembers = batchData.members
-          .filter((member) => {
-            if (member.id === memberId) {
-              memberRemoved = true;
-              return false;
-            }
-            return true;
-          })
-          .map((member, index) => ({ id: index + 1, name: member.name, email: member.email }));
+          .filter((member) => member.id !== id);
 
-        if (memberRemoved) {
-          await updateDoc(batchRef, { members: updatedMembers });
-        }
+        // Update Firestore document with updated 'members' array
+        await updateDoc(batchRef, { members: updatedMembers });
       });
+
+      showMessage("Member removed successfully!", "success");
     } else {
       console.error("Batch not found for:", batchName);
       showMessage("Batch not found!", "error");
@@ -514,6 +510,8 @@ async function removeMemberFromFirestore(batchName, memberId) {
     showMessage("Error removing member: " + error.message, "error");
   }
 }
+
+
 
 
 
