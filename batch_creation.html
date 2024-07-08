@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="./assests/images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="./batch_creation.css" />
+  <title>TaskTrace</title>
+</head>
+<body>
+  <section class="batch_creation">
+    <div class="navbar">
+      <div class="logotitle">
+        <div class="logo_icon">
+          <img src="./assests/image/tasktrace_logo1.png" alt="logo" />
+        </div>
+        <div class="title_name">TaskTrace</div>
+      </div>
+      <div class="right_buttons">
+        <div class="create_button">
+          <button type="button" id="createBatchButton">Create Batch</button>
+          <input type="file" id="fileInput" style="display: none;" accept=".xlsx, .xls" />
+        </div>
+        <div class="home_logo">
+          <a href="#">
+            <img src="./assests/image/home-hashtag.png" alt="home" />
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="icon">
+      <i class="fa-solid fa-bars" id="toggleBatchList"></i>
+    </div>
+    <div class="batch-list" id="batchListContainer" style="display: none;">
+      <ul id="batchList">
+        <!-- Batches will be populated here -->
+      </ul>
+    </div>
+    <div class="main_body">
+      <div class="batch-header">
+        <p class="batch_name" id="batchNameDisplay">Batch Name: Not Set</p>
+        <div class="batch_buttons">
+          <button class="change-batch-name" id="changeBatchNameBtn">Change Batch Name</button>
+          <button class="delete" id="deleteBatchBtn">Delete Batch</button>
+        </div>
+      </div>
+      <div id="messageDiv" class="messageDiv" style="display: none;">
+        <span id="messageText"></span>
+      </div>
+      <div class="table-container" id="tableContainer">
+        <table id="dataTable">
+          <thead class="table_head">
+            <tr>
+              <th>SL.NO</th>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Table rows will be populated dynamically -->
+          </tbody>
+        </table>
+        <button id="saveButton" style="display:none;">Save</button>
+      </div>
+    </div>
+  </section>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script src="./batch_creation.js" type="module"></script>
+</body>
+</html>

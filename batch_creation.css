@@ -1,0 +1,337 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  font-family: "Playfair", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.batch_creation {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  height: 100vh;
+  width: 100%;
+  background: #ffffff;
+}
+
+.navbar {
+  display: flex;
+  flex-direction: row;
+  border-radius: 6px 6px 0px 0px;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1756b3;
+  width: 100%;
+  height: 7%;
+}
+
+.logotitle {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  margin: 0px 0px 0px 30px;
+  width: 150px;
+  height: 30px;
+  gap: 10px;
+  color: #ffffff;
+}
+
+.logo_icon {
+  background-color: #ffffff;
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+}
+
+.logo_icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.title_name {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  font-family: "Cinzel", serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.right_buttons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-right: 20px;
+  height: 70px;
+}
+
+.create_button button {
+  background-color: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  color: #1756b3;
+  font-size: 12px;
+  margin-top: 3px;
+  height: 20px;
+}
+
+.home_logo img {
+  width: 30px;
+  height: 30px;
+  margin-top: 5px;
+}
+
+.fa-solid {
+  color: #1756b3;
+  margin-top: 10px;
+  display: flex !important;
+  font-size: x-large;
+  margin-left: 33px;
+}
+
+.main_body {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.batch-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ddebff;
+  border-radius: 4px 4px 0px 0px;
+  padding: 10px;
+  width: 1150px;
+}
+
+.batch_name {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "Cinzel", serif;
+  font-optical-sizing: auto;
+}
+
+.delete {
+  background-color: #1756b3;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  height: 30px;
+}
+
+.table-container {
+  background-color: #ffffff;
+  padding: 20px;
+  width: 1150px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ffffff;
+}
+
+th {
+  background-color: #ffffff;
+  font-family: "Cinzel", serif;
+  font-optical-sizing: auto;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #ddebff;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.add-member-row {
+  text-align: center;
+  background-color: #ffffff;
+  width: fit-content;
+}
+
+.add-member {
+  background-color: #1756b3;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 850px;
+  height: fit-content;
+  width: 200px;
+}
+
+td .edit,
+td .remove,
+th .edit,
+th .remove {
+  background-color: transparent;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+td .edit {
+  color: #624de3;
+}
+
+td .remove {
+  color: #a30d11;
+}
+
+.add-member i {
+  color: #ffffff;
+}
+
+.add_member_icon {
+  display: flex;
+}
+
+#saveButton {
+  background-color: #1756b3;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  display: none; /* Initially hidden, displayed conditionally in JavaScript */
+}
+
+.change-batch-name {
+  background-color: #1756b3;
+  color: #ffffff;
+  border: 1px solid #1756b3;
+  border-radius: 4px;
+  height: 30px;
+}
+
+.batch_buttons {
+  display: flex;
+  margin-right: 5px;
+  gap: 10px;
+}
+
+.messageDiv {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 1000;
+}
+
+.messageDiv.success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.messageDiv.error {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.messageDiv span {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.messageDiv button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #007bff;
+  font-size: 14px;
+  float: right;
+}
+
+.messageDiv button:focus {
+  outline: none;
+}
+
+
+
+
+.batch-name-input {
+  width: 200px;
+  padding: 5px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.save-button {
+  padding: 5px 10px;
+  background-color: #0056b3;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+
+.batch-list {
+  background-color: #1756b3;
+  border: 1px solid #ddebff;
+  padding: 10px;
+  position: absolute;
+  top: 90px;
+  width: 200px;
+  z-index: 1000;
+  display: none; /* Initially hide the batch list */
+}
+
+.batch-list.active {
+  display: block; /* Show batch list when active class is applied */
+}
+
+.batch-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.batch-list ul li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddebff;
+  color: #ffffff;
+}
+
+.batch-list ul li:last-child {
+  border-bottom: none;
+}
