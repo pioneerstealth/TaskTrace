@@ -17,7 +17,7 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// Your web app's Firebase configuration
+
 const firebaseConfig = {
   apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
   authDomain: "tasktrace-v2.firebaseapp.com",
@@ -98,48 +98,72 @@ document.getElementById("fileInput").addEventListener("change", function (event)
   reader.readAsArrayBuffer(file);
 });
 
+let isBatchSaved = false;
+
 function displayExcelData(data) {
   const tableBody = document.getElementById("tableBody");
   tableBody.innerHTML = ""; // Clear previous data
 
   let serialNumber = 1;
-  data.forEach(row => {
-      const tr = document.createElement("tr");
+  data.forEach((row) => {
+    const tr = document.createElement("tr");
 
-      // Add serial number
-      const serialTd = document.createElement("td");
-      serialTd.textContent = serialNumber++;
-      tr.appendChild(serialTd);
+    // Add serial number
+    const serialTd = document.createElement("td");
+    serialTd.textContent = serialNumber++;
+    tr.appendChild(serialTd);
 
-      // Add each cell value
-      for (let cellValue of row) {
-          const td = document.createElement("td");
-          td.textContent = cellValue;
-          tr.appendChild(td);
+    // Add each cell value
+    for (let cellValue of row) {
+      const td = document.createElement("td");
+      td.textContent = cellValue;
+      tr.appendChild(td);
+    }
+    const memberId = row[1];
+    const memberName = row[2];
+
+    const tdAction = document.createElement("td");
+
+    const editButton = document.createElement("button");
+    editButton.classList.add("edit");
+    editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
+    editButton.addEventListener("click", () => {
+      if (!isBatchSaved) {
+        showMessage("Please save the batch before editing.", "error");
+        return;
       }
+      updateMember(memberId, memberName);
+    });
+    tdAction.appendChild(editButton);
 
-      // Add edit and delete icons
-      
-      const tdAction = document.createElement("td");
+    const removeButton = document.createElement("button");
+    removeButton.classList.add("remove");
+    removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
+    removeButton.addEventListener("click", () => {
+      if (!isBatchSaved) {
+        showMessage("Please save the batch before deleting.", "error");
+        return;
+      }
+      removeMember(memberId);
+    });
+    tdAction.appendChild(removeButton);
 
-      const editButton = document.createElement("button");
-      editButton.classList.add("edit");
-      editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
-      editButton.addEventListener("click", () =>
-        updateMember(member.id, member.name)
-      );
-      tdAction.appendChild(editButton);
+    const chartButton = document.createElement("button");
+    chartButton.classList.add("chart");
+    chartButton.innerHTML = '<i class="fa-solid fa-chart-line"></i>';
+    chartButton.addEventListener("click", () => {
+      if (!isBatchSaved) {
+        showMessage("Please save the batch before viewing charts.", "error");
+        return;
+      }
+      viewChart(memberId);
+    });
+    tdAction.appendChild(chartButton);
 
-      const removeButton = document.createElement("button");
-      removeButton.classList.add("remove");
-      removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
-      removeButton.addEventListener("click", () => removeMember(member.id));
-      tdAction.appendChild(removeButton);
-
-      tr.appendChild(tdAction);
-      tableBody.appendChild(tr);
-  
+    tr.appendChild(tdAction);
+    tableBody.appendChild(tr);
   });
+
 }
 
 

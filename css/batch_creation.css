@@ -191,8 +191,10 @@ tbody tr:nth-child(even) {
 
 td .edit,
 td .remove,
+td .chart,
 th .edit,
-th .remove {
+th .remove,
+th .chart {
   background-color: transparent;
   color: inherit;
   border: none;
@@ -206,6 +208,8 @@ td .edit {
 td .remove {
   color: #a30d11;
 }
+
+
 
 .add-member i {
   color: #ffffff;
@@ -284,9 +288,6 @@ td .remove {
   outline: none;
 }
 
-
-
-
 .batch-name-input {
   width: 200px;
   padding: 5px;
@@ -303,7 +304,6 @@ td .remove {
   font-size: 14px;
   border-radius: 5px;
 }
-
 
 .batch-list {
   background-color: #1756b3;
