@@ -292,6 +292,9 @@ body {
 }
 
 .timer-section .extend-time-btn {
+    position: absolute;
+    top: 250px;
+    left: 145px;
     background-color: #2962FF;
     color: #ffffff;
     border: none;
