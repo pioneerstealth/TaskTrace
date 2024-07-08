@@ -41,6 +41,26 @@ body, html {
     height: 30px;
 }
 
+#user {
+    width: 35px;
+    top: .5%;
+    position: absolute;
+    right: 10%;
+}
+
+.user-info{
+    width: 250px;
+    height: 250px;
+    z-index: 2;
+    background-color: white;
+    position: absolute;
+    right: 5%;
+    top: 7%;
+    opacity: 0;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;
+}
+
 .logo img {
     /* width: 100%; */
     height: 100%;
@@ -95,6 +115,7 @@ html, body {
     box-sizing: border-box;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Merienda:wght@300..900&display=swap');
 *, *::before, *::after {
     -webkit-box-sizing: inherit;
     -moz-box-sizing: inherit;
@@ -243,6 +264,48 @@ html, body {
     margin: 0 10px;
 }
 
+/* New CSS for red animation */
+.red .card,
+.red .digit::before,
+.red .digit::after,
+.red .card-face-front,
+.red .card-face-back {
+  background-color: red;
+  color: white; /* Ensure the text is visible against the red background */
+}
+
+.red .card {
+  transition: background-color 0.6s, transform 0.6s;
+}
+
+.red .digit,
+.red .colon {
+  color: red;
+}
+
+.red .card-face {
+  color: white; /* or any other color to contrast with red background */
+}
+
+/* Ensure ::before and ::after are red */
+.red .digit::before,
+.red .digit::after {
+  background-color: red;
+}
+
+.red .digit-left::before,
+.red .digit-left::after,
+.red .digit-right::before,
+.red .digit-right::after {
+  background-color: red;
+}
+
+.red .colon::before,
+.red .colon::after {
+  background-color: red;
+}
+
+
 
 /* ///////////////////////////////////////////////////////////////////////////////////////// */
 
@@ -302,5 +365,19 @@ html, body {
   text-align: center;
 }
 
-/* /////////////////////////////HOVER/////////////////////////////////////////////// */
+/* /////////////////////////////USER/////////////////////////////////////////////// */
 
+#fullname{
+    /* position: absolute; */
+    margin-top: 30%;
+    text-align: center;
+    color: red;
+}
+
+#email{
+    text-align: center;
+}
+
+#role{
+    text-align: center;
+}
