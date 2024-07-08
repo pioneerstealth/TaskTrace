@@ -204,3 +204,18 @@ body, html {
     border-radius: 10px;
     left: 12%;
 }
+
+#fullname{
+    /* position: absolute; */
+    margin-top: 30%;
+    text-align: center;
+    color: red;
+}
+
+#email{
+    text-align: center;
+}
+
+#role{
+    text-align: center;
+}
