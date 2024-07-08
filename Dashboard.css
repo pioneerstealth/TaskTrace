@@ -1,0 +1,478 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family   =Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    font-family: "Playfair", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: "wdth"100;
+    width: 100%;
+    padding: 5px 5px 5px 5px;
+}
+
+/* The entire scrollbar */
+::-webkit-scrollbar {
+    width: 5px;
+    /* Width of the vertical scrollbar */
+    height: 12px;
+    /* Height of the horizontal scrollbar */
+}
+
+/* The track (background) */
+::-webkit-scrollbar-track {
+    background: #ffffff;
+    /* Color of the track */
+    border-radius: 10px;
+    /* Rounded corners of the track */
+}
+
+/* The thumb (draggable part) */
+::-webkit-scrollbar-thumb {
+    background: #1756B3;
+    /* Color of the thumb */
+    border-radius: 10px;
+    /* Rounded corners of the thumb */
+}
+
+/* The thumb when hovered */
+::-webkit-scrollbar-thumb:hover {
+    background: #90B4EA;
+    /* Color of the thumb when hovered */
+}
+
+/* The scrollbar buttons */
+::-webkit-scrollbar-button {
+    background: #ffffff;
+    /* Color of the buttons */
+    height: 3px;
+    /* Height of the buttons */
+    width: 20px;
+    /* Width of the buttons */
+}
+
+/* The corner where horizontal and vertical scrollbars meet */
+::-webkit-scrollbar-corner {
+    background: #1756B3;
+    /* Color of the corner */
+}
+
+
+
+.navbar_Dashboard {
+    /* position: sticky; */
+    display: flex;
+    flex-direction: row;
+    border-radius: 6px 6px 0px 0px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1756B3;
+    width: 100%;
+    height: 39px;
+}
+
+.logo_title {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin: 0px 0px 0px 30px;
+    width: 150px;
+    height: 30px;
+    gap: 10px;
+}
+
+.logo {
+    background-color: #ffffff;
+    border-radius: 15px;
+    width: 30px;
+    height: 30px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Maintains aspect ratio */
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-family: "Cinzel", serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    color: #fff;
+}
+
+.home_icon {
+    background-image: url('./assests/image/home-hashtag.png');
+    background-size: cover;
+    background-position: center;
+    margin-right: 10px;
+    width: 25px;
+    height: 25px;
+}
+
+.Dashboard_section {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to bottom right, #DDEBFF, #90B4EA);
+    width: 100%;
+    /* height: 100vh; */
+    padding: 20px 45px 20px 45px;
+    gap: 25px;
+}
+
+.one {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.search {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 0px 6px 6px 0px;
+    width: 30px;
+    height: 30px;
+    background-color: #fff;
+    background-image: url('./assests/image/loupe.png');
+    background-size: 70%;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+}
+
+.Search_form {
+
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    display: flex;
+    flex-direction: row;
+
+    width: 340px;
+    height: 30px;
+}
+
+.searchbox {
+    border-radius: 6px 0px 0px 6px;
+    padding-left: 15px;
+    width: 310px;
+    height: 30px;
+    border: none;
+
+}
+
+.dropdown {
+    /* position: relative; */
+    width: 230px;
+    filter: url(#goo);
+}
+
+.dropdown__face, .dropdown__items {
+    background-color: #fff;
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.dropdown__face {
+    display: block;
+    position: relative;
+}
+
+.dropdown__items {
+    margin: 0;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 100%;
+    list-style: none;
+    list-style-type: none;
+    /* display: flex; */
+    display: block;
+    justify-content: center;
+    visibility: hidden;
+    z-index: -1;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.93, 0.88, 0.1, 0.8);
+}
+
+.dropdown__items::before {
+    content: "";
+    background-color: #fff;
+    position: absolute;
+    bottom: 100%;
+    right: 20%;
+    height: 40px;
+    width: 20px;
+}
+
+.dropdown__arrow {
+    border-bottom: 2px solid #000;
+    border-right: 2px solid #000;
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    width: 10px;
+    height: 10px;
+    transform: rotate(45deg) translateY(-50%);
+    transform-origin: right;
+}
+
+.dropdown input {
+    display: none;
+}
+
+.dropdown input:checked~.dropdown__items {
+    top: calc(100% + 25px);
+    visibility: visible;
+    opacity: 1;
+}
+
+
+svg {
+    display: none;
+}
+
+
+.two {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.two_card {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    width: 340px;
+    height: 120px;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 13px;
+}
+
+.first_two1 {
+    font-family: "Playfair", serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+    font-variation-settings:
+        "wdth"100;
+    display: flex;
+    align-items: center;
+    /* background-color: chocolate; */
+    min-height: 25px;
+}
+
+.first_two2 {
+    font-family: "Playfair", serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+    font-variation-settings:
+        "wdth"100;
+    /* background-color: yellow; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-height: 44px;
+    gap: 5px;
+}
+
+.first_two2_1 {
+    min-height: 30px;
+    font-size: 30px;
+}
+
+.first_two2_2 {
+    display: flex;
+    align-items: end;
+    min-height: 30px;
+    font-size: 17px;
+}
+
+.first_two3 {
+    display: flex;
+    align-items: center;
+    color: #828282;
+    font-size: 15px;
+    /* background-color: violet; */
+    min-height: 25px;
+}
+
+.three {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.three_card {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    height: 370px;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+}
+
+#first_three {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0rem 2rem 0rem 2rem;
+    width: 650px;
+}
+
+.title_togle {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.switch-button {
+    background: rgba(58, 115, 212, 0.56);
+    border-radius: 7.5px;
+    /* 50% of original height */
+    overflow: hidden;
+    width: 86px;
+    /* 35% of original width + 2% */
+    text-align: center;
+    font-size: 9px;
+    /* Adjusted for smaller size */
+    letter-spacing: 1px;
+    color: #ffffff;
+    position: relative;
+    padding-right: 43px;
+    /* 35% of original width + 2% */
+}
+
+.switch-button:before {
+    content: "Line";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 43px;
+    /* 35% of original width + 2% */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.switch_button_checkbox {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+}
+
+.switch_button_checkbox:checked+.switch-button-label:before {
+    transform: translateX(43px);
+    /* 35% of original width + 2% */
+    transition: transform 300ms linear;
+}
+
+.switch_button_checkbox+.switch-button-label {
+    position: relative;
+    padding: 3.75px 0;
+    /* 50% of original height */
+    display: block;
+    user-select: none;
+    pointer-events: none;
+}
+
+.switch_button_checkbox+.switch-button-label:before {
+    content: "";
+    background: #fff;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 7.5px;
+    /* 50% of original height */
+    transform: translateX(0);
+    transition: transform 300ms;
+}
+
+.switch_button_checkbox+.switch-button-label .switch-button-label-span {
+    position: relative;
+}
+
+
+
+
+#second_three {
+    width: 420px;
+    overflow: auto;
+    /* Adds scrollbars only when necessary */
+}
+
+.four {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.four_card {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    height: 370px;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+}
+
+#first_four {
+    width: 420px;
+    overflow: auto;
+    /* Adds scrollbars only when necessary */
+}
+
+#second_four {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0rem 2rem 0rem 2rem;
+    width: 650px;
+}
+
+.five {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.five_card {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    height: 370px;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+}
+
+#first_five {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0rem 2rem 0rem 2rem;
+    width: 650px;
+}
+
+#second_five {
+    width: 420px;
+    overflow: auto;
+    /* Adds scrollbars only when necessary */
+}
