@@ -97,7 +97,7 @@ logIn_form.addEventListener("submit", (logIn) => {
     })
     .then(() => {
       logIn_form.reset();
-      window.location.href="./index.html"
+      window.location.href="./task_creation.html"
       // Optionally show a message
       // alert("User logged in!");
     })
