@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Hind:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --red: #e63946;
+    --white: #f1faee;
+    --cyan: #a8dadc;
+    --blue: #457b9d;
+    --navy: #1d3557;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    font-family: 'Hind', sans-serif;
+    background-color: var(--white);
+    color: var(--navy);
+}
+
+h2 {
+    font-family: "Bubblegum Sans", sans-serif;
+    font-weight: 400;
+    font-size: 40px;
+    margin-top: 3vh;
+    margin-bottom: 3vh;
+    color: var(--white);
+}
+
+#BatchDetails {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    box-sizing: border-box;
+    padding: 5%;
+    width: 60%;
+    margin: 50px;
+    background-color: var(--navy);
+}
+
+#tableContainer {
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--white);
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+
+
+th {
+    background-color: var(--blue);
+    color: var(--navy);
+}
+
+tbody tr:nth-child(even) {
+    background-color: var(--cyan);
+}
+
+#addMemberButton {
+    background-color: #e1ecf4;
+    border-radius: 3px;
+    border: 1px solid #7aa7c7;
+    box-shadow: rgba(255, 255, 255, .7) 0 1px 0 0 inset;
+    box-sizing: border-box;
+    color: #39739d;
+    cursor: pointer;
+    font-family: "Hind", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    width: 200px;
+    line-height: 1.15385;
+    margin: 20px;
+    outline: none;
+    padding: 8px .8em;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: baseline;
+    white-space: nowrap;
+}
+
+#addMemberButton:hover,
+#addMemberButton:focus {
+    background-color: var(--blue);
+    color: var(--navy);
+}
+
+#addMemberButton:focus {
+    box-shadow: 0 0 0 4px var(--cyan);
+}
+
+#addMemberButton:active {
+    background-color: #a0c7e4;
+    box-shadow: none;
+    color: #2c5777;
+}

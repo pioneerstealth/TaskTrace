@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Batch List</title>
+    <link rel="stylesheet" href="batch_list.css" />
+  </head>
+  <body>
+    <div class="Section">
+      <div class="container">
+        <div class="BatchList">
+          <section>
+            <h1>List of Batches</h1>
+
+            <div id="batchLinks">
+              <!-- Batch links will be dynamically added here -->
+            </div>
+          </section>
+        </div>
+      </div>
+      <div id="BatchDetails" class="BatchDetails">
+        <div class="Members">
+          <div class="BatchName"><h2 id="batchName"></h2></div>
+          <div id="totalMembers"></div>
+        </div>
+        <div class="Add">
+            <button id="addMemberButton">Add Member</button>
+<div class="table">
+ 
+        <div id="tableContainer">
+          <table id="batchTable" border="1">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Existing rows will be dynamically added here -->
+            </tbody>
+          </table>
+        </div>
+    </div>
+</div>
+       
+      </div>
+    </div>
+    <div class="Create_button" style="display: inline;">
+      <button class="button" type="button">
+        <a href="add_batch.html">Create Batch</a>
+      </button>
+      <button class="button1" type="button">
+        <a href="home.html">Home</a>
+      </button>
+    </div>
+
+    <script src="batch_list.js" type="module"></script>
+  </body>
+</html>
