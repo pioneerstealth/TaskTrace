@@ -1,33 +1,33 @@
 // Ensure the tasktrace element is visible on load and handle animation end
 
-window.addEventListener('load', function() {
-    const tasktrace = document.querySelector('.tasktrace');
-    tasktrace.style.visibility = 'visible';
-    tasktrace.addEventListener('animationend', function() {
-        tasktrace.classList.add('visible');
-    });
+window.addEventListener("load", function () {
+  const tasktrace = document.querySelector(".tasktrace");
+  tasktrace.style.visibility = "visible";
+  tasktrace.addEventListener("animationend", function () {
+    tasktrace.classList.add("visible");
+  });
 });
 
 // Get the user and info elements
-const userinfo = document.getElementById('user');
-const info = document.getElementById('info');
+const userinfo = document.getElementById("user");
+const info = document.getElementById("info");
 
 // Show user info on user icon click
-userinfo.addEventListener('click', function(event) {
-    event.preventDefault();
-    info.style.opacity = '1';
-    info.style.visibility = 'visible'; // Ensure it's visible
+userinfo.addEventListener("click", function (event) {
+  event.preventDefault();
+  info.style.opacity = "1";
+  info.style.visibility = "visible"; // Ensure it's visible
 });
 
 // Hide info when clicking outside of it
-document.addEventListener('click', function(event) {
-    const isClickInsideInfo = info.contains(event.target);
-    const isClickOnUser = userinfo.contains(event.target);
+document.addEventListener("click", function (event) {
+  const isClickInsideInfo = info.contains(event.target);
+  const isClickOnUser = userinfo.contains(event.target);
 
-    if (!isClickInsideInfo && !isClickOnUser) {
-        info.style.opacity = '0';
-        info.style.visibility = 'hidden'; // Optional: hide it completely
-    }
+  if (!isClickInsideInfo && !isClickOnUser) {
+    info.style.opacity = "0";
+    info.style.visibility = "hidden"; // Optional: hide it completely
+  }
 });
 
 // Import the functions you need from the SDKs you need
@@ -42,6 +42,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getAuth,
+  signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
@@ -74,6 +75,8 @@ document.getElementById("user").addEventListener("click", (event) => {
   fetchUserData();
 });
 
+// Select the signout button
+
 // Function to fetch user data and update UI
 function fetchUserData() {
   const user = auth.currentUser;
@@ -93,7 +96,21 @@ function fetchUserData() {
             <p id="fullname">Name: ${fullName}</p>
             <p id="email">${email}</p>
             <p id="role">Role: ${role}</p>
+            <button id="signout" class="signout">Sign Out</button>
           `;
+          const signoutButton = document.getElementById("signout");
+
+          // Add an event listener to the signout button
+          signoutButton.addEventListener("click", () => {
+            signOut(auth)
+              .then(() => {
+                console.log("User signed out successfully.");
+                window.location.href="./login_signup.html";
+              })
+              .catch((error) => {
+                console.error("Error signing out:", error);
+              });
+          });
         } else {
           console.log("No such document!");
         }
