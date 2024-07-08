@@ -30,55 +30,85 @@ document.addEventListener('click', function(event) {
     }
 });
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  updateDoc,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// Import the necessary Firebase functions
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, collection, getDocs, query, limit } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
-    authDomain: "tasktrace-v2.firebaseapp.com",
-    projectId: "tasktrace-v2",
-    storageBucket: "tasktrace-v2.appspot.com",
-    messagingSenderId: "863318084099",
-    appId: "1:863318084099:web:6a9abab8d8893caaf9dc36",
-    measurementId: "G-59DHK1FJ88"
+  apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
+  authDomain: "tasktrace-v2.firebaseapp.com",
+  projectId: "tasktrace-v2",
+  storageBucket: "tasktrace-v2.appspot.com",
+  messagingSenderId: "863318084099",
+  appId: "1:863318084099:web:6a9abab8d8893caaf9dc36",
+  measurementId: "G-59DHK1FJ88",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const analytics = getAnalytics(app);
+const database = getFirestore(app);
+const auth = getAuth();
 
-// Fetch a single user data from Firestore and display it in the user-info div
-// async function fetchUserData() {
-//     const userInfoDiv = document.getElementById('info');
-//     userInfoDiv.innerHTML = ''; // Clear previous data
-//     const userQuery = query(collection(db, "user"), limit(1)); // Limit to one document
-//     const querySnapshot = await getDocs(userQuery);
+// Prevent page refresh on user icon click
+document.getElementById("user").addEventListener("click", (event) => {
+  event.preventDefault();
+  fetchUserData();
+});
 
-//     if (!querySnapshot.empty) {
-//         const doc = querySnapshot.docs[0];
-//         const userData = doc.data();
-//         console.log(userData);
-//         const userDiv = document.createElement('div');
-//         userDiv.classList.add('user-data');
-//         userDiv.innerHTML = `
-//             <p><strong>Name:</strong> ${userData.name}</p>
-//             <p><strong>Email:</strong> ${userData.email}</p>
-//             <p><strong>Role:</strong> ${userData.role}</p>
-//         `;
-//         userInfoDiv.appendChild(userDiv);
-//     } else {
-//         userInfoDiv.innerHTML = '<p>No user data found.</p>';
-//     }
-// }
+// Function to fetch user data and update UI
+function fetchUserData() {
+  const user = auth.currentUser;
+  if (user) {
+    const userDocRef = doc(database, "users", user.uid);
+    getDoc(userDocRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          const fullName = userData.fullName;
+          const email = userData.email;
+          const role = userData.role;
 
-//collection ref
-const colRef = collection(db, 'batches')
+          // Update UI with fetched data
+          const infoDiv = document.getElementById("info");
+          infoDiv.innerHTML = `
+            <p id="fullname">Name: ${fullName}</p>
+            <p id="email">${email}</p>
+            <p id="role">Role: ${role}</p>
+          `;
+        } else {
+          console.log("No such document!");
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting user document:", error);
+      });
+  } else {
+    console.log("User not signed in.");
+  }
+}
 
-//get collection data
-getDocs(colRef)
-.then((snapshot) => {
-    console.log(snapshot.docs);
-})
+// Call fetchUserData when the page loads if user is already logged in
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    fetchUserData();
+  }
+});
