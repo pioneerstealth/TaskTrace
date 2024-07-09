@@ -12,14 +12,12 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  sendPasswordResetEmail // Import the required function
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
+  // Your Firebase config
   apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
   authDomain: "tasktrace-v2.firebaseapp.com",
   projectId: "tasktrace-v2",
@@ -29,9 +27,8 @@ const firebaseConfig = {
   measurementId: "G-59DHK1FJ88",
 };
 
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const database = getFirestore(app);
 
-export { app, auth, database };
+export { app, auth, database, sendPasswordResetEmail }; // Export the function
