@@ -208,9 +208,11 @@ td .edit {
 td .remove {
   color: #a30d11;
 }
-
-
-
+.fa-chart-line
+{
+  font-size: 12px;
+  margin-left: -3px;
+}
 .add-member i {
   color: #ffffff;
 }
