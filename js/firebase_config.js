@@ -31,4 +31,4 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const database = getFirestore(app);
 
-export { app, auth, database, sendPasswordResetEmail }; // Export the function
+export { app, auth, database, sendPasswordResetEmail,doc,setDoc,updateDoc,getDoc,createUserWithEmailAndPassword,signInWithEmailAndPassword,onAuthStateChanged }; // Export the function

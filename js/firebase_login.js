@@ -1,8 +1,5 @@
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const database = getFirestore(app);
-const auth = getAuth();
+import{auth, database, sendPasswordResetEmail,doc,setDoc,updateDoc,getDoc,createUserWithEmailAndPassword,signInWithEmailAndPassword,onAuthStateChanged } from './firebase_config.js';
 
 let isSigningUp = false;
 
