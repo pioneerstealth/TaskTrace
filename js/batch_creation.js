@@ -17,7 +17,7 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// Your web app's Firebase configuration
+
 const firebaseConfig = {
   apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
   authDomain: "tasktrace-v2.firebaseapp.com",
@@ -98,48 +98,72 @@ document.getElementById("fileInput").addEventListener("change", function (event)
   reader.readAsArrayBuffer(file);
 });
 
+let isBatchSaved = false;
+
 function displayExcelData(data) {
   const tableBody = document.getElementById("tableBody");
   tableBody.innerHTML = ""; // Clear previous data
 
   let serialNumber = 1;
-  data.forEach(row => {
-      const tr = document.createElement("tr");
+  data.forEach((row) => {
+    const tr = document.createElement("tr");
 
-      // Add serial number
-      const serialTd = document.createElement("td");
-      serialTd.textContent = serialNumber++;
-      tr.appendChild(serialTd);
+    // Add serial number
+    const serialTd = document.createElement("td");
+    serialTd.textContent = serialNumber++;
+    tr.appendChild(serialTd);
 
-      // Add each cell value
-      for (let cellValue of row) {
-          const td = document.createElement("td");
-          td.textContent = cellValue;
-          tr.appendChild(td);
+    // Add each cell value
+    for (let cellValue of row) {
+      const td = document.createElement("td");
+      td.textContent = cellValue;
+      tr.appendChild(td);
+    }
+    const memberId = row[1];
+    const memberName = row[2];
+
+    const tdAction = document.createElement("td");
+
+    const editButton = document.createElement("button");
+    editButton.classList.add("edit");
+    editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
+    editButton.addEventListener("click", () => {
+      if (!isBatchSaved) {
+        showMessage("Please save the batch before editing.", "error");
+        return;
       }
+      updateMember(memberId, memberName);
+    });
+    tdAction.appendChild(editButton);
 
-      // Add edit and delete icons
-      
-      const tdAction = document.createElement("td");
+    const removeButton = document.createElement("button");
+    removeButton.classList.add("remove");
+    removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
+    removeButton.addEventListener("click", () => {
+      if (!isBatchSaved) {
+        showMessage("Please save the batch before deleting.", "error");
+        return;
+      }
+      removeMember(memberId);
+    });
+    tdAction.appendChild(removeButton);
 
-      const editButton = document.createElement("button");
-      editButton.classList.add("edit");
-      editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
-      editButton.addEventListener("click", () =>
-        updateMember(member.id, member.name)
-      );
-      tdAction.appendChild(editButton);
+    const chartButton = document.createElement("button");
+    chartButton.classList.add("chart");
+    chartButton.innerHTML = '<i class="fa-solid fa-chart-line"></i>';
+    chartButton.addEventListener("click", () => {
+      if (!isBatchSaved) {
+        showMessage("Please save the batch before viewing charts.", "error");
+        return;
+      }
+      viewChart(memberId,memberName);
+    });
+    tdAction.appendChild(chartButton);
 
-      const removeButton = document.createElement("button");
-      removeButton.classList.add("remove");
-      removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
-      removeButton.addEventListener("click", () => removeMember(member.id));
-      tdAction.appendChild(removeButton);
-
-      tr.appendChild(tdAction);
-      tableBody.appendChild(tr);
-  
+    tr.appendChild(tdAction);
+    tableBody.appendChild(tr);
   });
+
 }
 
 
@@ -302,53 +326,6 @@ document
       showMessage("Error deleting batch: " + error.message, "error");
     }
   });
-
-// Populate table with data from Excel file
-// function populateTable(data) {
-//   console.trace("populatetable called");
-//   const tableBody = document.getElementById("tableBody");
-//   const tableHead = document.querySelector(".table_head");
-
-//   if (tableBody && tableHead) {
-//     tableBody.innerHTML = "";
-
-//     tableHead.style.display = "table-header-group";
-
-//     data.forEach((row, index) => {
-//       if (index === 0) return;
-
-//       const tr = document.createElement("tr");
-
-//       const tdId = document.createElement("td");
-//       tdId.textContent = row[0];
-//       tr.appendChild(tdId);
-
-//       const tdName = document.createElement("td");
-//       tdName.textContent = row[1];
-//       tr.appendChild(tdName);
-
-//       const tdAction = document.createElement("td");
-
-//       const editButton = document.createElement("button");
-//       editButton.classList.add("edit");
-//       editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
-//       editButton.addEventListener("click", () => updateMember(row[0], row[1]));
-//       tdAction.appendChild(editButton);
-
-//       const removeButton = document.createElement("button");
-//       removeButton.classList.add("remove");
-//       removeButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
-//       removeButton.addEventListener("click", () => removeMember(row[0]));
-//       tdAction.appendChild(removeButton);
-
-//       tr.appendChild(tdAction);
-//       tableBody.appendChild(tr);
-//     });
-
-//     document.getElementById("saveButton").style.display = "block";
-//   }
-// }
-
 async function updateMember(memberId, memberName) {
   const tableBody = document.getElementById("tableBody").children;
 
@@ -525,10 +502,9 @@ function showMessage(message, type) {
   messageDiv.className = `messageDiv ${type}`;
   messageDiv.style.display = "block";
 
-  // Automatically hide the message after 5 seconds
   setTimeout(function () {
     messageDiv.style.display = "none";
-  }, 3000); // 5000 milliseconds = 5 seconds
+  }, 3000);
 }
 
 // Event listener for toggle icon
@@ -673,10 +649,30 @@ function updateTable(members) {
         removeButton.addEventListener("click", () => removeMember(member.id));
         tdAction.appendChild(removeButton);
 
+        const chartButton = document.createElement("button");
+        chartButton.classList.add("chart");
+        chartButton.innerHTML = '<i class="fa-solid fa-chart-line"></i>';
+        chartButton.addEventListener("click", () => {
+          viewChart(member.id, member.name);
+        });
+        tdAction.appendChild(chartButton);
+
         tr.appendChild(tdAction);
         tableBody.appendChild(tr);
       });
     }
+  }
+}
+function viewChart(memberId, memberName) {
+  if (memberId && memberName) {
+    const batchName = getBatchNameForMember(memberId); // Retrieve the batch name for the member
+    if (batchName) {
+      window.location.href = `Dashboard.html?memberId=${memberId}&batchName=${batchName}`;
+    } else {
+      showMessage("Batch name not found for this member.", "error");
+    }
+  } else {
+    showMessage("Invalid member ID or member name.", "error");
   }
 }
 
