@@ -19,51 +19,41 @@ body {
     padding: 5px 5px 5px 5px;
 }
 
-/* The entire scrollbar */
+/* Width of the scrollbar */
 ::-webkit-scrollbar {
     width: 5px;
-    /* Width of the vertical scrollbar */
-    height: 12px;
-    /* Height of the horizontal scrollbar */
+    height: 5px;
 }
 
-/* The track (background) */
+/* Track (background of the scrollbar) */
 ::-webkit-scrollbar-track {
     background: #ffffff;
-    /* Color of the track */
-    border-radius: 10px;
-    /* Rounded corners of the track */
 }
 
-/* The thumb (draggable part) */
+/* Handle (dragging part of the scrollbar) */
 ::-webkit-scrollbar-thumb {
     background: #1756B3;
-    /* Color of the thumb */
     border-radius: 10px;
-    /* Rounded corners of the thumb */
+
 }
 
-/* The thumb when hovered */
+/* Handle when hovered */
 ::-webkit-scrollbar-thumb:hover {
     background: #90B4EA;
-    /* Color of the thumb when hovered */
 }
 
-/* The scrollbar buttons */
+/* Button (buttons on the scrollbar) */
 ::-webkit-scrollbar-button {
     background: #ffffff;
-    /* Color of the buttons */
     height: 3px;
-    /* Height of the buttons */
-    width: 20px;
-    /* Width of the buttons */
+    width: 0px;
 }
 
-/* The corner where horizontal and vertical scrollbars meet */
+/* Corner (corner where horizontal and vertical scrollbars meet) */
 ::-webkit-scrollbar-corner {
     background: #1756B3;
-    /* Color of the corner */
 }
+
 
 
 
@@ -174,88 +164,63 @@ body {
 
 }
 
-.dropdown {
-    /* position: relative; */
-    width: 230px;
-    filter: url(#goo);
-}
-
-.dropdown__face, .dropdown__items {
-    background-color: #fff;
-    padding: 4px;
+.dropdown_one {
+    background-color: #ffffff;
+    padding-left: 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
     border-radius: 6px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    min-width: 325px;
+
 }
 
-.dropdown__face {
-    display: block;
-    position: relative;
-}
-
-.dropdown__items {
-    margin: 0;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    width: 100%;
-    list-style: none;
-    list-style-type: none;
-    /* display: flex; */
-    display: block;
-    justify-content: center;
-    visibility: hidden;
-    z-index: -1;
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.93, 0.88, 0.1, 0.8);
-}
-
-.dropdown__items::before {
-    content: "";
-    background-color: #fff;
-    position: absolute;
-    bottom: 100%;
-    right: 20%;
-    height: 40px;
-    width: 20px;
-}
-
-.dropdown__arrow {
-    border-bottom: 2px solid #000;
-    border-right: 2px solid #000;
-    position: absolute;
-    top: 50%;
-    right: 30px;
-    width: 10px;
-    height: 10px;
-    transform: rotate(45deg) translateY(-50%);
-    transform-origin: right;
-}
-
-.dropdown input {
-    display: none;
-}
-
-.dropdown input:checked~.dropdown__items {
-    top: calc(100% + 25px);
-    visibility: visible;
-    opacity: 1;
+.dropdown_one p {
+    display: flex;
+    align-items: center;
 }
 
 
-svg {
-    display: none;
+.dropdown_one select {
+    font-family: "Playfair", serif;
+    font-size: 15px;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings:
+        "wdth"100;
+    border: none;
 }
+
 
 
 .two {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    gap: 20px;
+    justify-content: start;
+    padding-bottom: 5px;
+    overflow-x: auto;
+    /* Ensure the scrollbar is initially hidden */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+}
+
+/* Show scrollbar when hovering over the .two element */
+.two:hover {
+    scrollbar-width: auto;
+    /* Firefox */
+    -ms-overflow-style: auto;
+    /* IE and Edge */
 }
 
 .two_card {
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-    width: 340px;
-    height: 120px;
+    width: 170px;
+    height: 150px;
     border-radius: 4px;
     background-color: rgb(255, 255, 255);
     display: flex;
@@ -451,31 +416,4 @@ svg {
     justify-content: center;
     padding: 0rem 2rem 0rem 2rem;
     width: 650px;
-}
-
-.five {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.five_card {
-    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-    height: 370px;
-    border-radius: 4px;
-    background-color: rgb(255, 255, 255);
-}
-
-#first_five {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0rem 2rem 0rem 2rem;
-    width: 650px;
-}
-
-#second_five {
-    width: 420px;
-    overflow: auto;
-    /* Adds scrollbars only when necessary */
 }
