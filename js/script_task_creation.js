@@ -14,7 +14,7 @@ import {
   getAuth,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
- 
+import { initElements, initializeClock, updateDigit, updateClock } from './timer_task_creation.js';
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
@@ -60,6 +60,16 @@ onAuthStateChanged(auth, async (user) => {
 });
  
 document.addEventListener("DOMContentLoaded", async () => {
+  // console.log((localStorage.getItem('timerEndTime')-Date.now())>0)
+  if((localStorage.getItem('timerEndTime')-Date.now())>0){
+    leftPanel.classList.add("cardFlip");
+    rightPanel.classList.add("slideOutRight");
+    tableContainer.classList.add("fadeIn");
+    timerSection.classList.add("scaleUpFromBottom");
+    const batchData = localStorage.getItem('batch');
+    startTimer();
+    fetchStudents(batchData);
+  }
   document.getElementById("imagePopup").style.display = "none";
   await fetchBatches(); // Fetch and display batches on page load
   // Other event listeners and functionality remain unchanged
@@ -122,12 +132,18 @@ tagNameInput.addEventListener('input', function () {
  
 const button = document.querySelector(".create-task-button");
 button.addEventListener("click", async () => {
+  
+  leftPanel.classList.add("cardFlip");
+  rightPanel.classList.add("slideOutRight");
+  tableContainer.classList.add("fadeIn");
+  timerSection.classList.add("scaleUpFromBottom");
   const selectedBatchId = document.getElementById("batchSelect").value;
   const taskName = document.getElementById("taskName").value;
   const tagName = document.getElementById("tagName").value;
   const taskDescription = document.getElementById("taskDescription").value;
   const time=document.getElementById("time").value;
   const maxMarks=document.getElementById("maxMarks").value;
+  localStorage.setItem("maxMarks",maxMarks);
   if (taskName && taskDescription) {
     await createTask(selectedBatchId, taskName,tagName, taskDescription,time,maxMarks);
     console.log(`Task created for batch: ${selectedBatchId}`);
@@ -154,6 +170,7 @@ async function fetchBatches() {
   // Add event listener to handle batch selection
   batchSelect.addEventListener("change", async (event) => {
     const selectedBatchId = event.target.value;
+    localStorage.setItem('batch',selectedBatchId)
     await fetchStudents(selectedBatchId);
   });
  
@@ -309,7 +326,9 @@ window.addEventListener("click", function (event) {
  
 // Task creation function
 async function createTask(batchId, taskName,tagName, taskDescription,time,maxMarks) {
-    try {
+   
+  
+  try {
   
       if (!currentUser) {
         throw new Error("User is not authenticated");
@@ -339,12 +358,12 @@ async function createTask(batchId, taskName,tagName, taskDescription,time,maxMar
 
   
       // Add task document to Firestore
-      await addDoc(collection(db, "tasks"), taskData);
-      console.log("Task created successfully:", taskData);
-        leftPanel.classList.add("cardFlip");
-        rightPanel.classList.add("slideOutRight");
-        tableContainer.classList.add("fadeIn");
-        timerSection.classList.add("scaleUpFromBottom");
+      // await addDoc(collection(db, "tasks"), taskData);
+      // console.log("Task created successfully:", taskData);
+      //   leftPanel.classList.add("cardFlip");
+      //   rightPanel.classList.add("slideOutRight");
+      //   tableContainer.classList.add("fadeIn");
+      //   timerSection.classList.add("scaleUpFromBottom");
     } catch (error) {
       console.error("Error creating task:", error);
     }
@@ -362,6 +381,80 @@ async function createTask(batchId, taskName,tagName, taskDescription,time,maxMar
   const completeTaskBtn = document.querySelector('.action-btn:nth-child(2)');
   const createTaskBtn = document.querySelector('.create-task-button');
   const extendTimeBtn = document.querySelector('.extend-time-btn');
+  createTaskBtn.addEventListener('click', startTimer);
+  let totalSeconds = 0;
+
+  const startTimerClock = (seconds) => {
+    let endTime = localStorage.getItem('timerEndTime');
+
+    if (!endTime) {
+      endTime = Date.now() + seconds * 1000;
+      localStorage.setItem('timerEndTime', endTime);
+      console.log('timerset');
+    }
+
+    const initialTimeLeft = Math.max(0, endTime - Date.now());
+    const initialHours = Math.floor(initialTimeLeft / (1000 * 60 * 60) % 24);
+    const initialMinutes = Math.floor(initialTimeLeft / (1000 * 60) % 60);
+    const initialSeconds = Math.floor(initialTimeLeft / 1000 % 60);
+
+    initializeClock(initialHours, initialMinutes, initialSeconds);
+
+    let lastUpdateTime = Date.now();
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const timeSinceLastUpdate = now - lastUpdateTime;
+      lastUpdateTime = now;
+
+      const timeLeft = Math.max(0, endTime - now);
+
+      if (timeLeft === 0) {
+        localStorage.removeItem('timerEndTime');
+      } else {
+        const hours = Math.floor(timeLeft / (1000 * 60 * 60) % 24);
+        const minutes = Math.floor(timeLeft / (1000 * 60) % 60);
+        const seconds = Math.floor(timeLeft / 1000 % 60);
+
+        updateClock(hours, minutes, seconds);
+
+        const flipClockContainer = document.querySelector('.flip-clock-container');
+        if (timeLeft <= 60000) {
+          flipClockContainer.classList.add('red');
+        } else {
+          flipClockContainer.classList.remove('red');
+        }
+
+        // Schedule the next update for 1 second from now, or sooner if necessary
+        const nextUpdateTime = Math.max(1000, 1000 - timeSinceLastUpdate);
+        setTimeout(updateTimer, nextUpdateTime);
+      }
+    };
+
+    updateTimer();
+  };
+
+  function startTimer() {
+    const existingEndTime = localStorage.getItem('timerEndTime');
+    if (existingEndTime > 0) {
+      createTaskBtn.disabled = true;
+      const remainingTime = Math.max(0, existingEndTime - Date.now());
+      startTimerClock(Math.ceil(remainingTime / 1000));
+
+    } else {
+      createTaskBtn.disabled = true;
+      const timevalue = time.value;
+      const timeParts = timevalue.split(":");
+      const hours = parseInt(timeParts[0], 10);
+      const minutes = parseInt(timeParts[1], 10);
+      const seconds = parseInt(timeParts[2], 10);
+      totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+      startTimerClock(totalSeconds); // Start a new timer for 3 minutes (180 seconds)
+    }
+  
+    
+}
+
 
 
   
