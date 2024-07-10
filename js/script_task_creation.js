@@ -65,20 +65,77 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Other event listeners and functionality remain unchanged
 });
 
+const tagNameInput = document.getElementById('tagName');
+const tagNameSuggestions = document.getElementById('tagNameSuggestions');
+const suggestions = ["HTML", "JS", "TS", "CPP", "JAVA", "BOOTSTRAP"];
 
+//Formatting the timer section
+function formatTimeInput(input) {
+  const cleanInput = input.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+  let formattedInput = "";
+
+  if (cleanInput.length >= 1) {
+      formattedInput = cleanInput.slice(0, 2);
+  }
+  if (cleanInput.length >= 3) {
+      formattedInput += ":" + cleanInput.slice(2, 4);
+  }
+  if (cleanInput.length >= 5) {
+      formattedInput += ":" + cleanInput.slice(4, 6);
+  }
+
+  return formattedInput;
+}
+
+// Apply formatting to both time fields
+const timeInputs = [document.getElementById("time"), document.getElementById("timeToReduce")];
+
+timeInputs.forEach(input => {
+  input.addEventListener("input", (e) => {
+      e.target.value = formatTimeInput(e.target.value);
+  });
+});
+
+
+// Populate the datalist with initial suggestions
+suggestions.forEach(suggestion => {
+  const option = document.createElement('option');
+  option.value = suggestion;
+  tagNameSuggestions.appendChild(option);
+});
+
+tagNameInput.addEventListener('input', function () {
+  this.value = this.value.toUpperCase();
+  
+  // Clear existing options
+  tagNameSuggestions.innerHTML = '';
+
+  // Add options dynamically based on input value
+  suggestions.forEach(suggestion => {
+    if (suggestion.startsWith(this.value)) {
+      const option = document.createElement('option');
+      option.value = suggestion;
+      tagNameSuggestions.appendChild(option);
+    }
+  });
+});
  
 const button = document.querySelector(".create-task-button");
 button.addEventListener("click", async () => {
   const selectedBatchId = document.getElementById("batchSelect").value;
   const taskName = document.getElementById("taskName").value;
+  const tagName = document.getElementById("tagName").value;
   const taskDescription = document.getElementById("taskDescription").value;
+  const time=document.getElementById("time").value;
+  const maxMarks=document.getElementById("maxMarks").value;
   if (taskName && taskDescription) {
-    await createTask(selectedBatchId, taskName, taskDescription);
+    await createTask(selectedBatchId, taskName,tagName, taskDescription,time,maxMarks);
     console.log(`Task created for batch: ${selectedBatchId}`);
   } else {
     console.log("Task name and description are required.");
   }
 });
+
  
 async function fetchBatches() {
   const batchRef = collection(db, "batches");
@@ -251,7 +308,7 @@ window.addEventListener("click", function (event) {
 });
  
 // Task creation function
-async function createTask(batchId, taskName, taskDescription) {
+async function createTask(batchId, taskName,tagName, taskDescription,time,maxMarks) {
     try {
   
       if (!currentUser) {
@@ -271,6 +328,9 @@ async function createTask(batchId, taskName, taskDescription) {
   
       const taskData = {
         name: taskName,
+        tagName: tagName,
+        time:time,
+        maxMarks:maxMarks,
         description: taskDescription,
         batchId: batchId,
         createdBy: currentUser.uid,

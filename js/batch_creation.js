@@ -35,6 +35,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 let currentUser = null;
+const tags = ['JAVA', 'HTML', 'CSS', 'TS', 'JS', 'BOOTSTRAP'];
+const input = document.getElementById('tagInput');
+const suggestionsBox = document.getElementById('suggestions');
 
 // Check if user is authenticated on page load
 onAuthStateChanged(auth, async (user) => {

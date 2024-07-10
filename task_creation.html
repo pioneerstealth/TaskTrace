@@ -22,6 +22,11 @@
           </div>
           <div class="title">TaskTrace</div>
         </div>
+        <div class="home_logo">
+          <a href="index.html">
+            <img src="./assets/images/home-hashtag.png" alt="home" />
+          </a>
+        </div>
       </div>
       <div class="left-panel">
         <div class="character_container">
@@ -185,28 +190,25 @@
           <form>
             <label for="batchSelect">Select batch *</label>
             <select id="batchSelect" name="batch">
-              <option value="">Select</option>
+              <option value="">Batch Name</option>
             </select>
             <label for="tagName">Tag Name *</label>
-            <input
-              type="text"
-              id="tagName"
-              name="tagName"
-              placeholder="Value"
-            />
+            <input type="text" id="tagName" name="tagName" placeholder="Eg: HTML, CSS, JS, TS, JAVA, BOOTSTRAP, DOTNET, ANGULAR, REACT" list="tagNameSuggestions" />
+            <datalist id="tagNameSuggestions"></datalist>
+              <!-- <div id="tagNameSuggestions" class="suggestions"></div> -->
             <label for="taskName">Task Name *</label>
             <input
               type="text"
               id="taskName"
               name="taskName"
-              placeholder="Value"
+              placeholder="Eg: Factorial"
             />
 
             <label for="taskDescription">Task Description</label>
             <textarea
               id="taskDescription"
               name="taskDescription"
-              placeholder="Description"
+              placeholder="Eg : Write a Java program to print the factorial of a number"
             ></textarea>
 
             <label for="time">Time in 24 hours *</label>
@@ -220,7 +222,7 @@
               type="text"
               id="reductionPercentage"
               name="reductionPercentage"
-              placeholder="00"
+              placeholder="0%"
             />
 
             <label for="timeToReduce">Time to Reduce</label>
@@ -228,7 +230,7 @@
               type="text"
               id="timeToReduce"
               name="timeToReduce"
-              placeholder="00"
+              placeholder="00:00:00"
             />
           </form>
         </div>
