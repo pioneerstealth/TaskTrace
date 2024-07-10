@@ -64,6 +64,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   await fetchBatches(); // Fetch and display batches on page load
   // Other event listeners and functionality remain unchanged
 });
+
+
  
 const button = document.querySelector(".create-task-button");
 button.addEventListener("click", async () => {
@@ -287,4 +289,21 @@ async function createTask(batchId, taskName, taskDescription) {
       console.error("Error creating task:", error);
     }
   }
+  const batchSelect = document.getElementById('batchSelect');
+  const tagName = document.getElementById('tagName');
+  const taskName = document.getElementById('taskName');
+  const taskDescription = document.getElementById('taskDescription');
+  const time = document.getElementById('time');
+  const maxMarks = document.getElementById('maxMarks');
+  const reductionPercentage = document.getElementById('reductionPercentage');
+  const timeToReduce = document.getElementById('timeToReduce');
+  const tableBody = document.getElementById('tableBody');
+  const exportBtn = document.getElementById('exportBtn');
+  const completeTaskBtn = document.querySelector('.action-btn:nth-child(2)');
+  const createTaskBtn = document.querySelector('.create-task-button');
+  const extendTimeBtn = document.querySelector('.extend-time-btn');
+
+
+  
+  
   
