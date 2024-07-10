@@ -13,6 +13,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -35,6 +36,13 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const database = getFirestore(app);
 const auth = getAuth();
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // Redirect to login_signup.html if the user is not logged in
+    window.location.href = "login_signup.html";
+  }
+});
 
 // Prevent page refresh on user icon click
 document.getElementById("user").addEventListener("click", (event) => {
@@ -61,7 +69,21 @@ function fetchUserData() {
             <p id="fullname">Name: ${fullName}</p>
             <p id="email">${email}</p>
             <p id="role">Role: ${role}</p>
+            <button id="signout" class="signout">Sign Out</button>
           `;
+          const signoutButton = document.getElementById("signout");
+
+          // Add an event listener to the signout button
+          signoutButton.addEventListener("click", () => {
+            signOut(auth)
+              .then(() => {
+                console.log("User signed out successfully.");
+                window.location.href="./login_signup.html";
+              })
+              .catch((error) => {
+                console.error("Error signing out:", error);
+              });
+          });
         } else {
           console.log("No such document!");
         }
