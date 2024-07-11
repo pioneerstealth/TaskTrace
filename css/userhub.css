@@ -381,3 +381,12 @@ html, body {
 #role{
     text-align: center;
 }
+
+#signout{
+    text-decoration: none;
+    margin-left: 35%;
+    background-color: #1756B3;
+    color: white;
+    padding: 7px 8px;
+    border-radius: 6px;
+}

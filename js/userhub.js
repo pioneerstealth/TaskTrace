@@ -4,23 +4,17 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebas
 import {
   getFirestore,
   doc,
-  setDoc,
-  updateDoc,
-  getDoc,
+  onSnapshot,
+  collection,
+  getDoc // Added import for getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
   authDomain: "tasktrace-v2.firebaseapp.com",
@@ -37,20 +31,14 @@ const analytics = getAnalytics(app);
 const database = getFirestore(app);
 const auth = getAuth();
 
+// Redirect to login if user is not logged in
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    // Redirect to login_signup.html if the user is not logged in
     window.location.href = "login_signup.html";
   }
 });
 
-// Prevent page refresh on user icon click
-document.getElementById("user").addEventListener("click", (event) => {
-  event.preventDefault();
-  fetchUserData();
-});
-
-// Function to fetch user data and update UI
+// Fetch user data and update UI
 function fetchUserData() {
   const user = auth.currentUser;
   if (user) {
@@ -69,7 +57,7 @@ function fetchUserData() {
             <p id="fullname">Name: ${fullName}</p>
             <p id="email">${email}</p>
             <p id="role">Role: ${role}</p>
-            <button id="signout" class="signout">Sign Out</button>
+            <a href="#" id="signout" class="signout">Sign Out</a>
           `;
           const signoutButton = document.getElementById("signout");
 
@@ -78,7 +66,7 @@ function fetchUserData() {
             signOut(auth)
               .then(() => {
                 console.log("User signed out successfully.");
-                window.location.href="./login_signup.html";
+                window.location.href = "./login_signup.html";
               })
               .catch((error) => {
                 console.error("Error signing out:", error);
@@ -101,6 +89,12 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     fetchUserData();
   }
+});
+
+// Prevent page refresh on user icon click
+document.getElementById("user").addEventListener("click", (event) => {
+  event.preventDefault();
+  fetchUserData();
 });
 
 // Timer code (unchanged)
@@ -232,7 +226,7 @@ onAuthStateChanged(auth, (user) => {
     const remainingTime = Math.max(0, existingEndTime - Date.now());
     startTimer(Math.ceil(remainingTime / 1000));
   } else {
-    startTimer(120); // Start a new timer for 3 minutes (180 seconds)
+    startTimer(120); // Start a new timer for 2 minutes (120 seconds)
   }
 })();
 
@@ -255,3 +249,35 @@ document.addEventListener('click', function(event) {
       info.style.visibility = 'hidden'; // Optional: hide it completely
   }
 });
+
+
+window.onload = () => {
+  const taskTitleDiv = document.querySelector('.task-title');
+  const taskDescriptionDiv = document.querySelector('.description');
+
+  const tasksCollectionRef = collection(database, "tasks");
+
+  onSnapshot(tasksCollectionRef, (snapshot) => {
+    let tasksHtml = ''; // Accumulate HTML content
+
+    snapshot.forEach((doc) => {
+      const taskData = doc.data();
+      const taskName = taskData.taskName;
+      const taskDescription = taskData.taskDescription;
+
+      console.log(taskName); // For debugging purposes
+
+      // Append each task to the accumulated HTML
+      tasksHtml += `
+        <div>
+          <p>Name: ${taskName}</p>
+          <p>Description: ${taskDescription}</p>
+        </div>
+      `;
+    });
+
+    // Update the HTML elements once with all accumulated data
+    taskTitleDiv.innerHTML = tasksHtml;
+    // taskDescriptionDiv.innerHTML = tasksHtml; // Uncomment if both need to display the same content
+  });
+};
