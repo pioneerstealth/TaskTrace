@@ -219,16 +219,50 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
+  // // Fetch and populate batches
+  // async function populateBatchDropdowns() {
+  //   try {
+  //     console.log("Fetching batches...");
+  //     const batchesSnapshot = await getDocs(collection(db, "batches"));
+  //     console.log("Batches fetched:", batchesSnapshot);
+
+  //     const batches = batchesSnapshot.docs.map(doc => {
+  //       console.log("Document data:", doc.data());
+  //       return doc.data().batchName;
+  //     });
+  //     console.log("Batches data:", batches);
+
+  //     const dropdown1 = document.getElementById("dropdown_1");
+  //     const dropdown2 = document.getElementById("dropdown_2");
+
+  //     batches.forEach(batch => {
+  //       const option1 = document.createElement("option");
+  //       option1.value = batch;
+  //       option1.text = batch;
+  //       dropdown1.appendChild(option1);
+
+  //       const option2 = document.createElement("option");
+  //       option2.value = batch;
+  //       option2.text = batch;
+  //       dropdown2.appendChild(option2);
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching batches:", error);
+  //   }
+  // }
+
+  // await populateBatchDropdowns();
+  
   // Fetch and populate batches
   async function populateBatchDropdowns() {
     try {
       console.log("Fetching batches...");
-      const batchesSnapshot = await getDocs(collection(db, "batches"));
+      const batchesSnapshot = await getDocs(collection(db, "Marks"));
       console.log("Batches fetched:", batchesSnapshot);
 
       const batches = batchesSnapshot.docs.map(doc => {
         console.log("Document data:", doc.data());
-        return doc.data().batchName;
+        return doc.data().BatchName; 
       });
       console.log("Batches data:", batches);
 
