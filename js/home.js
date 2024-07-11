@@ -96,7 +96,7 @@ function fetchUserData() {
             <p id="fullname">Name: ${fullName}</p>
             <p id="email">${email}</p>
             <p id="role">Role: ${role}</p>
-            <button id="signout" class="signout">Sign Out</button>
+            <a href="" id="signout" class="signout">Sign Out</a>
           `;
           const signoutButton = document.getElementById("signout");
 
