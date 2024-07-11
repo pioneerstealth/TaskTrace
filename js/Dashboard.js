@@ -1,6 +1,9 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -11,7 +14,7 @@ const firebaseConfig = {
   storageBucket: "tasktrace-v2.appspot.com",
   messagingSenderId: "863318084099",
   appId: "1:863318084099:web:6a9abab8d8893caaf9dc36",
-  measurementId: "G-59DHK1FJ88"
+  measurementId: "G-59DHK1FJ88",
 };
 
 // Initialize Firebase app
@@ -173,86 +176,136 @@ document.addEventListener("DOMContentLoaded", async function () {
       chart2.config.type = chartType2;
       chart2.update(); // Update the chart to reflect changes
     });
+  // first table population--------------------------------------
+  const tableBody_second_three = document.getElementById(
+    "tableBody_second_three"
+  );
 
-  document.getElementById("piCheckbox").addEventListener("change", function () {
-    const tableDiv = document.getElementById("second_three2");
-    const chartDiv = document.getElementById("chartContainer");
-    const tableBody = document.getElementById("tableBody");
+  //  first pie chart--------------------------------------------------------
 
-    if (this.checked) {
-      // Hide the table and show the chart
-      tableDiv.style.display = "none";
-      chartDiv.style.display = "block";
+  let piCheckbox_second_three_flag = false;
+  document
+    .getElementById("piCheckbox_second_three")
+    .addEventListener("change", function () {
+      const tableDiv = document.getElementById("second_three2");
+      const chartContainer_second_three2 = document.getElementById(
+        "chartContainer_second_three2"
+      );
 
-      // Create dummy data for the pie chart
-      const data = {
-        labels: ["Tag1", "Tag2"],
-        datasets: [
-          {
-            label: "Average Mark",
-            data: [87.5, 77.5],
-            backgroundColor: ["Red", "Blue"],
-          },
-        ],
-      };
+      if (this.checked) {
+        // Hide the table and show the chart
+        tableDiv.style.display = "none";
+        chartContainer_second_three2.style.display = "block";
 
-      // Create the pie chart
-      const ctx = document.getElementById("pieChart").getContext("2d");
-      new Chart(ctx, {
-        type: "pie",
-        data: data,
-        options: {
-          plugins: {
-            title: {
-              display: true,
-              text: "Batch Name",
-              align: "start",
-              color: "black",
+        // Create dummy data for the pie chart
+        const data = {
+          labels: ["Tag1", "Tag2"],
+          datasets: [
+            {
+              label: "Average Mark",
+              data: [87.5, 77.5],
+              backgroundColor: ["Red", "Blue"],
             },
-          },
-        },
-      });
-    } else {
-      // Show the table and hide the chart
-      tableDiv.style.display = "block";
-      chartDiv.style.display = "none";
-    }
-  });
+          ],
+        };
+        if (!piCheckbox_second_three_flag) {
+          piCheckbox_second_three_flag = true;
+          // Create the pie chart
+          const ctx = document
+            .getElementById("pieChart_second_three2")
+            .getContext("2d");
+          new Chart(ctx, {
+            type: "pie",
+            data: data,
+            options: {
+              plugins: {
+                legend: {
+                  labels: {
+                    usePointStyle: true,
+                    pointStyle: "rectRounded",
+                  },
+                },
+                title: {
+                  display: true,
+                  text: "Batch Name",
+                  align: "start",
+                  color: "black",
+                },
+              },
+            },
+          });
+        }
+      } else {
+        // Show the table and hide the chart
+        tableDiv.style.display = "block";
+        chartContainer_second_three2.style.display = "none";
+      }
+    });
 
-  // // Fetch and populate batches
-  // async function populateBatchDropdowns() {
-  //   try {
-  //     console.log("Fetching batches...");
-  //     const batchesSnapshot = await getDocs(collection(db, "batches"));
-  //     console.log("Batches fetched:", batchesSnapshot);
+  // second table population--------------------------------------
+  const tableBody_first_four = document.getElementById("tableBody_first_four");
 
-  //     const batches = batchesSnapshot.docs.map(doc => {
-  //       console.log("Document data:", doc.data());
-  //       return doc.data().batchName;
-  //     });
-  //     console.log("Batches data:", batches);
+  //  secont pie chart--------------------------------------------------------
 
-  //     const dropdown1 = document.getElementById("dropdown_1");
-  //     const dropdown2 = document.getElementById("dropdown_2");
+  let piCheckbox_first_four_flag = false;
+  document
+    .getElementById("piCheckbox_first_four")
+    .addEventListener("change", function () {
+      const tableDiv = document.getElementById("first_four2");
+      const chartContainer_first_four2 = document.getElementById(
+        "chartContainer_first_four2"
+      );
 
-  //     batches.forEach(batch => {
-  //       const option1 = document.createElement("option");
-  //       option1.value = batch;
-  //       option1.text = batch;
-  //       dropdown1.appendChild(option1);
+      if (this.checked) {
+        // Hide the table and show the chart
+        tableDiv.style.display = "none";
+        chartContainer_first_four2.style.display = "block";
 
-  //       const option2 = document.createElement("option");
-  //       option2.value = batch;
-  //       option2.text = batch;
-  //       dropdown2.appendChild(option2);
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching batches:", error);
-  //   }
-  // }
+        // Create dummy data for the pie chart
+        const data = {
+          labels: ["Tag1", "Tag2"],
+          datasets: [
+            {
+              label: "Average Mark",
+              data: [87.5, 77.5],
+              backgroundColor: ["pink", "green"],
+            },
+          ],
+        };
+        if (!piCheckbox_first_four_flag) {
+          piCheckbox_first_four_flag = true;
+          // Create the pie chart
+          const ctx = document
+            .getElementById("pieChart_first_four2")
+            .getContext("2d");
+          new Chart(ctx, {
+            type: "pie",
+            data: data,
+            options: {
+              plugins: {
+                legend: {
+                  labels: {
+                    usePointStyle: true,
+                    pointStyle: "rectRounded",
+                  },
+                },
+                title: {
+                  display: true,
+                  text: "Batch Name",
+                  align: "start",
+                  color: "black",
+                },
+              },
+            },
+          });
+        }
+      } else {
+        // Show the table and hide the chart
+        tableDiv.style.display = "block";
+        chartContainer_first_four2.style.display = "none";
+      }
+    });
 
-  // await populateBatchDropdowns();
-  
   // Fetch and populate batches
   async function populateBatchDropdowns() {
     try {
@@ -260,16 +313,16 @@ document.addEventListener("DOMContentLoaded", async function () {
       const batchesSnapshot = await getDocs(collection(db, "Marks"));
       console.log("Batches fetched:", batchesSnapshot);
 
-      const batches = batchesSnapshot.docs.map(doc => {
+      const batches = batchesSnapshot.docs.map((doc) => {
         console.log("Document data:", doc.data());
-        return doc.data().BatchName; 
+        return doc.data().BatchName;
       });
       console.log("Batches data:", batches);
 
       const dropdown1 = document.getElementById("dropdown_1");
       const dropdown2 = document.getElementById("dropdown_2");
 
-      batches.forEach(batch => {
+      batches.forEach((batch) => {
         const option1 = document.createElement("option");
         option1.value = batch;
         option1.text = batch;
