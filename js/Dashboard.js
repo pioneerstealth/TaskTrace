@@ -32,20 +32,20 @@ document.addEventListener("DOMContentLoaded", async function () {
   const chart1 = new Chart(chart_first_three, {
     type: chartType1,
     data: {
-      labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+      labels: [0, "Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
       datasets: [
         {
           label: "B1",
           backgroundColor: "#342567",
           borderColor: "#342567",
-          data: [17, 19, 3, 5, 2, 3],
+          data: [0, 17, 19, 3, 5, 2, 3],
           borderWidth: 1.5,
         },
         {
           label: "B2",
           backgroundColor: "#345557",
           borderColor: "#345557",
-          data: [12, 9, 6, 8, 2, 6],
+          data: [0, 12, 9, 6, 8, 2, 6],
           borderWidth: 1.5,
         },
       ],
@@ -107,20 +107,20 @@ document.addEventListener("DOMContentLoaded", async function () {
   const chart2 = new Chart(chart_second_four, {
     type: chartType2,
     data: {
-      labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+      labels: [0, "Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
       datasets: [
         {
           label: "B1",
           backgroundColor: "#f11167",
           borderColor: "#f11167",
-          data: [1, 9, 13, 15, 8, 8],
+          data: [0, 1, 9, 13, 15, 8, 8],
           borderWidth: 1.5,
         },
         {
           label: "B2",
           backgroundColor: "#341111",
           borderColor: "#341111",
-          data: [11, 19, 16, 0, 0, 16],
+          data: [0, 11, 19, 16, 0, 0, 16],
           borderWidth: 1.5,
         },
       ],
