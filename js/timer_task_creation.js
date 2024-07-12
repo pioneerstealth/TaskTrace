@@ -77,5 +77,5 @@
 
   
 
-  // Check if there's an existing timer and start it, or start a new one
+
  
