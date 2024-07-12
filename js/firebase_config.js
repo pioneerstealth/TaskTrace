@@ -17,14 +17,13 @@ import {
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  // Your Firebase config
-  apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
-  authDomain: "tasktrace-v2.firebaseapp.com",
-  projectId: "tasktrace-v2",
-  storageBucket: "tasktrace-v2.appspot.com",
-  messagingSenderId: "863318084099",
-  appId: "1:863318084099:web:6a9abab8d8893caaf9dc36",
-  measurementId: "G-59DHK1FJ88",
+  apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
+  authDomain: "task-trace.firebaseapp.com",
+  projectId: "task-trace",
+  storageBucket: "task-trace.appspot.com",
+  messagingSenderId: "542109212256",
+  appId: "1:542109212256:web:a54bd96c131eff4a152d05",
+  measurementId: "G-MZNCSCVN54"
 };
 
 const app = initializeApp(firebaseConfig);

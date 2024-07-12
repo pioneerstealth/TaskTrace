@@ -4,9 +4,12 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebas
 import {
   getFirestore,
   doc,
-  onSnapshot,
+  getDocs,
+  getDoc,
   collection,
-  getDoc // Added import for getDoc
+  query,
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getAuth,
@@ -16,13 +19,13 @@ import {
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
-  authDomain: "tasktrace-v2.firebaseapp.com",
-  projectId: "tasktrace-v2",
-  storageBucket: "tasktrace-v2.appspot.com",
-  messagingSenderId: "863318084099",
-  appId: "1:863318084099:web:6a9abab8d8893caaf9dc36",
-  measurementId: "G-59DHK1FJ88",
+  apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
+  authDomain: "task-trace.firebaseapp.com",
+  projectId: "task-trace",
+  storageBucket: "task-trace",
+  messagingSenderId: "542109212256",
+  appId: "1:542109212256:web:a54bd96c131eff4a152d05",
+  measurementId: "G-MZNCSCVN54"
 };
 
 // Initialize Firebase
@@ -97,139 +100,6 @@ document.getElementById("user").addEventListener("click", (event) => {
   fetchUserData();
 });
 
-// Timer code (unchanged)
-(() => {
-  "use strict";
-
-  const initElements = (type) => {
-    const els = [{}, {}];
-    if (!["s", "m", "h"].includes(type)) return els;
-
-    const target = document.querySelector(`.flip-clock-${type}`);
-    if (!target) return els;
-
-    ["left", "right"].forEach((side, index) => {
-      const el = els[index];
-      el.digit = target.querySelector(`.digit-${side}`);
-      el.card = el.digit.querySelector(".card");
-      el.cardFaces = el.card.querySelectorAll(".card-face");
-      [el.cardFaceA, el.cardFaceB] = el.cardFaces;
-    });
-
-    return els;
-  };
-
-  const els = {
-    h: initElements("h"),
-    m: initElements("m"),
-    s: initElements("s")
-  };
-
-  const initializeClock = (h, m, s) => {
-    const time = {
-      h: [Math.floor(h / 10), h % 10],
-      m: [Math.floor(m / 10), m % 10],
-      s: [Math.floor(s / 10), s % 10]
-    };
-
-    Object.entries(time).forEach(([unit, digits]) => {
-      digits.forEach((digit, index) => {
-        const el = els[unit][index];
-        el.digit.dataset.digitBefore = digit;
-        el.cardFaceA.textContent = digit;
-        el.cardFaceB.textContent = digit;
-      });
-    });
-  };
-
-  const updateDigit = (el, newDigit) => {
-    if (!el.digit) return;
-
-    const currentDigit = parseInt(el.digit.dataset.digitBefore);
-    
-    if (currentDigit !== newDigit) {
-      el.cardFaceB.textContent = newDigit;
-
-      el.card.addEventListener("transitionend", () => {
-        el.digit.dataset.digitBefore = newDigit;
-        el.cardFaceA.textContent = newDigit;
-
-        const cardClone = el.card.cloneNode(true);
-        cardClone.classList.remove("flipped");
-        el.digit.replaceChild(cardClone, el.card);
-        el.card = cardClone;
-        [el.cardFaceA, el.cardFaceB] = el.card.querySelectorAll(".card-face");
-      }, { once: true });
-
-      el.card.classList.add("flipped");
-    }
-  };
-
-  const updateClock = (h, m, s) => {
-    const time = {
-      h: [Math.floor(h / 10), h % 10],
-      m: [Math.floor(m / 10), m % 10],
-      s: [Math.floor(s / 10), s % 10]
-    };
-
-    Object.entries(time).forEach(([unit, digits]) => {
-      digits.forEach((digit, index) => updateDigit(els[unit][index], digit));
-    });
-  };
-
-  const startTimer = (seconds) => {
-    let endTime = localStorage.getItem('timerEndTime');
-    
-    if (!endTime) {
-      endTime = Date.now() + seconds * 1000;
-      localStorage.setItem('timerEndTime', endTime);
-    }
-
-    const initialTimeLeft = Math.max(0, endTime - Date.now());
-    const initialHours = Math.floor(initialTimeLeft / (1000 * 60 * 60) % 24);
-    const initialMinutes = Math.floor(initialTimeLeft / (1000 * 60) % 60);
-    const initialSeconds = Math.floor(initialTimeLeft / 1000 % 60);
-
-    initializeClock(initialHours, initialMinutes, initialSeconds);
-
-    const updateTimer = () => {
-      const now = Date.now();
-      const timeLeft = Math.max(0, endTime - now);
-
-      if (timeLeft === 0) {
-        localStorage.removeItem('timerEndTime');
-      } else {
-        const hours = Math.floor(timeLeft / (1000 * 60 * 60) % 24);
-        const minutes = Math.floor(timeLeft / (1000 * 60) % 60);
-        const seconds = Math.floor(timeLeft / 1000 % 60);
-
-        updateClock(hours, minutes, seconds);
-
-        // Add red animation if time left is below 100 seconds
-        const flipClockContainer = document.querySelector('.flip-clock-container');
-        if (timeLeft <= 60000) {
-          flipClockContainer.classList.add('red');
-        } else {
-          flipClockContainer.classList.remove('red');
-        }
-
-        requestAnimationFrame(updateTimer);
-      }
-    };
-
-    updateTimer();
-  };
-
-  // Check if there's an existing timer and start it, or start a new one
-  const existingEndTime = localStorage.getItem('timerEndTime');
-  if (existingEndTime) {
-    const remainingTime = Math.max(0, existingEndTime - Date.now());
-    startTimer(Math.ceil(remainingTime / 1000));
-  } else {
-    startTimer(120); // Start a new timer for 2 minutes (120 seconds)
-  }
-})();
-
 const userinfo = document.getElementById('user');
 const info = document.getElementById('info');
 
@@ -250,34 +120,174 @@ document.addEventListener('click', function(event) {
   }
 });
 
-
-window.onload = () => {
-  const taskTitleDiv = document.querySelector('.task-title');
-  const taskDescriptionDiv = document.querySelector('.description');
-
+// Function to fetch and display the active task
+async function fetchActiveTask() {
   const tasksCollectionRef = collection(database, "tasks");
+  const tasksQuery = query(tasksCollectionRef, orderBy("createdAt", "desc"), limit(1));
+  
+  const snapshot = await getDocs(tasksQuery);
 
-  onSnapshot(tasksCollectionRef, (snapshot) => {
-    let tasksHtml = ''; // Accumulate HTML content
+  if (!snapshot.empty) {
+    const now = new Date();
+    let activeTaskHtml = '';
+    let timeLeftMs = 0;
 
     snapshot.forEach((doc) => {
       const taskData = doc.data();
-      const taskName = taskData.taskName;
-      const taskDescription = taskData.taskDescription;
+      const taskName = taskData.name;
+      const taskDescription = taskData.description;
+      const createdAt = taskData.createdAt.toDate();
+      const timeLimit = taskData.time; // Assume format is "HH:MM:SS"
 
-      console.log(taskName); // For debugging purposes
+      // Convert time limit to milliseconds
+      const [hours, minutes, seconds] = timeLimit.split(':').map(Number);
+      const timeLimitMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
 
-      // Append each task to the accumulated HTML
-      tasksHtml += `
-        <div>
-          <p>Name: ${taskName}</p>
-          <p>Description: ${taskDescription}</p>
-        </div>
-      `;
+      const taskExpiration = new Date(createdAt.getTime() + timeLimitMs);
+
+      if (now <= taskExpiration) {
+        console.log(`Active task found: ${taskName}`); // Debugging
+        activeTaskHtml += `
+          <div>
+            <p>Name: ${taskName}</p>
+            <p>Description: ${taskDescription}</p>
+          </div>
+        `;
+        timeLeftMs = taskExpiration - now; // Calculate remaining time
+      } else {
+        console.log(`Task ${taskName} is not active anymore.`); // Debugging
+      }
     });
 
-    // Update the HTML elements once with all accumulated data
-    taskTitleDiv.innerHTML = tasksHtml;
-    // taskDescriptionDiv.innerHTML = tasksHtml; // Uncomment if both need to display the same content
+    const taskTitleDiv = document.querySelector('.task-title');
+    if (taskTitleDiv) {
+      taskTitleDiv.innerHTML = activeTaskHtml || "<p>No active tasks found</p>";
+    } else {
+      console.error("taskTitleDiv not found in the DOM.");
+    }
+
+    // Start the timer based on the remaining time of the active task
+    startTimer(timeLeftMs / 1000); // Convert milliseconds to seconds
+  } else {
+    console.log("No tasks found.");
+    const taskTitleDiv = document.querySelector('.task-title');
+    if (taskTitleDiv) {
+      taskTitleDiv.innerHTML = "<p>No tasks found</p>";
+    }
+    startTimer(0); // Set the timer to 0 when no tasks are found
+  }
+}
+
+// Timer code
+const initElements = (type) => {
+  const els = [{}, {}];
+  if (!["s", "m", "h"].includes(type)) return els;
+
+  const target = document.querySelector(`.flip-clock-${type}`);
+  if (!target) return els;
+
+  ["left", "right"].forEach((side, index) => {
+    const el = els[index];
+    el.digit = target.querySelector(`.digit-${side}`);
+    el.card = el.digit.querySelector(".card");
+    el.cardFaces = el.card.querySelectorAll(".card-face");
+    [el.cardFaceA, el.cardFaceB] = el.cardFaces;
   });
+
+  return els;
+};
+
+const els = {
+  h: initElements("h"),
+  m: initElements("m"),
+  s: initElements("s")
+};
+
+const initializeClock = (h, m, s) => {
+  const time = {
+    h: [Math.floor(h / 10), h % 10],
+    m: [Math.floor(m / 10), m % 10],
+    s: [Math.floor(s / 10), s % 10]
+  };
+
+  Object.entries(time).forEach(([unit, digits]) => {
+    digits.forEach((digit, index) => {
+      const el = els[unit][index];
+      el.digit.dataset.digitBefore = digit;
+      el.cardFaceA.textContent = digit;
+      el.cardFaceB.textContent = digit;
+    });
+  });
+};
+
+const updateDigit = (el, newDigit) => {
+  if (!el.digit) return;
+
+  const currentDigit = parseInt(el.digit.dataset.digitBefore);
+  
+  if (currentDigit !== newDigit) {
+    el.cardFaceB.textContent = newDigit;
+
+    el.card.addEventListener("transitionend", () => {
+      el.digit.dataset.digitBefore = newDigit;
+      el.cardFaceA.textContent = newDigit;
+
+      const cardClone = el.card.cloneNode(true);
+      cardClone.classList.remove("flipped");
+      el.digit.replaceChild(cardClone, el.card);
+      el.card = cardClone;
+      [el.cardFaceA, el.cardFaceB] = el.card.querySelectorAll(".card-face");
+    }, { once: true });
+
+    el.card.classList.add("flipped");
+  }
+};
+
+const updateClock = (h, m, s) => {
+  const time = {
+    h: [Math.floor(h / 10), h % 10],
+    m: [Math.floor(m / 10), m % 10],
+    s: [Math.floor(s / 10), s % 10]
+  };
+
+  Object.entries(time).forEach(([unit, digits]) => {
+    digits.forEach((digit, index) => updateDigit(els[unit][index], digit));
+  });
+};
+
+const startTimer = (seconds) => {
+  let endTime = Date.now() + seconds * 1000;
+
+  const updateTimer = () => {
+    const now = Date.now();
+    const timeLeft = Math.max(0, endTime - now);
+
+    if (timeLeft === 0) {
+      console.log("Timer finished.");
+      updateClock(0, 0, 0); // Set the clock to 0:0:0
+    } else {
+      const hours = Math.floor(timeLeft / (1000 * 60 * 60) % 24);
+      const minutes = Math.floor(timeLeft / (1000 * 60) % 60);
+      const seconds = Math.floor(timeLeft / 1000 % 60);
+
+      updateClock(hours, minutes, seconds);
+
+      // Add red animation if time left is below 100 seconds
+      const flipClockContainer = document.querySelector('.flip-clock-container');
+      if (timeLeft <= 60000) {
+        flipClockContainer.classList.add('red');
+      } else {
+        flipClockContainer.classList.remove('red');
+      }
+
+      requestAnimationFrame(updateTimer);
+    }
+  };
+
+  updateTimer();
+};
+
+// Fetch and display active task when the page loads
+window.onload = () => {
+  fetchActiveTask();
 };
