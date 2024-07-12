@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Create a gradient for the "Obtained" segment
   var gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
   gradient.addColorStop(1, "#36A2EB");
-  gradient.addColorStop(0, "#ffffff");
+  gradient.addColorStop(0, "#EAF5FD");
 
   // Create the custom plugin to draw text in the center
   const centerTextPlugin = {
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
         {
           data: [70, 30], // 70% obtained out of 100%
           backgroundColor: [gradient, "#ffffff"], // Gradient for "Obtained" and solid color for "Remaining"
-          hoverBackgroundColor: [gradient, "#FF6384"],
+          hoverBackgroundColor: [gradient, "#ff0000"],
         },
       ],
     },
@@ -137,8 +137,8 @@ document.addEventListener("DOMContentLoaded", function () {
     .getContext("2d");
 
   var gradientSecond = DoughnutChart_second.createLinearGradient(0, 0, 0, 400);
-  gradientSecond.addColorStop(1, "#FF6384");
-  gradientSecond.addColorStop(0, "#ffffff");
+  gradientSecond.addColorStop(1, "#57C16B");
+  gradientSecond.addColorStop(0, "#DDF2E1");
 
   const centerTextPluginSecond = {
     id: "centerTextPluginSecond",
@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
         textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
         textY1 = height / 2 - 10;
 
-      ctx.fillStyle = "#FF6384";
+      ctx.fillStyle = "#57C16B";
       ctx.fillText(text1, textX1, textY1);
 
       var smallerFontSize = (height / 200).toFixed(2);
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
         textY2 = height / 2 + 20;
 
-      ctx.fillStyle = "#FF6384";
+      ctx.fillStyle = "#57C16B";
       ctx.fillText(text2, textX2, textY2);
 
       ctx.save();
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
         {
           data: [60, 40],
           backgroundColor: [gradientSecond, "#ffffff"],
-          hoverBackgroundColor: [gradientSecond, "#FF6384"],
+          hoverBackgroundColor: [gradientSecond, "#FF0000"],
         },
       ],
     },
@@ -203,4 +203,85 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     plugins: [centerTextPluginSecond],
   });
+
+  // chart1----------------------------------------------
+
+  // Chart setup for the second chart in 'first_two' div
+  let chartType2 = "line";
+
+  // Create the new chart
+  const chart_second_four = document.getElementById("chart_first_two"); // Get the new canvas element
+
+  const chart2 = new Chart(chart_second_four, {
+    type: chartType2,
+    data: {
+      labels: [0, "Red", "Blue", "Yellow", "Green", "Purple", "Orange", ""],
+      datasets: [
+        {
+          label: "Batch",
+          backgroundColor: "#f11167",
+          borderColor: "#f11167",
+          data: [0, 1, 9, 13, 15, 8, 8],
+          borderWidth: 1.5,
+        },
+        {
+          label: "Individual",
+          backgroundColor: "#341111",
+          borderColor: "#341111",
+          data: [0, 11, 19, 16, 0, 0, 16],
+          borderWidth: 1.5,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          align: "end",
+          labels: {
+            usePointStyle: true,
+            pointStyle: "rectRounded",
+          },
+        },
+      },
+      animation: {
+        duration: 2000, // Animation duration in milliseconds
+        easing: "bounce", // Animation effect
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Average Time", // Set your Y axis label here
+            font: {
+              size: 14,
+              weight: "bold",
+            },
+            color: "black",
+          },
+        },
+        x: {
+          title: {
+            display: true,
+            text: "Task Tags", // Set your X axis label here
+            font: {
+              size: 14,
+              weight: "bold",
+            },
+            color: "black",
+          },
+        },
+      },
+    },
+  });
+
+  // Toggle chart type on button click
+  document
+    .getElementById("switch_button_checkbox_first_two")
+    .addEventListener("click", function () {
+      // Toggle chart type
+      chartType2 = chartType2 === "bar" ? "line" : "bar";
+      chart2.config.type = chartType2;
+      chart2.update(); // Update the chart to reflect changes
+    });
 });
