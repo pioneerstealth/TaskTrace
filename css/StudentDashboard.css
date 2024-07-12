@@ -253,8 +253,85 @@ body {
 
 #second_one2 {
     height: 370px;
+}
+
+.second_one2_dropdown {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    height: 30px;
+    width: 100%;
+}
+
+
+#taskStatusDropdown {
+    border: none;
+    /* No border */
+    width: 40%;
+    /* Width set to 70% */
+    height: 30px;
+    font-size: 16px;
+    font-family: "Playfair", serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings:
+        "wdth"100;
+    border-radius: 6px;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+}
+
+/* Style the option elements */
+#taskStatusDropdown option {
+    background-color: #ffffff;
+}
+
+.second_one2_table {
+    overflow-y: auto;
+    height: 300px;
+    width: 100%;
+}
+
+.table_head {
+    color: #828282;
+    font-weight: 500;
+    /* border: 1px solid #000; */
+    /* Add border to the table header */
+}
+
+table {
+    width: 100%;
+    /* Make the table full width */
+    border-collapse: collapse;
+    /* Ensure borders are collapsed for a cleaner look */
+    /* border: 1px solid #000;
+    border-radius: 5px; */
+}
+
+table, th, td {
+    border: 1px solid #000;
+    /* Add border to the table, table headers, and table cells */
+    border-radius: 5px;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+    width: 50%;
+    /* Add padding for better readability */
 
 }
+
+
+
+#markTable_second_one2 {
+    width: 100%;
+
+}
+
+
+
 
 .two {
     display: flex;

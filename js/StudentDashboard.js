@@ -284,4 +284,19 @@ document.addEventListener("DOMContentLoaded", function () {
       chart2.config.type = chartType2;
       chart2.update(); // Update the chart to reflect changes
     });
+
+  // JavaScript to populate the dropdown options-----------------------------------------
+  var dropdown = document.getElementById("taskStatusDropdown");
+  var options = [
+    "Completed Tasks",
+    "Time extended Tasks",
+    "Not completed Tasks",
+  ];
+
+  options.forEach(function (optionText) {
+    var option = document.createElement("option");
+    option.text = optionText;
+    option.value = optionText.toLowerCase().replace(/ /g, "_");
+    dropdown.appendChild(option);
+  });
 });
