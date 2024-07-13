@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Average Time", // Set your Y axis label here
+            text: "Average Mark", // Set your Y axis label here
             font: {
               size: 14,
               weight: "bold",
