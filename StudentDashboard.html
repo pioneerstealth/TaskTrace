@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="./assets/images/tasktrace_logo1.png"
+      type="image/png"
+    />
+    <link rel="stylesheet" href="./css/StudentDashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>TaskTrace</title>
+  </head>
+  <body>
+    <div class="navbar_Dashboard">
+      <div class="logo_title">
+        <div class="logo">
+          <img src="./assets/images/T1.png" alt="logo" />
+        </div>
+        <div class="title">TaskTrace</div>
+      </div>
+      <div
+        class="home_icon"
+        onclick="window.location.href='./index.html';"
+      ></div>
+    </div>
+
+    <div class="Dashboard_section">
+      <div class="one">
+        <div class="one_card" id="first_one">
+          <div class="first_imgHead">
+            <div class="first_imgHead_image"></div>
+            <div class="first_imgHead_heading">
+              Rithik Ramachandran A <br />
+              ILP Batch 4
+            </div>
+          </div>
+          <div class="first_pi_data">
+            <canvas id="first_piChart"></canvas>
+          </div>
+        </div>
+        <div id="second_one">
+          <div class="one_card" id="second_one1">
+            <div class="second_one1_heading">
+              Avg mark scored by the individual
+            </div>
+            <div class="second_one1_charts">
+              <div id="donutchart1">
+                <canvas id="DoughnutChart_first"></canvas>
+              </div>
+              <div id="donutchart2">
+                <canvas id="DoughnutChart_second"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="one_card" id="second_one2">
+              <div class="second_one2_dropdown">
+                                <!-- Dropdown select option will be created here -->
+                                <select id="taskStatusDropdown"></select>
+            </div>
+            <div class="second_one2_table">
+              <table id="markTable_second_one2">
+                  <thead class="table_head">
+                      <tr>
+                          <th>Tags</th>
+                          <th>Average Time</th>
+                      </tr>
+                  </thead>
+                  <tbody id="tableBody_second_one">
+                      <!-- Table rows will be populated dynamically -->
+                  </tbody>
+              </table>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="two">
+        <div class="two_card" id="first_two">
+          <div class="title_toggle">
+            <div id="title_first_two">
+              Performance Metrics: Number of Individuals and Attained Marks
+            </div>
+            <div class="switch-button">
+              <input class="switch_button_checkbox" id="switch_button_checkbox_first_two" type="checkbox"></input>
+              <label class="switch-button-label" for=""><span class="switch-button-label-span">Bar</span></label>
+            </div>
+          </div>
+          <div class="chart1">
+            <canvas id="chart_first_two">
+
+            </canvas>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <script defer type="module" src="./js/StudentDashboard.js"></script>
+  </body>
+</html>

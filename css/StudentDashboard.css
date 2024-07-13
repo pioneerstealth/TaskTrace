@@ -1,0 +1,451 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family   =Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    font-family: "Playfair", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: "wdth"100;
+    width: 100%;
+    padding: 5px 5px 5px 5px;
+}
+
+/* The entire scrollbar */
+::-webkit-scrollbar {
+    width: 5px;
+    /* Width of the vertical scrollbar */
+    height: 12px;
+    /* Height of the horizontal scrollbar */
+}
+
+/* The track (background) */
+::-webkit-scrollbar-track {
+    background: #ffffff;
+    /* Color of the track */
+    border-radius: 10px;
+    /* Rounded corners of the track */
+}
+
+/* The thumb (draggable part) */
+::-webkit-scrollbar-thumb {
+    background: #1756B3;
+    /* Color of the thumb */
+    border-radius: 10px;
+    /* Rounded corners of the thumb */
+}
+
+/* The thumb when hovered */
+::-webkit-scrollbar-thumb:hover {
+    background: #90B4EA;
+    /* Color of the thumb when hovered */
+}
+
+/* The scrollbar buttons */
+::-webkit-scrollbar-button {
+    background: #ffffff;
+    /* Color of the buttons */
+    height: 3px;
+    /* Height of the buttons */
+    width: 20px;
+    /* Width of the buttons */
+}
+
+/* The corner where horizontal and vertical scrollbars meet */
+::-webkit-scrollbar-corner {
+    background: #1756B3;
+    /* Color of the corner */
+}
+
+
+
+.navbar_Dashboard {
+    /* position: sticky; */
+    display: flex;
+    flex-direction: row;
+    border-radius: 6px 6px 0px 0px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1756B3;
+    width: 100%;
+    height: 39px;
+}
+
+.logo_title {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin: 0px 0px 0px 30px;
+    width: 150px;
+    height: 30px;
+    gap: 10px;
+}
+
+.logo {
+    background-color: #ffffff;
+    border-radius: 15px;
+    width: 30px;
+    height: 30px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 15px;
+    /* Maintains aspect ratio */
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-family: "Cinzel", serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    color: #fff;
+}
+
+.home_icon {
+    background-image: url('../assets/images/home-hashtag.png');
+    background-size: cover;
+    background-position: center;
+    margin-right: 10px;
+    width: 25px;
+    height: 25px;
+}
+
+
+.Dashboard_section {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to bottom right, #DDEBFF, #90B4EA);
+    width: 100%;
+    /* height: 100vh; */
+    padding: 3rem 7rem 3rem 7rem;
+    gap: 3rem;
+}
+
+.one {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.one_card {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem 2.5rem .5rem 2.5rem;
+}
+
+#first_one {
+    width: 400px;
+    height: 700px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.first_imgHead {
+    height: 250px;
+    width: 250px;
+    /* background-color: violet; */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+
+}
+
+.first_imgHead_image {
+    height: 170px;
+    width: 170px;
+    background-color: aqua;
+    border-radius: 100px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.first_imgHead_heading {
+    text-align: center;
+    /* background-color: antiquewhite; */
+    width: 210px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.first_pi_data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 350px;
+    width: 100%;
+
+}
+
+
+
+#second_one {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 550px;
+    height: 700px;
+}
+
+#second_one1 {
+    height: 290px;
+
+}
+
+.second_one1_heading {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: "Cinzel", serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 20px;
+
+}
+
+.second_one1_charts {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 210px;
+}
+
+#donutchart1 {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#donutchart2 {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#second_one2 {
+    height: 370px;
+}
+
+.second_one2_dropdown {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    height: 30px;
+    width: 100%;
+}
+
+
+#taskStatusDropdown {
+    border: none;
+    /* No border */
+    width: 40%;
+    /* Width set to 70% */
+    height: 30px;
+    font-size: 16px;
+    font-family: "Playfair", serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings:
+        "wdth"100;
+    border-radius: 6px;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+}
+
+/* Style the option elements */
+#taskStatusDropdown option {
+    background-color: #ffffff;
+}
+
+.second_one2_table {
+    overflow-y: auto;
+    height: 300px;
+    width: 100%;
+}
+
+.table_head {
+    color: #828282;
+    font-weight: 500;
+    /* border: 1px solid #000; */
+    /* Add border to the table header */
+}
+
+table {
+    width: 100%;
+    /* Make the table full width */
+    border-collapse: collapse;
+    /* Ensure borders are collapsed for a cleaner look */
+    /* border: 1px solid #000;
+    border-radius: 5px; */
+}
+
+table, th, td {
+    border: 1px solid #000;
+    /* Add border to the table, table headers, and table cells */
+    border-radius: 5px;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+    width: 50%;
+    /* Add padding for better readability */
+
+}
+
+
+
+#markTable_second_one2 {
+    width: 100%;
+
+}
+
+
+
+
+.two {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+
+.two_card {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 13px;
+}
+
+#first_two {
+    height: 460px;
+    width: 100%;
+}
+
+
+.title_toggle {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1rem 2rem .5rem 1rem;
+}
+
+
+
+
+.switch-button {
+    background: rgba(58, 115, 212, 0.56);
+    border-radius: 7.5px;
+    /* 50% of original height */
+    overflow: hidden;
+    width: 86px;
+    /* 35% of original width + 2% */
+    text-align: center;
+    font-size: 9px;
+    /* Adjusted for smaller size */
+    letter-spacing: 1px;
+    color: #ffffff;
+    position: relative;
+    padding-right: 43px;
+    /* 35% of original width + 2% */
+}
+
+.switch-button:before {
+    content: "Line";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 43px;
+    /* 35% of original width + 2% */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.switch_button_checkbox {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+}
+
+.switch_button_checkbox:checked+.switch-button-label:before {
+    transform: translateX(43px);
+    /* 35% of original width + 2% */
+    transition: transform 300ms linear;
+}
+
+.switch_button_checkbox+.switch-button-label {
+    position: relative;
+    padding: 3.75px 0;
+    /* 50% of original height */
+    display: block;
+    user-select: none;
+    pointer-events: none;
+}
+
+.switch_button_checkbox+.switch-button-label:before {
+    content: "";
+    background: #fff;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 7.5px;
+    /* 50% of original height */
+    transform: translateX(0);
+    transition: transform 300ms;
+}
+
+.switch_button_checkbox+.switch-button-label .switch-button-label-span {
+    position: relative;
+}
+
+.chart1 {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 380px;
+}
