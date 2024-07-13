@@ -127,9 +127,8 @@ function displayExcelData(data) {
       td.textContent = cellValue;
       tr.appendChild(td);
     }
-
-    const memberId = row[1];
-    const memberName = row[2];
+    const memberId = row[2];
+    const memberName = row[3];
 
     const tdAction = document.createElement("td");
 

@@ -16,6 +16,53 @@ body {
   font-style: normal;
   font-variation-settings: "wdth" 100;
 }
+/* The entire scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  /* Width of the vertical scrollbar */
+  height: 12px;
+  /* Height of the horizontal scrollbar */
+}
+
+/* The track (background) */
+::-webkit-scrollbar-track {
+  background: #ffffff;
+  /* Color of the track */
+  border-radius: 10px;
+  /* Rounded corners of the track */
+}
+
+/* The thumb (draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #1756B3;
+  /* Color of the thumb */
+  border-radius: 10px;
+  /* Rounded corners of the thumb */
+}
+
+/* The thumb when hovered */
+::-webkit-scrollbar-thumb:hover {
+  background: #90B4EA;
+  /* Color of the thumb when hovered */
+}
+
+/* The scrollbar buttons */
+::-webkit-scrollbar-button {
+  background: #ffffff;
+  /* Color of the buttons */
+  height: 3px;
+  /* Height of the buttons */
+  width: 20px;
+  /* Width of the buttons */
+}
+
+/* The corner where horizontal and vertical scrollbars meet */
+::-webkit-scrollbar-corner {
+  background: #1756B3;
+  /* Color of the corner */
+}
+
+
 
 .batch_creation {
   display: flex;
@@ -336,4 +383,116 @@ td .remove {
 
 .batch-list ul li:last-child {
   border-bottom: none;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .table-container, .batch-header {
+    width: 95%;
+  }
+
+  .batch-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .right_buttons {
+    margin-right: 10px;
+  }
+
+  .navbar {
+    height: auto;
+    padding: 10px;
+  }
+
+  .logotitle, .right_buttons {
+    margin: 0;
+  }
+
+  .create_button button {
+    font-size: 10px;
+    height: 18px;
+  }
+
+  .home_logo img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .batch_name {
+    font-size: 14px;
+  }
+
+  .delete {
+    padding: 5px;
+    height: 25px;
+  }
+
+  .add-member {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .batch-header, .table-container {
+    width: 100%;
+    padding: 10px;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+
+  .batch_name {
+    font-size: 12px;
+  }
+
+  .delete {
+    padding: 4px;
+    height: 20px;
+  }
+
+  .add-member {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .batch_buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 5px;
+  }
+
+  .batch-header, .table-container {
+    padding: 5px;
+  }
+
+  th, td {
+    padding: 5px;
+  }
+
+  .batch_name {
+    font-size: 10px;
+  }
+
+  .delete {
+    padding: 3px;
+    height: 15px;
+  }
+
+  .add-member {
+    width: 100%;
+    font-size: 10px;
+  }
 }
