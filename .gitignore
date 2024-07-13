@@ -84,3 +84,7 @@ coverage/
 *.sublime-project
 *.sublime-workspace
 reference.js
+reference.js
+improvedjs.js
+update.js
+newrealtime.js
