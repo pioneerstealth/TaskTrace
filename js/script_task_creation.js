@@ -77,9 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     timerSection.classList.add("scaleUpFromBottom");
     const batchData = localStorage.getItem("batch");
     fetchStudents(batchData);
-    if(localStorage.getItem("timerEndTime")-Date.now() < 0){
-        startTimer();
-    }
+    initializeTimer();
   }
   document.getElementById("imagePopup").style.display = "none";
   await fetchBatches(); // Fetch and display batches on page load
@@ -112,6 +110,7 @@ function formatTimeInput(input) {
 const timeInputs = [
   document.getElementById("time"),
   document.getElementById("timeToReduce"),
+  document.getElementById("timeToExtend"),
 ];
 
 timeInputs.forEach((input) => {
@@ -434,34 +433,50 @@ async function createTask(
 }
 let totalSeconds = 0;
 
-const startTimerClock = (seconds) => {
-  let endTime = localStorage.getItem("timerEndTime");
-
-  if (!endTime) {
-    endTime = Date.now() + seconds * 1000;
-    localStorage.setItem("timerEndTime", endTime);
-    console.log("timerset");
+function initializeTimer() {
+  const endTime = localStorage.getItem("timerEndTime");
+  if (endTime && parseInt(endTime) > Date.now()) {
+    startTimerClock();
+  } else {
+    // Clear any stale timer data
+    localStorage.removeItem("timerEndTime");
+    updateClock(0, 0, 0);
   }
+}
 
-  const initialTimeLeft = Math.max(0, endTime - Date.now());
-  const initialHours = Math.floor((initialTimeLeft / (1000 * 60 * 60)) % 24);
-  const initialMinutes = Math.floor((initialTimeLeft / (1000 * 60)) % 60);
-  const initialSeconds = Math.floor((initialTimeLeft / 1000) % 60);
+function startTimer() {
+  const createTaskBtn = document.querySelector(".create-task-button");
+  createTaskBtn.disabled = true;
 
-  initializeClock(initialHours, initialMinutes, initialSeconds);
+  const existingEndTime = localStorage.getItem("timerEndTime");
+  if (existingEndTime && parseInt(existingEndTime) > Date.now()) {
+    startTimerClock();
+  } else {
+    const timevalue = time.value;
+    const [hours, minutes, seconds] = timevalue.split(":").map(part => parseInt(part, 10));
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+    const endTime = Date.now() + totalSeconds * 1000;
+    localStorage.setItem("timerEndTime", endTime);
+    startTimerClock();
+  }
+}
 
-  let lastUpdateTime = Date.now();
-
+function startTimerClock() {
   const updateTimer = () => {
-    const now = Date.now();
-    const timeSinceLastUpdate = now - lastUpdateTime;
-    lastUpdateTime = now;
+    const endTime = localStorage.getItem("timerEndTime");
+    if (!endTime) {
+      clearInterval(window.timerInterval);
+      updateClock(0, 0, 0);
+      return;
+    }
 
+    const now = Date.now();
     const timeLeft = Math.max(0, endTime - now);
 
     if (timeLeft === 0) {
       localStorage.removeItem("timerEndTime");
       updateClock(0, 0, 0);
+      clearInterval(window.timerInterval);
     } else {
       const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
@@ -469,44 +484,19 @@ const startTimerClock = (seconds) => {
 
       updateClock(hours, minutes, seconds);
 
-      const flipClockContainer = document.querySelector(
-        ".flip-clock-container"
-      );
+      const flipClockContainer = document.querySelector(".flip-clock-container");
       if (timeLeft <= 60000) {
         flipClockContainer.classList.add("red");
       } else {
         flipClockContainer.classList.remove("red");
       }
-
-      // Schedule the next update for 1 second from now, or sooner if necessary
-      const nextUpdateTime = Math.max(1000, 1000 - timeSinceLastUpdate);
-      setTimeout(updateTimer, nextUpdateTime);
     }
   };
 
-  updateTimer();
-};
-
-function startTimer() {
-  const createTaskBtn = document.querySelector(".create-task-button");
-  const existingEndTime = localStorage.getItem("timerEndTime");
-  if (existingEndTime > 0) {
-    createTaskBtn.disabled = true;
-    const remainingTime = Math.max(0, existingEndTime - Date.now());
-    startTimerClock(Math.ceil(remainingTime / 1000));
-  } else {
-    createTaskBtn.disabled = true;
-    const timevalue = time.value;
-    const timeParts = timevalue.split(":");
-    const hours = parseInt(timeParts[0], 10);
-    const minutes = parseInt(timeParts[1], 10);
-    const seconds = parseInt(timeParts[2], 10);
-    totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    localStorage.setItem("totalSeconds", totalSeconds);
-    startTimerClock(totalSeconds); // Start a new timer for 3 minutes (180 seconds)
-  }
+  clearInterval(window.timerInterval);
+  window.timerInterval = setInterval(updateTimer, 1000);
+  updateTimer(); // Call immediately to avoid delay
 }
-
 
 
 function formatTime(ms) {
@@ -527,3 +517,40 @@ exportBtn.addEventListener('click',()=>{
   const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
   XLSX.writeFile(wb, ""+taskName.value+".xlsx");
 })
+
+const extendTimeBtn = document.querySelector('.extend-time-btn');
+const submitTime= document.getElementById('submitTime');
+const popup = document.getElementById('popup-extend');
+const timeInput = document.getElementById('timeToExtend');
+extendTimeBtn.addEventListener('click', () => {
+            popup.style.display = 'block';
+});
+
+ submitTime.addEventListener('click',()=>{
+  const time = timeInput.value;
+  const [hours, minutes, seconds] = time.split(":").map(part => parseInt(part, 10));
+  const customIntervalMillis = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
+
+  if (customIntervalMillis) {
+    let currentEndTime = parseInt(localStorage.getItem("timerEndTime"));
+    if (isNaN(currentEndTime) || currentEndTime <= Date.now()) {
+      currentEndTime = Date.now();
+    }
+    const newEndTime = currentEndTime + customIntervalMillis;
+    localStorage.setItem("timerEndTime", newEndTime);
+    
+    // Stop the current timer and start a new one
+    clearInterval(window.timerInterval);
+    startTimerClock(Math.ceil((newEndTime - Date.now()) / 1000));
+  }
+  
+  popup.style.display = 'none';
+  timeInput.value = '';
+});
+
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                popup.style.display = 'none';
+                timeInput.value = '';
+            }
+        });
