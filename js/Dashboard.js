@@ -575,8 +575,8 @@ function updateTableHeaders() {
   // Set the header text for the batch name columns
   batchNameColumn1.textContent = dropdown1.value ? `${dropdown1.value} Average Time` : 'Batch name Average Time';
   batchNameColumn2.textContent = dropdown2.value ? `${dropdown2.value} Average Time` : 'Batch name Average Time';
-  batchNameColumn3.textContent = dropdown1.value ? `${dropdown1.value} Average Mark` : 'Batch name Average Mark';
-  batchNameColumn4.textContent = dropdown2.value ? `${dropdown2.value} Average Mark` : 'Batch name Average Mark';
+  batchNameColumn3.textContent = dropdown1.value ? `${dropdown1.value} Average Marks` : 'Batch name Average Marks';
+  batchNameColumn4.textContent = dropdown2.value ? `${dropdown2.value} Average Marks` : 'Batch name Average Marks';
  
 populateTableBody();
 populateTableBody2();
