@@ -36,7 +36,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 let currentUser = null;
-
+let taskId;
 const leftPanel = document.querySelector(".left-panel");
 const rightPanel = document.querySelector(".right-panel");
 const tableContainer = document.querySelector(
@@ -60,15 +60,53 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const completeTaskBtn = document.getElementById("taskcomplete");
+function getTableData() {
+  const table = document.querySelector('table');
+  const rows = table.getElementsByTagName("tr");
+  const data = [];
+
+  for (let i = 1; i < rows.length; i++) { // Skip the header row
+    const cells = rows[i].getElementsByTagName("td");
+    const rowData = {
+      id: cells[0].textContent,
+      name: cells[1].textContent,
+      submissionStatus: cells[2].querySelector("button").textContent,
+      taskStatus: cells[3].querySelector("button").textContent,
+      timeTaken: cells[4].textContent,
+      marks: cells[5].textContent,
+      imgurl: "https://via.placeholder.com/50"
+    };
+    data.push(rowData);
+  }
+
+  return data;
+}
+
+const completeTaskBtn = document.getElementById("taskcomplete");
   console.log(completeTaskBtn);
-  completeTaskBtn.addEventListener("click", () => {
+  completeTaskBtn.addEventListener("click",async  () => {
     console.log("inside completetask");
-    localStorage.setItem(localStorage.getItem("taskName"),false);
+    const tableData = getTableData();
+    console.log("Table Data:", tableData);
+
+
+    // Get task ID from localStorage
+    const taskId = localStorage.getItem("taskId")
+    console.log("taskid",taskId);
+    
+    if (!taskId) {
+      throw new Error("Task ID not found in localStorage");
+    }
+
+    // Update task document in Firestore
+    const taskDocRef = doc(db, "tasks", taskId);
+    await updateDoc(taskDocRef, { students: tableData ,status:"completed"});
     localStorage.clear();
+    console.log("Task updated successfully with table data.");
+
   });
 
+document.addEventListener("DOMContentLoaded", async () => {
   // console.log((localStorage.getItem('timerEndTime')-Date.now())>0)
   if (localStorage.getItem(localStorage.getItem("taskName"))) {
     leftPanel.classList.add("cardFlip");
@@ -410,19 +448,48 @@ async function createTask(
     }
 
     const taskData = {
+      status:"active",
       name: taskName,
       tagName: tagName,
       time: time,
+      newEndTime:time,
       maxMarks: maxMarks,
       description: taskDescription,
       batchId: batchId,
       createdBy: currentUser.uid,
       createdAt: new Date(),
+      students:[]
     };
 
-    //Add task document to Firestore
-    await addDoc(collection(db, "tasks"), taskData);
+    const taskDocRef = await addDoc(collection(db, "tasks"), taskData);
+    taskId = taskDocRef.id;
+    console.log("taskId",taskId);
+    localStorage.setItem("taskId",taskId);
+    console.log(localStorage.getItem("taskId"));
+
     console.log("Task created successfully:", taskData);
+
+    // Fetch students from the batch
+    const batchDocRef = doc(db, "batches", batchId);
+    const batchDoc = await getDoc(batchDocRef);
+    if (!batchDoc.exists()) {
+      throw new Error("Batch document not found");
+    }
+
+    const batchData = batchDoc.data();
+    const students = batchData.members.map(student => ({
+      id: student.id,
+      name: student.name,
+      submissionStatus: "Pending",
+      taskStatus: "Pending",
+      timeTaken: "00:00:00",
+      marks: student.marks || "0",
+      imgurl: student.imageUrl || "https://via.placeholder.com/50"
+    }));
+
+    // Update the task document with the fetched students
+    await updateDoc(taskDocRef, { students: students });
+
       leftPanel.classList.add("cardFlip");
       rightPanel.classList.add("slideOutRight");
       tableContainer.classList.add("fadeIn");
@@ -455,6 +522,7 @@ function startTimer() {
     const timevalue = time.value;
     const [hours, minutes, seconds] = timevalue.split(":").map(part => parseInt(part, 10));
     const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+    localStorage.setItem("totalSeconds",totalSeconds);
     const endTime = Date.now() + totalSeconds * 1000;
     localStorage.setItem("timerEndTime", endTime);
     startTimerClock();
@@ -526,7 +594,7 @@ extendTimeBtn.addEventListener('click', () => {
             popup.style.display = 'block';
 });
 
- submitTime.addEventListener('click',()=>{
+submitTime.addEventListener('click', async () => {
   const time = timeInput.value;
   const [hours, minutes, seconds] = time.split(":").map(part => parseInt(part, 10));
   const customIntervalMillis = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
@@ -537,13 +605,43 @@ extendTimeBtn.addEventListener('click', () => {
       currentEndTime = Date.now();
     }
     const newEndTime = currentEndTime + customIntervalMillis;
+
+    const taskId = localStorage.getItem("taskId");
+    const taskDocRef = doc(db, "tasks", taskId);
+
+    // Update the total seconds in localStorage
+    const totalSeconds = parseInt(localStorage.getItem("totalSeconds") || "0") + customIntervalMillis / 1000;
+    localStorage.setItem("totalSeconds", totalSeconds);
+
+    // Retrieve and update the time extensions array in localStorage
+    const timeExtensions = JSON.parse(localStorage.getItem("timeExtensions")) || [];
+    timeExtensions.push({ extension: customIntervalMillis, timestamp: Date.now() });
+    localStorage.setItem("timeExtensions", JSON.stringify(timeExtensions));
+
+    let Extensions = parseInt(localStorage.getItem("StartTime"));
+
+    timeExtensions.forEach(element => {
+        Extensions+=element.extension;
+    });
+    console.log(formatTime(Extensions-Date.now()))
+    // Update the new end time in Firestore
+    await updateDoc(taskDocRef, { 
+      newEndTime: formatTime(newEndTime - Date.now()),
+      timeExtensions: Extensions,
+      noOfExtensions:timeExtensions.length // Save the array of extensions to Firestore
+    });
+
+    console.log("New End Time: " + formatTime(newEndTime - Date.now()));
+
+    // Update the end time in localStorage
     localStorage.setItem("timerEndTime", newEndTime);
-    
+
     // Stop the current timer and start a new one
     clearInterval(window.timerInterval);
     startTimerClock(Math.ceil((newEndTime - Date.now()) / 1000));
   }
-  
+
+  // Hide the popup and clear the time input field
   popup.style.display = 'none';
   timeInput.value = '';
 });
