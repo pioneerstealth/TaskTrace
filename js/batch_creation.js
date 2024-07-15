@@ -631,12 +631,13 @@ async function fetchBatchDetails(batchName) {
       where("batchName", "==", batchName)
     );
     const batchSnapshot = await getDocs(batchQuery);
-    let batchId;
     if (!batchSnapshot.empty) {
       batchSnapshot.forEach((doc) => {
         const batchData = doc.data();
+        const batchId = doc.id;
+        console.log("Batchid",batchId);
         console.log(batchData);
-        updateTable(batchData.members); // Update table with batch members
+        updateTable(batchData.members,batchId); // Update table with batch members
       });
     } else {
       showMessage("Batch not found!", "error");
@@ -672,7 +673,7 @@ function clearTable() {
 
 
 // Function to update the table with batch member details
-function updateTable(members) {
+function updateTable(members,batchId) {
   console.trace("updateTable called");
   const tableBody = document.getElementById("tableBody");
   const tableHead = document.querySelector(".table_head");
@@ -725,7 +726,7 @@ function updateTable(members) {
         chartButton.classList.add("chart");
         chartButton.innerHTML = '<i class="fa-solid fa-chart-line"></i>';
         chartButton.addEventListener("click", () => {
-          viewChart(member.id, member.name);
+          viewChart(member.id, member.name,batchId);
         });
         tdAction.appendChild(chartButton);
 
@@ -735,11 +736,10 @@ function updateTable(members) {
     }
   }
 }
-function viewChart(memberId, memberName) {
+function viewChart(memberId, memberName,batchId) {
   if (memberId && memberName) {
-    const batchName = getBatchNameForMember(memberId); // Retrieve the batch name for the member
     if (batchName) {
-      window.location.href = `Dashboard.html?memberId=${memberId}&batchName=${batchName}`;
+      window.location.href = `Dashboard.html?memberId=${memberId}&batchId=${batchId}`;
     } else {
       showMessage("Batch name not found for this member.", "error");
     }
