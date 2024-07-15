@@ -199,50 +199,48 @@
           </div>
         </div>
       </div>
-      <div class="four">
-        <div class="four_card" id="first_four">
-          <div class="first_four1">
-            <div class="first_four_title">Avg Mark in Tags</div>
+<div class="four">
+    <div class="four_card" id="first_four">
+        <div class="first_four1">
+            <div class="first_four_title">Avg Time in Tags</div>
             <div class="pi">
-              <label for="piCheckbox">Pi</label>
-              <input type="checkbox" id="piCheckbox_first_four" name="piCheckbox">
+                <label for="piCheckbox">Pi</label>
+                <input type="checkbox" id="piCheckbox_first_four" name="piCheckbox">
             </div>
-          </div>
-          <div class="first_four2" id="first_four2">
+        </div>
+        <div class="first_four2" id="first_four2">
             <table id="markTable_first_four">
-              <thead class="table_head">
-                <tr>
-                  <th>Tags</th>
-                  <th>Batch name
-                    Average Time</th>
-                    <th>Batch name
-                      Average Time</th>
+                <thead class="table_head">
+                  <tr>
+                    <th>Tags</th>
+                    <th id="batchNameColumn1"></th>
+                    <th id="batchNameColumn2"></th>
                 </tr>
-              </thead>
-              <tbody id="tableBody_first_four">
+                </thead>
+                <tbody id="tableBody_first_four">
                 <!-- Table rows will be populated dynamically -->
-              </tbody>
+                </tbody>
             </table>
-          </div>
-          <div class="first_four2" id="chartContainer_first_four2" style="display:none;">
+        </div>
+        <div class="first_four2" id="chartContainer_first_four2" style="display:none;">
             <canvas id="pieChart_first_four2"></canvas>
-          </div>
         </div>
+    </div>
 
-        <div class="four_card" id="second_four">
-          <div class="title_togle">
+    <div class="four_card" id="second_four">
+        <div class="title_toggle">
             <div id="title_chart">
-              Performance Metrics: Number of Individuals and Attained Marks
-          </div>
-          <div class="switch-button">
-            <input class="switch_button_checkbox" id="switch_button_checkbox_second_four" type="checkbox"></input>
-            <label class="switch-button-label" for=""><span class="switch-button-label-span">Bar</span></label>
-          </div>
-          </div>
-
-          <canvas id="chart_second_four"></canvas>
+                Performance Metrics: Tag and Time
+            </div>
+            <div class="switch-button">
+                <input class="switch_button_checkbox" id="switch_button_checkbox_second_four" type="checkbox"></input>
+                <label class="switch-button-label" for=""><span class="switch-button-label-span">Bar</span></label>
+            </div>
         </div>
-      </div>
+
+        <canvas id="chart_second_four"></canvas>
+    </div>
+</div>
 
 
     </div>
