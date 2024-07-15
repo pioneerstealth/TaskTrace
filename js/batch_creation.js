@@ -276,11 +276,10 @@ document.getElementById("saveButton").addEventListener("click", async function (
   for (let i = 0; i < tableBody.length; i++) {
     const row = tableBody[i];
     const rowData = {
-      id: row.children[1].textContent.trim(), // Assuming id is in the first column (index 0)
-      name: row.children[2].textContent.trim(),
-      email: row.children[3].textContent.trim(),
+      id: row.children[0].textContent.trim(), // Assuming id is in the first column (index 0)
+      name: row.children[1].textContent.trim(), // Assuming name is in the second column (index 1)
+      email: row.children[2].textContent.trim(), // Assuming email is in the third column (index 2)
     };
-    // addUser(rowData.name,rowData.email)
     tableData.push(rowData);
   }
 
@@ -313,19 +312,51 @@ document.getElementById("saveButton").addEventListener("click", async function (
     }
 
     // Save the batch with its members data
-    await addDoc(collection(db, "batches"), {
+    const batchDocRef = await addDoc(collection(db, "batches"), {
       batchName: batchName,
       members: tableData,
       createdBy: currentUser.uid,
     });
 
-    showMessage("Batch saved successfully!", "success");
+    // Add each user to the users collection and send magic link
+    for (const member of tableData) {
+      await addUserAndSendMagicLink(member.id, member.name, member.email);
+    }
+
+    showMessage("Batch and users saved successfully!", "success");
   } catch (error) {
     console.error("Error saving batch: ", error);
     showMessage("Error saving batch: " + error.message, "error");
   }
 });
 
+async function addUserAndSendMagicLink(userId, userName, userEmail) {
+  try {
+    // Add user to the users collection
+    await setDoc(doc(db, "users", userId), {
+      id: userId,
+      name: userName,
+      email: userEmail,
+      lastLogin:new Date(),
+      role:"user"
+    });
+
+    // Send magic link to the user's email
+    const actionCodeSettings = {
+      url: window.location.href,
+      handleCodeInApp: true,
+    };
+
+    await firebase.auth().sendSignInLinkToEmail(userEmail, actionCodeSettings);
+
+    console.log(`Magic link sent to ${userEmail}`);
+
+    // Inform the user to check their email
+    window.localStorage.setItem('emailForSignIn', userEmail);
+  } catch (error) {
+    console.error("Error adding user and sending magic link: ", error);
+  }
+}
 
 
 // Event listener for Delete Batch button
@@ -600,7 +631,7 @@ async function fetchBatchDetails(batchName) {
       where("batchName", "==", batchName)
     );
     const batchSnapshot = await getDocs(batchQuery);
-
+    let batchId;
     if (!batchSnapshot.empty) {
       batchSnapshot.forEach((doc) => {
         const batchData = doc.data();
