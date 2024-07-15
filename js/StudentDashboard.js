@@ -1,4 +1,109 @@
-document.addEventListener("DOMContentLoaded", function () {
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  getDoc,
+  updateDoc,
+  query,
+  where,
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
+  authDomain: "task-trace.firebaseapp.com",
+  projectId: "task-trace",
+  storageBucket: "task-trace.appspot.com",
+  messagingSenderId: "542109212256",
+  appId: "1:542109212256:web:a54bd96c131eff4a152d05",
+  measurementId: "G-MZNCSCVN54",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const memberId = params.get("memberId");
+  const memberName = params.get("memberName");
+  console.log(memberId);
+
+  // div clear function-----------------------------------------------------
+
+  function clearDivContent(divId) {
+    var div = document.getElementById(divId);
+    if (div) {
+      div.innerHTML = "";
+    } else {
+      console.error("No element found with the id:", divId);
+    }
+  }
+
+  // fetch batch id------------------------------------------
+
+  async function getBatchIdByStudentId(studentId) {
+    const tasksCollection = collection(db, "tasks");
+
+    try {
+      const tasksSnapshot = await getDocs(tasksCollection);
+      let batchId = null;
+
+      tasksSnapshot.forEach((doc) => {
+        const taskData = doc.data();
+        const students = taskData.students || [];
+
+        students.forEach((student) => {
+          if (student.id === studentId) {
+            batchId = taskData.batchId;
+          }
+        });
+      });
+
+      if (batchId) {
+        console.log(`Batch ID for student ID ${studentId}: ${batchId}`);
+        return batchId;
+      } else {
+        console.log(`No batch ID found for student ID ${studentId}`);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching batch ID:", error);
+    }
+  }
+
+  // Example usage
+  // getBatchIdByStudentId(memberId);
+
+  // first_imgHead_heading population-----------------------------------------
+
+  function first_imgHead_heading_populate(name, batch) {
+    let divId = "first_imgHead_heading";
+    clearDivContent(divId);
+    const div = document.getElementById("first_imgHead_heading");
+    if (div) {
+      div.innerHTML = `${name} <br /> ${batch}`;
+    } else {
+      console.error("Element with class 'first_imgHead_heading' not found.");
+    }
+  }
+
+  first_imgHead_heading_populate(memberName, memberId);
+
   // pie chart----------------------------------------------------------------
   // Select the canvas element
   const first_piChart = document
