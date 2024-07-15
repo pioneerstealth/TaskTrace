@@ -40,7 +40,7 @@ const db = getFirestore(app);
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const memberId = params.get("memberId");
-  const memberName = params.get("memberName");
+  const memberName = params.get("batchId");
   console.log(memberId);
 
   // div clear function-----------------------------------------------------

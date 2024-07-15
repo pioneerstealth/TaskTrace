@@ -730,10 +730,10 @@ function updateTable(members,batchId) {
 }
 function viewChart(memberId, memberName,batchId) {
   if (memberId && memberName) {
-    if (batchName) {
+    if (batchId) {
       console.log(memberId);
-      console.log(memberName);
-      window.location.href = `StudentDashboard.html?memberId=${memberId}&memberName=${memberName}`;
+      console.log(batchId);
+      window.location.href = `StudentDashboard.html?memberId=${memberId}&=batchId${batchId}`;
     } else {
       showMessage("Batch name not found for this member.", "error");
     }
