@@ -10,7 +10,7 @@
     />
     <link rel="stylesheet" href="./css/Dashboard.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+ 
     <title>TaskTrace</title>
   </head>
   <body>
@@ -24,7 +24,7 @@
       <div class="home_icon" onclick="window.location.href='./index.html';">
       </div>
       </div>
-
+ 
   <div class="Dashboard_section">
     <div class="one">
       <div class="dropdown_one">
@@ -159,17 +159,17 @@
         <div class="three_card" id="first_three">
           <div class="title_togle">
             <div id="title_first_three">
-              Performance Metrics: Number of Individuals and Attained Marks
+              Performance Metrics: Tags and Average Marks
           </div>
           <div class="switch-button">
             <input class="switch_button_checkbox" id="switch_button_checkbox_first_three" type="checkbox"></input>
             <label class="switch-button-label" for=""><span class="switch-button-label-span">Bar</span></label>
           </div>
           </div>
-
+ 
           <canvas id="chart_first_three"></canvas>
         </div>
-
+ 
         <div class="three_card" id="second_three">
           <div class="second_three1">
             <div class="second_three_title">Avg Mark in Tags</div>
@@ -183,11 +183,9 @@
               <thead class="table_head">
                 <tr>
                   <th>Tags</th>
-                  <th>Batch name
-                    Average Mark</th>
-                    <th>Batch name
-                      Average Mark</th>
-                </tr>
+                  <th id="batchNameColumn3"></th>
+                  <th id="batchNameColumn4"></th>
+              </tr>
               </thead>
               <tbody id="tableBody_second_three">
                 <!-- Table rows will be populated dynamically -->
@@ -226,25 +224,26 @@
             <canvas id="pieChart_first_four2"></canvas>
         </div>
     </div>
-
+ 
     <div class="four_card" id="second_four">
         <div class="title_toggle">
             <div id="title_chart">
-                Performance Metrics: Tag and Time
+                Performance Metrics: Tags and Average Time
             </div>
             <div class="switch-button">
                 <input class="switch_button_checkbox" id="switch_button_checkbox_second_four" type="checkbox"></input>
                 <label class="switch-button-label" for=""><span class="switch-button-label-span">Bar</span></label>
             </div>
         </div>
-
+ 
         <canvas id="chart_second_four"></canvas>
     </div>
 </div>
-
-
+ 
+ 
     </div>
-
+ 
     <script defer type="module" src="./js/Dashboard.js"></script>
   </body>
 </html>
+ 
