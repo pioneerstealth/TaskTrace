@@ -438,7 +438,7 @@ let taskStatus=processData(taskData,memberId,batchId);
           {
             data: [overallPercentage, remainingPercentage],
             backgroundColor: [gradient, "#ffffff"],
-            hoverBackgroundColor: [gradient, "#ff0000"],
+            hoverBackgroundColor: [gradient, "#ff4743"],
           },
         ],
       },
@@ -500,22 +500,7 @@ let taskStatus=processData(taskData,memberId,batchId);
     console.error("Error:", error);
   }
 
-  // Example usage
-
-  // getUniqueTagNames(batchId)
-  //   .then((tagNames) => {
-  //     const tagNamesArray = tagNames;
-  //     console.log("Tag names retrieved successfully:", tagNamesArray);
-
-  //     // Store the tag names array for further use
-  //     // You can now use tagNamesArray for other operations
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error retrieving tag names:", error);
-  //   });
-
-  // Call the function with the parameters from the URL
-  // fetchBatchAndMemberInfo(memberId, batchId);
+ 
 
   // pie chart----------------------------------------------------------------
   // Select the canvas element
@@ -530,15 +515,15 @@ let taskStatus=processData(taskData,memberId,batchId);
       {
         data: taskStatus, // Dummy data
         backgroundColor: [
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(255, 99, 132, 0.2)",
+          "#00ed00",
+          "#009efa",
+          "#ed1f17",
         ],
-        borderColor: [
-          "rgba(75, 192, 192, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(255, 99, 132, 1)",
-        ],
+        // borderColor: [
+        //   "#ed1f17",
+        //   "rgba(255, 206, 86, 1)",
+        //   "rgba(255, 99, 132, 1)",
+        // ],
         borderWidth: 1,
       },
     ],
@@ -569,86 +554,6 @@ let taskStatus=processData(taskData,memberId,batchId);
   // Create the pie chart
   const myPieChart = new Chart(first_piChart, config);
 
-  // donutchart-------------------------------------------
-  // Get the context of the canvas element we just created
-
-  // var DoughnutChart_first = document
-  //   .getElementById("DoughnutChart_first")
-  //   .getContext("2d");
-
-  // // Create a gradient for the "Obtained" segment
-  // var gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
-  // gradient.addColorStop(1, "#36A2EB");
-  // gradient.addColorStop(0, "#EAF5FD");
-
-  // // Create the custom plugin to draw text in the center
-  // const centerTextPlugin = {
-  //   id: "centerTextPlugin",
-  //   beforeDraw: function (chart) {
-  //     var width = chart.width,
-  //       height = chart.height,
-  //       ctx = chart.ctx;
-
-  //     ctx.restore();
-  //     var fontSize = (height / 114).toFixed(2);
-  //     ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
-  //     ctx.textBaseline = "middle";
-
-  //     var text1 = "70%",
-  //       text2 = "Obtained",
-  //       textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
-  //       textY1 = height / 2 - 10;
-
-  //     // Set color for the "70%" text
-  //     ctx.fillStyle = "#36A2EB"; // Change this color as needed
-  //     ctx.fillText(text1, textX1, textY1);
-
-  //     // Adjust font size for the smaller "obtained" text
-  //     var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
-  //     ctx.font = "bold " + smallerFontSize + "em Georgia";
-
-  //     var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
-  //       textY2 = height / 2 + 20;
-
-  //     // Set color for the "obtained" text
-  //     ctx.fillStyle = "#36A2EB"; // Change this color as needed
-  //     ctx.fillText(text2, textX2, textY2);
-
-  //     ctx.save();
-  //   },
-  // };
-
-  // // Create the Doughnut chart
-  // var myDoughnutChart = new Chart(DoughnutChart_first, {
-  //   type: "doughnut",
-  //   data: {
-  //     labels: ["Obtained", "Remaining"],
-  //     datasets: [
-  //       {
-  //         data: [70, 30], // 70% obtained out of 100%
-  //         backgroundColor: [gradient, "#ffffff"], // Gradient for "Obtained" and solid color for "Remaining"
-  //         hoverBackgroundColor: [gradient, "#ff0000"],
-  //       },
-  //     ],
-  //   },
-  //   options: {
-  //     responsive: true,
-  //     cutout: "70%",
-  //     plugins: {
-  //       legend: {
-  //         display: false, // Disable the legend
-  //       },
-  //       tooltip: {
-  //         callbacks: {
-  //           label: function (tooltipItem) {
-  //             return tooltipItem.label + ": " + tooltipItem.raw + "%";
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },
-  //   plugins: [centerTextPlugin],
-  // });
 
   // New code for the second doughnut chart
   var DoughnutChart_second = document
@@ -700,7 +605,7 @@ let taskStatus=processData(taskData,memberId,batchId);
         {
           data: [60, 40],
           backgroundColor: [gradientSecond, "#ffffff"],
-          hoverBackgroundColor: [gradientSecond, "#FF0000"],
+          hoverBackgroundColor: [gradientSecond, "#ff4743"],
         },
       ],
     },
