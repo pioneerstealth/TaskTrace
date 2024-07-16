@@ -35,7 +35,7 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const memberId = params.get("memberId");
   const batchId = params.get("batchId");
@@ -90,63 +90,195 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function fetchTagNamesByBatchId(batchId) {
-    try {
-      // Query tasks collection where batchId matches
-      const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
-      const querySnapshot = await getDocs(q);
+  //average name with tag student and batch---------------------------------------------
+  async function calculateAverageMark(batchId, tagName, studentId) {
+    // Get tasks from Firestore
+    const tasksRef = collection(db, "tasks");
+    const q = query(
+      tasksRef,
+      where("batchId", "==", batchId),
+      where("tagName", "==", tagName)
+    );
+    const querySnapshot = await getDocs(q);
 
-      const tagNames = [];
+    let totalPercentage = 0;
+    let taskCount = 0;
 
-      // Iterate through all matching task documents
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        tagNames.push(data.tagName);
-      });
+    querySnapshot.forEach((doc) => {
+      const task = doc.data();
+      const maxMarks = parseFloat(task.maxMarks);
+      const student = task.students.find((student) => student.id === studentId);
 
-      console.log(`Tag Names for batchId ${batchId}:`, tagNames);
-    } catch (error) {
-      console.error("Error fetching tag names:", error);
+      if (student && maxMarks) {
+        const studentMarks = parseFloat(student.marks);
+        const percentage = (studentMarks / maxMarks) * 100;
+        totalPercentage += percentage;
+        taskCount++;
+      }
+    });
+
+    if (taskCount === 0) {
+      return 0; // If no tasks are found, return 0
     }
+
+    return totalPercentage / taskCount;
+  }
+
+  // const tagName = "JAVA";
+  // const studentId = memberId;
+  // calculateAverageMark(batchId, tagName, memberId)
+  //   .then((averageMark) => {
+  //     console.log(
+  //       `Average mark percentage for student ${studentId} in tag ${tagName}: ${averageMark}%`
+  //     );
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error calculating average mark percentage:", error);
+  //   });
+
+  //store tagname------------------------------
+
+  async function getUniqueTagNames(batchId) {
+    // Get tasks from Firestore
+    const tasksRef = collection(db, "tasks");
+    const q = query(tasksRef, where("batchId", "==", batchId));
+    const querySnapshot = await getDocs(q);
+
+    const uniqueTagNames = new Set();
+
+    querySnapshot.forEach((doc) => {
+      const task = doc.data();
+      if (task.tagName) {
+        uniqueTagNames.add(task.tagName);
+      }
+    });
+
+    // Convert the set to an array
+    const tagNamesArray = Array.from(uniqueTagNames);
+
+    // Display the unique tag names
+    // console.log(`Unique tag names for batch ${batchId}:`, tagNamesArray);
+
+    return tagNamesArray;
+  }
+
+  try {
+    const tagNamesArray = await getUniqueTagNames(batchId);
+    console.log("Tag names retrieved successfully:", tagNamesArray);
+
+    let totalPercentage = 0;
+
+    for (const tagName of tagNamesArray) {
+      const averageMark = await calculateAverageMark(
+        batchId,
+        tagName,
+        memberId
+      );
+      totalPercentage += averageMark;
+      console.log(
+        `Average mark percentage for student ${memberId} in tag ${tagName}: ${averageMark}%`
+      );
+    }
+
+    const overallPercentage = totalPercentage / tagNamesArray.length;
+    console.log(
+      `Overall average percentage for student ${memberId}: ${overallPercentage}%`
+    );
+
+    // Update the Chart.js data dynamically
+    const DoughnutChart_first = document
+      .getElementById("DoughnutChart_first")
+      .getContext("2d");
+    const gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(1, "#36A2EB");
+    gradient.addColorStop(0, "#EAF5FD");
+
+    const remainingPercentage = 100 - overallPercentage;
+
+    // Create the Doughnut chart
+    const myDoughnutChart = new Chart(DoughnutChart_first, {
+      type: "doughnut",
+      data: {
+        labels: ["Obtained", "Remaining"],
+        datasets: [
+          {
+            data: [overallPercentage, remainingPercentage],
+            backgroundColor: [gradient, "#ffffff"],
+            hoverBackgroundColor: [gradient, "#ff0000"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        cutout: "70%",
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (tooltipItem) {
+                return tooltipItem.label + ": " + tooltipItem.raw + "%";
+              },
+            },
+          },
+        },
+      },
+      plugins: [
+        {
+          id: "centerTextPlugin",
+          beforeDraw: function (chart) {
+            var width = chart.width,
+              height = chart.height,
+              ctx = chart.ctx;
+
+            ctx.restore();
+            var fontSize = (height / 114).toFixed(2);
+            ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
+            ctx.textBaseline = "middle";
+
+            var text1 = `${overallPercentage.toFixed(2)}%`,
+              text2 = "Obtained",
+              textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
+              textY1 = height / 2 - 10;
+
+            // Set color for the "overallPercentage" text
+            ctx.fillStyle = "#36A2EB"; // Change this color as needed
+            ctx.fillText(text1, textX1, textY1);
+
+            // Adjust font size for the smaller "obtained" text
+            var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
+            ctx.font = "bold " + smallerFontSize + "em Georgia";
+
+            var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
+              textY2 = height / 2 + 20;
+
+            // Set color for the "obtained" text
+            ctx.fillStyle = "#36A2EB"; // Change this color as needed
+            ctx.fillText(text2, textX2, textY2);
+
+            ctx.save();
+          },
+        },
+      ],
+    });
+  } catch (error) {
+    console.error("Error:", error);
   }
 
   // Example usage
-  fetchTagNamesByBatchId(batchId);
 
-  // Function to calculate average marks based on tagName
-  async function calculateAverageMarks(tagName) {
-    try {
-      // Query tasks collection where tagName matches
-      const q = query(collection(db, "tasks"), where("tagName", "==", tagName));
-      const querySnapshot = await getDocs(q);
+  // getUniqueTagNames(batchId)
+  //   .then((tagNames) => {
+  //     const tagNamesArray = tagNames;
+  //     console.log("Tag names retrieved successfully:", tagNamesArray);
 
-      let totalMarks = 0;
-      let studentCount = 0;
-
-      // Iterate through all matching task documents
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-
-        // Iterate through all students in each task document
-        data.students.forEach((student) => {
-          totalMarks += parseFloat(student.marks);
-          studentCount++;
-        });
-      });
-
-      // Calculate average marks
-      const averageMarks = studentCount
-        ? (totalMarks / studentCount).toFixed(2)
-        : 0;
-
-      console.log(`Average Marks for tagName ${tagName}:`, averageMarks);
-    } catch (error) {
-      console.error("Error calculating average marks:", error);
-    }
-  }
-
-  // Example usage
-  calculateAverageMarks("JAVA");
+  //     // Store the tag names array for further use
+  //     // You can now use tagNamesArray for other operations
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error retrieving tag names:", error);
+  //   });
 
   // Call the function with the parameters from the URL
   // fetchBatchAndMemberInfo(memberId, batchId);
@@ -205,83 +337,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // donutchart-------------------------------------------
   // Get the context of the canvas element we just created
-  var DoughnutChart_first = document
-    .getElementById("DoughnutChart_first")
-    .getContext("2d");
 
-  // Create a gradient for the "Obtained" segment
-  var gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(1, "#36A2EB");
-  gradient.addColorStop(0, "#EAF5FD");
+  // var DoughnutChart_first = document
+  //   .getElementById("DoughnutChart_first")
+  //   .getContext("2d");
 
-  // Create the custom plugin to draw text in the center
-  const centerTextPlugin = {
-    id: "centerTextPlugin",
-    beforeDraw: function (chart) {
-      var width = chart.width,
-        height = chart.height,
-        ctx = chart.ctx;
+  // // Create a gradient for the "Obtained" segment
+  // var gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
+  // gradient.addColorStop(1, "#36A2EB");
+  // gradient.addColorStop(0, "#EAF5FD");
 
-      ctx.restore();
-      var fontSize = (height / 114).toFixed(2);
-      ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
-      ctx.textBaseline = "middle";
+  // // Create the custom plugin to draw text in the center
+  // const centerTextPlugin = {
+  //   id: "centerTextPlugin",
+  //   beforeDraw: function (chart) {
+  //     var width = chart.width,
+  //       height = chart.height,
+  //       ctx = chart.ctx;
 
-      var text1 = "70%",
-        text2 = "Obtained",
-        textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
-        textY1 = height / 2 - 10;
+  //     ctx.restore();
+  //     var fontSize = (height / 114).toFixed(2);
+  //     ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
+  //     ctx.textBaseline = "middle";
 
-      // Set color for the "70%" text
-      ctx.fillStyle = "#36A2EB"; // Change this color as needed
-      ctx.fillText(text1, textX1, textY1);
+  //     var text1 = "70%",
+  //       text2 = "Obtained",
+  //       textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
+  //       textY1 = height / 2 - 10;
 
-      // Adjust font size for the smaller "obtained" text
-      var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
-      ctx.font = "bold " + smallerFontSize + "em Georgia";
+  //     // Set color for the "70%" text
+  //     ctx.fillStyle = "#36A2EB"; // Change this color as needed
+  //     ctx.fillText(text1, textX1, textY1);
 
-      var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
-        textY2 = height / 2 + 20;
+  //     // Adjust font size for the smaller "obtained" text
+  //     var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
+  //     ctx.font = "bold " + smallerFontSize + "em Georgia";
 
-      // Set color for the "obtained" text
-      ctx.fillStyle = "#36A2EB"; // Change this color as needed
-      ctx.fillText(text2, textX2, textY2);
+  //     var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
+  //       textY2 = height / 2 + 20;
 
-      ctx.save();
-    },
-  };
+  //     // Set color for the "obtained" text
+  //     ctx.fillStyle = "#36A2EB"; // Change this color as needed
+  //     ctx.fillText(text2, textX2, textY2);
 
-  // Create the Doughnut chart
-  var myDoughnutChart = new Chart(DoughnutChart_first, {
-    type: "doughnut",
-    data: {
-      labels: ["Obtained", "Remaining"],
-      datasets: [
-        {
-          data: [70, 30], // 70% obtained out of 100%
-          backgroundColor: [gradient, "#ffffff"], // Gradient for "Obtained" and solid color for "Remaining"
-          hoverBackgroundColor: [gradient, "#ff0000"],
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      cutout: "70%",
-      plugins: {
-        legend: {
-          display: false, // Disable the legend
-        },
-        tooltip: {
-          callbacks: {
-            label: function (tooltipItem) {
-              return tooltipItem.label + ": " + tooltipItem.raw + "%";
-            },
-          },
-        },
-      },
-    },
-    plugins: [centerTextPlugin],
-  });
+  //     ctx.save();
+  //   },
+  // };
+
+  // // Create the Doughnut chart
+  // var myDoughnutChart = new Chart(DoughnutChart_first, {
+  //   type: "doughnut",
+  //   data: {
+  //     labels: ["Obtained", "Remaining"],
+  //     datasets: [
+  //       {
+  //         data: [70, 30], // 70% obtained out of 100%
+  //         backgroundColor: [gradient, "#ffffff"], // Gradient for "Obtained" and solid color for "Remaining"
+  //         hoverBackgroundColor: [gradient, "#ff0000"],
+  //       },
+  //     ],
+  //   },
+  //   options: {
+  //     responsive: true,
+  //     cutout: "70%",
+  //     plugins: {
+  //       legend: {
+  //         display: false, // Disable the legend
+  //       },
+  //       tooltip: {
+  //         callbacks: {
+  //           label: function (tooltipItem) {
+  //             return tooltipItem.label + ": " + tooltipItem.raw + "%";
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  //   plugins: [centerTextPlugin],
+  // });
 
   // New code for the second doughnut chart
   var DoughnutChart_second = document

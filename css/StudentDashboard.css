@@ -174,10 +174,13 @@ body {
 }
 
 .first_imgHead_image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
     height: 170px;
     width: 170px;
-    background-color: aqua;
-    border-radius: 100px;
+    border-radius: 50%;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
