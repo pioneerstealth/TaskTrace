@@ -17,9 +17,6 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
 const firebaseConfig = {
   apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
   authDomain: "task-trace.firebaseapp.com",
@@ -496,24 +493,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Create the new chart
   const chart_second_four = document.getElementById("chart_first_two"); // Get the new canvas element
-
+  console.log(storedTagNames);
   const chart2 = new Chart(chart_second_four, {
     type: chartType2,
     data: {
-      labels: [0, "Red", "Blue", "Yellow", "Green", "Purple", "Orange", ""],
+      labels: storedTagNames,
       datasets: [
         {
           label: "Batch",
           backgroundColor: "#f11167",
           borderColor: "#f11167",
-          data: [0, 1, 9, 13, 15, 8, 8],
+          data: storedTagNames.map((tagName) => avgMarkForBatch[tagName] || 0),
           borderWidth: 1.5,
         },
         {
           label: "Individual",
           backgroundColor: "#341111",
           borderColor: "#341111",
-          data: [0, 11, 19, 16, 0, 0, 16],
+          data: storedTagNames.map(
+            (tagName) => avgMarkForStudent[tagName] || 0
+          ),
           borderWidth: 1.5,
         },
       ],
@@ -529,15 +528,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         },
       },
       animation: {
-        duration: 2000, // Animation duration in milliseconds
-        easing: "bounce", // Animation effect
+        duration: 2000,
+        easing: "bounce",
       },
       scales: {
         y: {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Average Mark", // Set your Y axis label here
+            text: "Average Mark",
             font: {
               size: 14,
               weight: "bold",
@@ -548,7 +547,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         x: {
           title: {
             display: true,
-            text: "Task Tags", // Set your X axis label here
+            text: "Task Tags",
             font: {
               size: 14,
               weight: "bold",
