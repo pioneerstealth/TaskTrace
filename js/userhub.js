@@ -140,7 +140,8 @@ async function fetchActiveTask() {
       const taskName = taskData.name;
       const taskDescription = taskData.description;
       const createdAt = taskData.createdAt.toDate();
-      const timeLimit = taskData.totaltime; 
+      const timeLimit = taskData.totaltime;
+      const status = taskData.status;
       console.log(timeLimit)// Assume format is "HH:MM:SS"
 
       // Convert time limit to milliseconds
@@ -149,7 +150,7 @@ async function fetchActiveTask() {
 
       const taskExpiration = new Date(createdAt.getTime() + timeLimitMs);
 
-      if (now <= taskExpiration) {
+      if (status != "completed") {
         console.log(`Active task found: ${taskName}`); // Debugging
         activeTaskHtml += `
           <div>
