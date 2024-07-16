@@ -5,22 +5,17 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebas
 // https://firebase.google.com/docs/web/setup#available-libraries
 import {
   getFirestore,
-  collection,
-  addDoc,
-  getDocs,
   doc,
   getDoc,
-  updateDoc,
+  collection,
   query,
   where,
+  getDocs,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import {
   getAuth,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
   apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
@@ -37,11 +32,36 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const memberId = params.get("memberId");
-  const memberName = params.get("batchId");
-  console.log(memberId);
+  const batchId = params.get("batchId");
+
+  //fetch batch name and student name function----------------------------------------
+  async function fetchBatchNameAndStudentName(documentId, memberId) {
+    try {
+      const docRef = doc(db, "batches", documentId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const batchName = data.batchName;
+
+        // Find student name from members array
+        const member = data.members.find((member) => member.id === memberId);
+        const studentName = member ? member.name : "Student not found";
+
+        first_imgHead_heading_populate(batchName, studentName);
+      } else {
+        console.log("No such document!");
+      }
+    } catch (error) {
+      console.error("Error getting document:", error);
+    }
+  }
+
+  // Example usage
+  fetchBatchNameAndStudentName(batchId, memberId);
 
   // div clear function-----------------------------------------------------
 
@@ -54,55 +74,334 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // fetch batch id------------------------------------------
-
-  async function getBatchIdByStudentId(studentId) {
-    const tasksCollection = collection(db, "tasks");
-
-    try {
-      const tasksSnapshot = await getDocs(tasksCollection);
-      let batchId = null;
-
-      tasksSnapshot.forEach((doc) => {
-        const taskData = doc.data();
-        const students = taskData.students || [];
-
-        students.forEach((student) => {
-          if (student.id === studentId) {
-            batchId = taskData.batchId;
-          }
-        });
-      });
-
-      if (batchId) {
-        console.log(`Batch ID for student ID ${studentId}: ${batchId}`);
-        return batchId;
-      } else {
-        console.log(`No batch ID found for student ID ${studentId}`);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching batch ID:", error);
-    }
-  }
-
-  // Example usage
-  // getBatchIdByStudentId(memberId);
-
   // first_imgHead_heading population-----------------------------------------
 
-  function first_imgHead_heading_populate(name, batch) {
+  function first_imgHead_heading_populate(batchName, studentName) {
     let divId = "first_imgHead_heading";
     clearDivContent(divId);
     const div = document.getElementById("first_imgHead_heading");
     if (div) {
-      div.innerHTML = `${name} <br /> ${batch}`;
+      div.innerHTML = `${studentName} <br /> ${batchName}`;
     } else {
       console.error("Element with class 'first_imgHead_heading' not found.");
     }
   }
 
-  first_imgHead_heading_populate(memberName, memberId);
+  //average name with tag student and batch---------------------------------------------
+  async function calculateAverageMark(batchId, tagName, studentId) {
+    // Get tasks from Firestore
+    const tasksRef = collection(db, "tasks");
+    const q = query(
+      tasksRef,
+      where("batchId", "==", batchId),
+      where("tagName", "==", tagName)
+    );
+    const querySnapshot = await getDocs(q);
+
+    let totalPercentage = 0;
+    let taskCount = 0;
+
+    querySnapshot.forEach((doc) => {
+      const task = doc.data();
+      const maxMarks = parseFloat(task.maxMarks);
+      const student = task.students.find((student) => student.id === studentId);
+
+      if (student && maxMarks) {
+        const studentMarks = parseFloat(student.marks);
+        const percentage = (studentMarks / maxMarks) * 100;
+        totalPercentage += percentage;
+        taskCount++;
+      }
+    });
+
+    if (taskCount === 0) {
+      return 0; // If no tasks are found, return 0
+    }
+
+    return totalPercentage / taskCount;
+  }
+
+  // const tagName = "JAVA";
+  // const studentId = memberId;
+  // calculateAverageMark(batchId, tagName, memberId)
+  //   .then((averageMark) => {
+  //     console.log(
+  //       `Average mark percentage for student ${studentId} in tag ${tagName}: ${averageMark}%`
+  //     );
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error calculating average mark percentage:", error);
+  //   });
+
+  //store tagname------------------------------
+  async function fetchTagNamesByBatchId(batchId) {
+    try {
+      const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
+      const querySnapshot = await getDocs(q);
+
+      const tagNamesSet = new Set();
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const tagName = data.tagName;
+        if (tagName) {
+          tagNamesSet.add(tagName);
+        } else {
+          console.error(`Undefined TagName in document ID: ${doc.id}`);
+        }
+      });
+
+      const tagNames = Array.from(tagNamesSet);
+      console.log(`Tag Names for batchId ${batchId}:`, tagNames);
+      return tagNames;
+    } catch (error) {
+      console.error("Error fetching tag names:", error);
+      return []; // Return an empty array in case of error
+    }
+  }
+
+  const storedTagNames = await fetchTagNamesByBatchId(batchId);
+  console.log("Stored tag names:", storedTagNames);
+
+  // const tagName=fetchTagNamesByBatchId(batchId);
+  // console.log(tagName)
+
+  // Function to fetch average marks for a batch for each tag
+  async function fetchAverageMarksForBatch(batchId, tagNames) {
+    try {
+      const averageMarks = {};
+
+      // Fetch data for each tag
+      for (const tagName of tagNames) {
+        const q = query(
+          collection(db, "tasks"),
+          where("batchId", "==", batchId),
+          where("tagName", "==", tagName)
+        );
+        const querySnapshot = await getDocs(q);
+
+        let totalMarks = 0;
+        let studentCount = 0;
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          data.students.forEach((student) => {
+            totalMarks += parseFloat(student.marks);
+            studentCount++;
+          });
+        });
+
+        const averageMark = studentCount
+          ? (totalMarks / studentCount).toFixed(2)
+          : 0;
+        averageMarks[tagName] = parseFloat(averageMark);
+      }
+
+      console.log("Average Marks for Batch:", averageMarks);
+      return averageMarks;
+    } catch (error) {
+      console.error("Error fetching average marks:", error);
+      return {}; // Return an empty object in case of error
+    }
+  }
+
+  let avgMarkForBatch = await fetchAverageMarksForBatch(
+    batchId,
+    storedTagNames
+  );
+  console.log(avgMarkForBatch);
+
+  // Function to fetch average marks for a particular student in a batch for each tag
+  // Function to fetch average marks for a particular student in a batch for each tag
+  async function fetchAverageMarksForStudent(batchId, memberId, tagNames) {
+    try {
+      const averageMarks = {};
+
+      // Fetch data for each tag
+      for (const tagName of tagNames) {
+        const q = query(
+          collection(db, "tasks"),
+          where("batchId", "==", batchId),
+          where("tagName", "==", tagName)
+        );
+        const querySnapshot = await getDocs(q);
+
+        let totalMarks = 0;
+        let taskCount = 0;
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          data.students.forEach((student) => {
+            if (student.id === memberId) {
+              totalMarks += parseFloat(student.marks);
+              taskCount++;
+            }
+          });
+        });
+
+        const averageMark = taskCount ? (totalMarks / taskCount).toFixed(2) : 0;
+        averageMarks[tagName] = parseFloat(averageMark);
+      }
+
+      console.log("Average Marks for Student:", averageMarks);
+      return averageMarks;
+    } catch (error) {
+      console.error("Error fetching average marks for student:", error);
+      return {};
+    }
+  }
+
+  let avgMarkForStudent = await fetchAverageMarksForStudent(
+    batchId,
+    memberId,
+    storedTagNames
+  );
+  console.log(avgMarkForStudent);
+
+  async function getUniqueTagNames(batchId) {
+    // Get tasks from Firestore
+    const tasksRef = collection(db, "tasks");
+    const q = query(tasksRef, where("batchId", "==", batchId));
+    const querySnapshot = await getDocs(q);
+
+    const uniqueTagNames = new Set();
+
+    querySnapshot.forEach((doc) => {
+      const task = doc.data();
+      if (task.tagName) {
+        uniqueTagNames.add(task.tagName);
+      }
+    });
+
+    // Convert the set to an array
+    const tagNamesArray = Array.from(uniqueTagNames);
+
+    // Display the unique tag names
+    // console.log(`Unique tag names for batch ${batchId}:`, tagNamesArray);
+
+    return tagNamesArray;
+  }
+
+  try {
+    const tagNamesArray = await getUniqueTagNames(batchId);
+    console.log("Tag names retrieved successfully:", tagNamesArray);
+
+    let totalPercentage = 0;
+
+    for (const tagName of tagNamesArray) {
+      const averageMark = await calculateAverageMark(
+        batchId,
+        tagName,
+        memberId
+      );
+      totalPercentage += averageMark;
+      console.log(
+        `Average mark percentage for student ${memberId} in tag ${tagName}: ${averageMark}%`
+      );
+    }
+
+    const overallPercentage = totalPercentage / tagNamesArray.length;
+    console.log(
+      `Overall average percentage for student ${memberId}: ${overallPercentage}%`
+    );
+
+    // Update the Chart.js data dynamically
+    const DoughnutChart_first = document
+      .getElementById("DoughnutChart_first")
+      .getContext("2d");
+    const gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(1, "#36A2EB");
+    gradient.addColorStop(0, "#EAF5FD");
+
+    const remainingPercentage = 100 - overallPercentage;
+
+    // Create the Doughnut chart
+    const myDoughnutChart = new Chart(DoughnutChart_first, {
+      type: "doughnut",
+      data: {
+        labels: ["Obtained", "Remaining"],
+        datasets: [
+          {
+            data: [overallPercentage, remainingPercentage],
+            backgroundColor: [gradient, "#ffffff"],
+            hoverBackgroundColor: [gradient, "#ff0000"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        cutout: "70%",
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (tooltipItem) {
+                return tooltipItem.label + ": " + tooltipItem.raw + "%";
+              },
+            },
+          },
+        },
+      },
+      plugins: [
+        {
+          id: "centerTextPlugin",
+          beforeDraw: function (chart) {
+            var width = chart.width,
+              height = chart.height,
+              ctx = chart.ctx;
+
+            ctx.restore();
+            var fontSize = (height / 114).toFixed(2);
+            ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
+            ctx.textBaseline = "middle";
+
+            var text1 = `${overallPercentage.toFixed(2)}%`,
+              text2 = "Obtained",
+              textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
+              textY1 = height / 2 - 10;
+
+            // Set color for the "overallPercentage" text
+            ctx.fillStyle = "#36A2EB"; // Change this color as needed
+            ctx.fillText(text1, textX1, textY1);
+
+            // Adjust font size for the smaller "obtained" text
+            var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
+            ctx.font = "bold " + smallerFontSize + "em Georgia";
+
+            var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
+              textY2 = height / 2 + 20;
+
+            // Set color for the "obtained" text
+            ctx.fillStyle = "#36A2EB"; // Change this color as needed
+            ctx.fillText(text2, textX2, textY2);
+
+            ctx.save();
+          },
+        },
+      ],
+    });
+  } catch (error) {
+    console.error("Error:", error);
+  }
+
+  // Example usage
+
+  // getUniqueTagNames(batchId)
+  //   .then((tagNames) => {
+  //     const tagNamesArray = tagNames;
+  //     console.log("Tag names retrieved successfully:", tagNamesArray);
+
+  //     // Store the tag names array for further use
+  //     // You can now use tagNamesArray for other operations
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error retrieving tag names:", error);
+  //   });
+
+  // Call the function with the parameters from the URL
+  // fetchBatchAndMemberInfo(memberId, batchId);
 
   // pie chart----------------------------------------------------------------
   // Select the canvas element
@@ -158,83 +457,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // donutchart-------------------------------------------
   // Get the context of the canvas element we just created
-  var DoughnutChart_first = document
-    .getElementById("DoughnutChart_first")
-    .getContext("2d");
 
-  // Create a gradient for the "Obtained" segment
-  var gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(1, "#36A2EB");
-  gradient.addColorStop(0, "#EAF5FD");
+  // var DoughnutChart_first = document
+  //   .getElementById("DoughnutChart_first")
+  //   .getContext("2d");
 
-  // Create the custom plugin to draw text in the center
-  const centerTextPlugin = {
-    id: "centerTextPlugin",
-    beforeDraw: function (chart) {
-      var width = chart.width,
-        height = chart.height,
-        ctx = chart.ctx;
+  // // Create a gradient for the "Obtained" segment
+  // var gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
+  // gradient.addColorStop(1, "#36A2EB");
+  // gradient.addColorStop(0, "#EAF5FD");
 
-      ctx.restore();
-      var fontSize = (height / 114).toFixed(2);
-      ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
-      ctx.textBaseline = "middle";
+  // // Create the custom plugin to draw text in the center
+  // const centerTextPlugin = {
+  //   id: "centerTextPlugin",
+  //   beforeDraw: function (chart) {
+  //     var width = chart.width,
+  //       height = chart.height,
+  //       ctx = chart.ctx;
 
-      var text1 = "70%",
-        text2 = "Obtained",
-        textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
-        textY1 = height / 2 - 10;
+  //     ctx.restore();
+  //     var fontSize = (height / 114).toFixed(2);
+  //     ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
+  //     ctx.textBaseline = "middle";
 
-      // Set color for the "70%" text
-      ctx.fillStyle = "#36A2EB"; // Change this color as needed
-      ctx.fillText(text1, textX1, textY1);
+  //     var text1 = "70%",
+  //       text2 = "Obtained",
+  //       textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
+  //       textY1 = height / 2 - 10;
 
-      // Adjust font size for the smaller "obtained" text
-      var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
-      ctx.font = "bold " + smallerFontSize + "em Georgia";
+  //     // Set color for the "70%" text
+  //     ctx.fillStyle = "#36A2EB"; // Change this color as needed
+  //     ctx.fillText(text1, textX1, textY1);
 
-      var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
-        textY2 = height / 2 + 20;
+  //     // Adjust font size for the smaller "obtained" text
+  //     var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
+  //     ctx.font = "bold " + smallerFontSize + "em Georgia";
 
-      // Set color for the "obtained" text
-      ctx.fillStyle = "#36A2EB"; // Change this color as needed
-      ctx.fillText(text2, textX2, textY2);
+  //     var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
+  //       textY2 = height / 2 + 20;
 
-      ctx.save();
-    },
-  };
+  //     // Set color for the "obtained" text
+  //     ctx.fillStyle = "#36A2EB"; // Change this color as needed
+  //     ctx.fillText(text2, textX2, textY2);
 
-  // Create the Doughnut chart
-  var myDoughnutChart = new Chart(DoughnutChart_first, {
-    type: "doughnut",
-    data: {
-      labels: ["Obtained", "Remaining"],
-      datasets: [
-        {
-          data: [70, 30], // 70% obtained out of 100%
-          backgroundColor: [gradient, "#ffffff"], // Gradient for "Obtained" and solid color for "Remaining"
-          hoverBackgroundColor: [gradient, "#ff0000"],
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      cutout: "70%",
-      plugins: {
-        legend: {
-          display: false, // Disable the legend
-        },
-        tooltip: {
-          callbacks: {
-            label: function (tooltipItem) {
-              return tooltipItem.label + ": " + tooltipItem.raw + "%";
-            },
-          },
-        },
-      },
-    },
-    plugins: [centerTextPlugin],
-  });
+  //     ctx.save();
+  //   },
+  // };
+
+  // // Create the Doughnut chart
+  // var myDoughnutChart = new Chart(DoughnutChart_first, {
+  //   type: "doughnut",
+  //   data: {
+  //     labels: ["Obtained", "Remaining"],
+  //     datasets: [
+  //       {
+  //         data: [70, 30], // 70% obtained out of 100%
+  //         backgroundColor: [gradient, "#ffffff"], // Gradient for "Obtained" and solid color for "Remaining"
+  //         hoverBackgroundColor: [gradient, "#ff0000"],
+  //       },
+  //     ],
+  //   },
+  //   options: {
+  //     responsive: true,
+  //     cutout: "70%",
+  //     plugins: {
+  //       legend: {
+  //         display: false, // Disable the legend
+  //       },
+  //       tooltip: {
+  //         callbacks: {
+  //           label: function (tooltipItem) {
+  //             return tooltipItem.label + ": " + tooltipItem.raw + "%";
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  //   plugins: [centerTextPlugin],
+  // });
 
   // New code for the second doughnut chart
   var DoughnutChart_second = document
@@ -316,24 +616,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Create the new chart
   const chart_second_four = document.getElementById("chart_first_two"); // Get the new canvas element
-
+  console.log(storedTagNames);
   const chart2 = new Chart(chart_second_four, {
     type: chartType2,
     data: {
-      labels: [0, "Red", "Blue", "Yellow", "Green", "Purple", "Orange", ""],
+      labels: storedTagNames,
       datasets: [
         {
           label: "Batch",
           backgroundColor: "#f11167",
           borderColor: "#f11167",
-          data: [0, 1, 9, 13, 15, 8, 8],
+          data: storedTagNames.map((tagName) => avgMarkForBatch[tagName] || 0),
           borderWidth: 1.5,
         },
         {
           label: "Individual",
           backgroundColor: "#341111",
           borderColor: "#341111",
-          data: [0, 11, 19, 16, 0, 0, 16],
+          data: storedTagNames.map(
+            (tagName) => avgMarkForStudent[tagName] || 0
+          ),
           borderWidth: 1.5,
         },
       ],
@@ -349,15 +651,15 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       },
       animation: {
-        duration: 2000, // Animation duration in milliseconds
-        easing: "bounce", // Animation effect
+        duration: 2000,
+        easing: "bounce",
       },
       scales: {
         y: {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Average Mark", // Set your Y axis label here
+            text: "Average Mark",
             font: {
               size: 14,
               weight: "bold",
@@ -368,7 +670,7 @@ document.addEventListener("DOMContentLoaded", () => {
         x: {
           title: {
             display: true,
-            text: "Task Tags", // Set your X axis label here
+            text: "Task Tags",
             font: {
               size: 14,
               weight: "bold",
