@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Form</title>
+    <link rel="stylesheet" href="./css/feedback.css">
+</head>
+<body>
+    <div class="navbar_log_sign">
+        <div class="logo_title">
+            <div class="logo">
+                <img src="./assets/images/tasktrace_logo1.png" alt="logo" />
+            </div>
+            <a href=""><img id="user" src="./assets/images/user.png" alt=""></a>
+            <div class="title">TaskTrace</div>
+        </div>
+    </div>
+    <div id="info" class="user-info"></div>
+    <div class="feedback-container">
+        <h1>FEEDBACK</h1>
+        <form id="feedbackForm">
+            <input type="checkbox" id="excellent" name="rating" value="excellent" onclick="onlyOne(this)">
+            <label for="excellent">Excellent</label>
+    
+            <input type="checkbox" id="average" name="rating" value="average" onclick="onlyOne(this)">
+            <label for="average">Average</label>
+    
+            <input type="checkbox" id="below-average" name="rating" value="below-average" onclick="onlyOne(this)">
+            <label for="below-average">Below Average</label>
+    
+            <textarea id="feedbackText" style="background-color: #d9d9d9; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;" id="textarea" placeholder="Text Here"></textarea>
+    
+            <button type="submit">SUBMIT</button>
+        </form>
+    </div>
+
+    <script type="module" src="./js/feedback.js"></script>
+    <script src="onlyOne.js"></script>
+</body>
+</html>
