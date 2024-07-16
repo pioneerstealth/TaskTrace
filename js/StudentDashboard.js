@@ -5,14 +5,12 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebas
 // https://firebase.google.com/docs/web/setup#available-libraries
 import {
   getFirestore,
-  collection,
-  addDoc,
-  getDocs,
   doc,
   getDoc,
-  updateDoc,
+  collection,
   query,
   where,
+  getDocs,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import {
   getAuth,
@@ -40,8 +38,33 @@ const db = getFirestore(app);
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const memberId = params.get("memberId");
-  const memberName = params.get("batchId");
-  console.log(memberId);
+  const batchId = params.get("batchId");
+
+  //fetch batch name and student name function----------------------------------------
+  async function fetchBatchNameAndStudentName(documentId, memberId) {
+    try {
+      const docRef = doc(db, "batches", documentId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const batchName = data.batchName;
+
+        // Find student name from members array
+        const member = data.members.find((member) => member.id === memberId);
+        const studentName = member ? member.name : "Student not found";
+
+        first_imgHead_heading_populate(batchName, studentName);
+      } else {
+        console.log("No such document!");
+      }
+    } catch (error) {
+      console.error("Error getting document:", error);
+    }
+  }
+
+  // Example usage
+  fetchBatchNameAndStudentName(batchId, memberId);
 
   // div clear function-----------------------------------------------------
 
@@ -54,55 +77,79 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // fetch batch id------------------------------------------
-
-  async function getBatchIdByStudentId(studentId) {
-    const tasksCollection = collection(db, "tasks");
-
-    try {
-      const tasksSnapshot = await getDocs(tasksCollection);
-      let batchId = null;
-
-      tasksSnapshot.forEach((doc) => {
-        const taskData = doc.data();
-        const students = taskData.students || [];
-
-        students.forEach((student) => {
-          if (student.id === studentId) {
-            batchId = taskData.batchId;
-          }
-        });
-      });
-
-      if (batchId) {
-        console.log(`Batch ID for student ID ${studentId}: ${batchId}`);
-        return batchId;
-      } else {
-        console.log(`No batch ID found for student ID ${studentId}`);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching batch ID:", error);
-    }
-  }
-
-  // Example usage
-  // getBatchIdByStudentId(memberId);
-
   // first_imgHead_heading population-----------------------------------------
 
-  function first_imgHead_heading_populate(name, batch) {
+  function first_imgHead_heading_populate(batchName, studentName) {
     let divId = "first_imgHead_heading";
     clearDivContent(divId);
     const div = document.getElementById("first_imgHead_heading");
     if (div) {
-      div.innerHTML = `${name} <br /> ${batch}`;
+      div.innerHTML = `${studentName} <br /> ${batchName}`;
     } else {
       console.error("Element with class 'first_imgHead_heading' not found.");
     }
   }
 
-  first_imgHead_heading_populate(memberName, memberId);
+  async function fetchTagNamesByBatchId(batchId) {
+    try {
+      // Query tasks collection where batchId matches
+      const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
+      const querySnapshot = await getDocs(q);
+
+      const tagNames = [];
+
+      // Iterate through all matching task documents
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        tagNames.push(data.tagName);
+      });
+
+      console.log(`Tag Names for batchId ${batchId}:`, tagNames);
+    } catch (error) {
+      console.error("Error fetching tag names:", error);
+    }
+  }
+
+  // Example usage
+  fetchTagNamesByBatchId(batchId);
+
+  // Function to calculate average marks based on tagName
+  async function calculateAverageMarks(tagName) {
+    try {
+      // Query tasks collection where tagName matches
+      const q = query(collection(db, "tasks"), where("tagName", "==", tagName));
+      const querySnapshot = await getDocs(q);
+
+      let totalMarks = 0;
+      let studentCount = 0;
+
+      // Iterate through all matching task documents
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        // Iterate through all students in each task document
+        data.students.forEach((student) => {
+          totalMarks += parseFloat(student.marks);
+          studentCount++;
+        });
+      });
+
+      // Calculate average marks
+      const averageMarks = studentCount
+        ? (totalMarks / studentCount).toFixed(2)
+        : 0;
+
+      console.log(`Average Marks for tagName ${tagName}:`, averageMarks);
+    } catch (error) {
+      console.error("Error calculating average marks:", error);
+    }
+  }
+
+  // Example usage
+  calculateAverageMarks("JAVA");
+
+  // Call the function with the parameters from the URL
+  // fetchBatchAndMemberInfo(memberId, batchId);
 
   // pie chart----------------------------------------------------------------
   // Select the canvas element

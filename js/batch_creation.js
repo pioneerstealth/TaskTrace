@@ -272,16 +272,16 @@ document
     const tableData = [];
     const tableBody = document.getElementById("tableBody").children;
 
-  // Iterate through table rows to collect member data
-  for (let i = 0; i < tableBody.length; i++) {
-    const row = tableBody[i];
-    const rowData = {
-      id: row.children[0].textContent.trim(), // Assuming id is in the first column (index 0)
-      name: row.children[1].textContent.trim(), // Assuming name is in the second column (index 1)
-      email: row.children[2].textContent.trim(), // Assuming email is in the third column (index 2)
-    };
-    tableData.push(rowData);
-  }
+    // Iterate through table rows to collect member data
+    for (let i = 0; i < tableBody.length; i++) {
+      const row = tableBody[i];
+      const rowData = {
+        id: row.children[0].textContent.trim(), // Assuming id is in the first column (index 0)
+        name: row.children[1].textContent.trim(), // Assuming name is in the second column (index 1)
+        email: row.children[2].textContent.trim(), // Assuming email is in the third column (index 2)
+      };
+      tableData.push(rowData);
+    }
 
     try {
       let batchName = document
@@ -314,24 +314,24 @@ document
         return;
       }
 
-    // Save the batch with its members data
-    const batchDocRef = await addDoc(collection(db, "batches"), {
-      batchName: batchName,
-      members: tableData,
-      createdBy: currentUser.uid,
-    });
+      // Save the batch with its members data
+      const batchDocRef = await addDoc(collection(db, "batches"), {
+        batchName: batchName,
+        members: tableData,
+        createdBy: currentUser.uid,
+      });
 
-    // Add each user to the users collection and send magic link
-    for (const member of tableData) {
-      await addUserAndSendMagicLink(member.id, member.name, member.email);
+      // Add each user to the users collection and send magic link
+      for (const member of tableData) {
+        await addUserAndSendMagicLink(member.id, member.name, member.email);
+      }
+
+      showMessage("Batch and users saved successfully!", "success");
+    } catch (error) {
+      console.error("Error saving batch: ", error);
+      showMessage("Error saving batch: " + error.message, "error");
     }
-
-    showMessage("Batch and users saved successfully!", "success");
-  } catch (error) {
-    console.error("Error saving batch: ", error);
-    showMessage("Error saving batch: " + error.message, "error");
-  }
-});
+  });
 
 async function addUserAndSendMagicLink(userId, userName, userEmail) {
   try {
@@ -340,8 +340,8 @@ async function addUserAndSendMagicLink(userId, userName, userEmail) {
       id: userId,
       name: userName,
       email: userEmail,
-      lastLogin:new Date(),
-      role:"user"
+      lastLogin: new Date(),
+      role: "user",
     });
 
     // Send magic link to the user's email
@@ -355,12 +355,11 @@ async function addUserAndSendMagicLink(userId, userName, userEmail) {
     console.log(`Magic link sent to ${userEmail}`);
 
     // Inform the user to check their email
-    window.localStorage.setItem('emailForSignIn', userEmail);
+    window.localStorage.setItem("emailForSignIn", userEmail);
   } catch (error) {
     console.error("Error adding user and sending magic link: ", error);
   }
 }
-
 
 // Event listener for Delete Batch button
 document
@@ -628,9 +627,9 @@ async function fetchBatchDetails(batchName) {
       batchSnapshot.forEach((doc) => {
         const batchData = doc.data();
         const batchId = doc.id;
-        console.log("Batchid",batchId);
+        console.log("Batchid", batchId);
         console.log(batchData);
-        updateTable(batchData.members,batchId); // Update table with batch members
+        updateTable(batchData.members, batchId); // Update table with batch members
       });
     } else {
       showMessage("Batch not found!", "error");
@@ -665,7 +664,7 @@ function clearTable() {
 }
 
 // Function to update the table with batch member details
-function updateTable(members,batchId) {
+function updateTable(members, batchId) {
   console.trace("updateTable called");
   const tableBody = document.getElementById("tableBody");
   const tableHead = document.querySelector(".table_head");
@@ -718,7 +717,7 @@ function updateTable(members,batchId) {
         chartButton.classList.add("chart");
         chartButton.innerHTML = '<i class="fa-solid fa-chart-line"></i>';
         chartButton.addEventListener("click", () => {
-          viewChart(member.id, member.name,batchId);
+          viewChart(member.id, member.name, batchId);
         });
         tdAction.appendChild(chartButton);
 
@@ -728,12 +727,12 @@ function updateTable(members,batchId) {
     }
   }
 }
-function viewChart(memberId, memberName,batchId) {
+function viewChart(memberId, memberName, batchId) {
   if (memberId && memberName) {
     if (batchId) {
       console.log(memberId);
       console.log(batchId);
-      window.location.href = `StudentDashboard.html?memberId=${memberId}&=batchId${batchId}`;
+      window.location.href = `StudentDashboard.html?memberId=${memberId}&batchId=${batchId}`;
     } else {
       showMessage("Batch name not found for this member.", "error");
     }
