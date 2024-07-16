@@ -17,8 +17,6 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-
-
 const firebaseConfig = {
   apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
   authDomain: "task-trace.firebaseapp.com",
@@ -76,65 +74,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-
-  async function getTaskData(batchId) {
-    const taskData = [];
-    const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
-
-    const querySnapshot = await getDocs(q);
-
-    querySnapshot.forEach((doc) => {
-        taskData.push(doc.data());
-    });
-
-    console.log("Retrieved task data: ", taskData);
-    return taskData;
-}
-
- let taskData= await getTaskData(batchId)
-
- console.log(taskData)
-
-
- function processData(taskData, memberId, batchId) {
-  let completedTasks = 0;
-  let timeExtendedTasks = 0;
-  let notCompletedTasks = 0;
-
-  taskData.forEach(task => {
-    task.students.forEach(student => {
-      if (student.id === memberId) {
-        if (student.taskStatus === 'Completed') {
-          console.log("completed");
-          const totalTimeSeconds = timeStringToSeconds(task.time);
-          const timeTakenSeconds = timeStringToSeconds(student.timeTaken);
-          const newEndTimeSeconds = timeStringToSeconds(task.totaltime);
-
-          if (totalTimeSeconds!==newEndTimeSeconds) {
-            timeExtendedTasks++;
-          } else {
-            completedTasks++;
-          }
-        } else if (student.taskStatus === 'Pending') {
-          notCompletedTasks++;
-        }
-      }
-    });
-  });
-
-  console.log('Completed Tasks:', completedTasks);
-  console.log('Time Extended Tasks:', timeExtendedTasks);
-  console.log('Not Completed Tasks:', notCompletedTasks);
-  return [completedTasks, timeExtendedTasks, notCompletedTasks];
-}
-
-// Utility function to convert time strings to seconds
-function timeStringToSeconds(timeString) {
-  const [hours, minutes, seconds] = timeString.split(':').map(Number);
-  return hours * 3600 + minutes * 60 + seconds;
-}
-
-let taskStatus=processData(taskData,memberId,batchId);
   // first_imgHead_heading population-----------------------------------------
 
   function first_imgHead_heading_populate(batchName, studentName) {
@@ -148,6 +87,53 @@ let taskStatus=processData(taskData,memberId,batchId);
     }
   }
 
+  //average name with tag student and batch---------------------------------------------
+  async function calculateAverageMark(batchId, tagName, studentId) {
+    // Get tasks from Firestore
+    const tasksRef = collection(db, "tasks");
+    const q = query(
+      tasksRef,
+      where("batchId", "==", batchId),
+      where("tagName", "==", tagName)
+    );
+    const querySnapshot = await getDocs(q);
+
+    let totalPercentage = 0;
+    let taskCount = 0;
+
+    querySnapshot.forEach((doc) => {
+      const task = doc.data();
+      const maxMarks = parseFloat(task.maxMarks);
+      const student = task.students.find((student) => student.id === studentId);
+
+      if (student && maxMarks) {
+        const studentMarks = parseFloat(student.marks);
+        const percentage = (studentMarks / maxMarks) * 100;
+        totalPercentage += percentage;
+        taskCount++;
+      }
+    });
+
+    if (taskCount === 0) {
+      return 0; // If no tasks are found, return 0
+    }
+
+    return totalPercentage / taskCount;
+  }
+
+  // const tagName = "JAVA";
+  // const studentId = memberId;
+  // calculateAverageMark(batchId, tagName, memberId)
+  //   .then((averageMark) => {
+  //     console.log(
+  //       `Average mark percentage for student ${studentId} in tag ${tagName}: ${averageMark}%`
+  //     );
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error calculating average mark percentage:", error);
+  //   });
+
+  //store tagname------------------------------
   async function fetchTagNamesByBatchId(batchId) {
     try {
       const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
@@ -177,87 +163,242 @@ let taskStatus=processData(taskData,memberId,batchId);
   const storedTagNames = await fetchTagNamesByBatchId(batchId);
   console.log("Stored tag names:", storedTagNames);
 
-
   // const tagName=fetchTagNamesByBatchId(batchId);
   // console.log(tagName)
 
-// Function to fetch average marks for a batch for each tag
-async function fetchAverageMarksForBatch(batchId, tagNames) {
-  try {
-    const averageMarks = {};
+  // Function to fetch average marks for a batch for each tag
+  async function fetchAverageMarksForBatch(batchId, tagNames) {
+    try {
+      const averageMarks = {};
 
-    // Fetch data for each tag
-    for (const tagName of tagNames) {
-      const q = query(collection(db, "tasks"), where("batchId", "==", batchId), where("tagName", "==", tagName));
-      const querySnapshot = await getDocs(q);
+      // Fetch data for each tag
+      for (const tagName of tagNames) {
+        const q = query(
+          collection(db, "tasks"),
+          where("batchId", "==", batchId),
+          where("tagName", "==", tagName)
+        );
+        const querySnapshot = await getDocs(q);
 
-      let totalMarks = 0;
-      let studentCount = 0;
+        let totalMarks = 0;
+        let studentCount = 0;
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        data.students.forEach((student) => {
-          totalMarks += parseFloat(student.marks);
-          studentCount++;
-        });
-      });
-
-      const averageMark = studentCount ? (totalMarks / studentCount).toFixed(2) : 0;
-      averageMarks[tagName] = parseFloat(averageMark);
-    }
-
-    console.log("Average Marks for Batch:", averageMarks);
-    return averageMarks;
-  } catch (error) {
-    console.error("Error fetching average marks:", error);
-    return {}; // Return an empty object in case of error
-  }
-}
-
-
-let avgMarkForBatch= await fetchAverageMarksForBatch(batchId,storedTagNames)
-console.log(avgMarkForBatch)
-
-
-// Function to fetch average marks for a particular student in a batch for each tag
-async function fetchAverageMarksForStudent(batchId, memberId, tagNames) {
-  try {
-    const averageMarks = {};
-
-    // Fetch data for each tag
-    for (const tagName of tagNames) {
-      const q = query(collection(db, "tasks"), where("batchId", "==", batchId), where("tagName", "==", tagName));
-      const querySnapshot = await getDocs(q);
-
-      let totalMarks = 0;
-      let taskCount = 0;
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        data.students.forEach((student) => {
-          if (student.id === memberId) {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          data.students.forEach((student) => {
             totalMarks += parseFloat(student.marks);
-            taskCount++;
-          }
+            studentCount++;
+          });
         });
-      });
 
-      const averageMark = taskCount ? (totalMarks / taskCount).toFixed(2) : 0;
-      averageMarks[tagName] = parseFloat(averageMark);
+        const averageMark = studentCount
+          ? (totalMarks / studentCount).toFixed(2)
+          : 0;
+        averageMarks[tagName] = parseFloat(averageMark);
+      }
+
+      console.log("Average Marks for Batch:", averageMarks);
+      return averageMarks;
+    } catch (error) {
+      console.error("Error fetching average marks:", error);
+      return {}; // Return an empty object in case of error
+    }
+  }
+
+  let avgMarkForBatch = await fetchAverageMarksForBatch(
+    batchId,
+    storedTagNames
+  );
+  console.log(avgMarkForBatch);
+
+  // Function to fetch average marks for a particular student in a batch for each tag
+  // Function to fetch average marks for a particular student in a batch for each tag
+  async function fetchAverageMarksForStudent(batchId, memberId, tagNames) {
+    try {
+      const averageMarks = {};
+
+      // Fetch data for each tag
+      for (const tagName of tagNames) {
+        const q = query(
+          collection(db, "tasks"),
+          where("batchId", "==", batchId),
+          where("tagName", "==", tagName)
+        );
+        const querySnapshot = await getDocs(q);
+
+        let totalMarks = 0;
+        let taskCount = 0;
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          data.students.forEach((student) => {
+            if (student.id === memberId) {
+              totalMarks += parseFloat(student.marks);
+              taskCount++;
+            }
+          });
+        });
+
+        const averageMark = taskCount ? (totalMarks / taskCount).toFixed(2) : 0;
+        averageMarks[tagName] = parseFloat(averageMark);
+      }
+
+      console.log("Average Marks for Student:", averageMarks);
+      return averageMarks;
+    } catch (error) {
+      console.error("Error fetching average marks for student:", error);
+      return {};
+    }
+  }
+
+  let avgMarkForStudent = await fetchAverageMarksForStudent(
+    batchId,
+    memberId,
+    storedTagNames
+  );
+  console.log(avgMarkForStudent);
+
+  async function getUniqueTagNames(batchId) {
+    // Get tasks from Firestore
+    const tasksRef = collection(db, "tasks");
+    const q = query(tasksRef, where("batchId", "==", batchId));
+    const querySnapshot = await getDocs(q);
+
+    const uniqueTagNames = new Set();
+
+    querySnapshot.forEach((doc) => {
+      const task = doc.data();
+      if (task.tagName) {
+        uniqueTagNames.add(task.tagName);
+      }
+    });
+
+    // Convert the set to an array
+    const tagNamesArray = Array.from(uniqueTagNames);
+
+    // Display the unique tag names
+    // console.log(`Unique tag names for batch ${batchId}:`, tagNamesArray);
+
+    return tagNamesArray;
+  }
+
+  try {
+    const tagNamesArray = await getUniqueTagNames(batchId);
+    console.log("Tag names retrieved successfully:", tagNamesArray);
+
+    let totalPercentage = 0;
+
+    for (const tagName of tagNamesArray) {
+      const averageMark = await calculateAverageMark(
+        batchId,
+        tagName,
+        memberId
+      );
+      totalPercentage += averageMark;
+      console.log(
+        `Average mark percentage for student ${memberId} in tag ${tagName}: ${averageMark}%`
+      );
     }
 
-    console.log("Average Marks for Student:", averageMarks);
-    return averageMarks;
+    const overallPercentage = totalPercentage / tagNamesArray.length;
+    console.log(
+      `Overall average percentage for student ${memberId}: ${overallPercentage}%`
+    );
+
+    // Update the Chart.js data dynamically
+    const DoughnutChart_first = document
+      .getElementById("DoughnutChart_first")
+      .getContext("2d");
+    const gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(1, "#36A2EB");
+    gradient.addColorStop(0, "#EAF5FD");
+
+    const remainingPercentage = 100 - overallPercentage;
+
+    // Create the Doughnut chart
+    const myDoughnutChart = new Chart(DoughnutChart_first, {
+      type: "doughnut",
+      data: {
+        labels: ["Obtained", "Remaining"],
+        datasets: [
+          {
+            data: [overallPercentage, remainingPercentage],
+            backgroundColor: [gradient, "#ffffff"],
+            hoverBackgroundColor: [gradient, "#ff0000"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        cutout: "70%",
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (tooltipItem) {
+                return tooltipItem.label + ": " + tooltipItem.raw + "%";
+              },
+            },
+          },
+        },
+      },
+      plugins: [
+        {
+          id: "centerTextPlugin",
+          beforeDraw: function (chart) {
+            var width = chart.width,
+              height = chart.height,
+              ctx = chart.ctx;
+
+            ctx.restore();
+            var fontSize = (height / 114).toFixed(2);
+            ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
+            ctx.textBaseline = "middle";
+
+            var text1 = `${overallPercentage.toFixed(2)}%`,
+              text2 = "Obtained",
+              textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
+              textY1 = height / 2 - 10;
+
+            // Set color for the "overallPercentage" text
+            ctx.fillStyle = "#36A2EB"; // Change this color as needed
+            ctx.fillText(text1, textX1, textY1);
+
+            // Adjust font size for the smaller "obtained" text
+            var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
+            ctx.font = "bold " + smallerFontSize + "em Georgia";
+
+            var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
+              textY2 = height / 2 + 20;
+
+            // Set color for the "obtained" text
+            ctx.fillStyle = "#36A2EB"; // Change this color as needed
+            ctx.fillText(text2, textX2, textY2);
+
+            ctx.save();
+          },
+        },
+      ],
+    });
   } catch (error) {
-    console.error("Error fetching average marks for student:", error);
-    return {};
+    console.error("Error:", error);
   }
-}
 
+  // Example usage
 
-let avgMarkForStudent= await fetchAverageMarksForStudent(batchId,memberId,storedTagNames)
-console.log(avgMarkForStudent)
+  // getUniqueTagNames(batchId)
+  //   .then((tagNames) => {
+  //     const tagNamesArray = tagNames;
+  //     console.log("Tag names retrieved successfully:", tagNamesArray);
 
+  //     // Store the tag names array for further use
+  //     // You can now use tagNamesArray for other operations
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error retrieving tag names:", error);
+  //   });
 
   // Call the function with the parameters from the URL
   // fetchBatchAndMemberInfo(memberId, batchId);
@@ -273,7 +414,7 @@ console.log(avgMarkForStudent)
     labels: ["Completed Tasks", "Time Extended Tasks", "Not Completed Tasks"],
     datasets: [
       {
-        data: taskStatus, // Dummy data
+        data: [30, 20, 50], // Dummy data
         backgroundColor: [
           "rgba(75, 192, 192, 0.2)",
           "rgba(255, 206, 86, 0.2)",
@@ -316,83 +457,84 @@ console.log(avgMarkForStudent)
 
   // donutchart-------------------------------------------
   // Get the context of the canvas element we just created
-  var DoughnutChart_first = document
-    .getElementById("DoughnutChart_first")
-    .getContext("2d");
 
-  // Create a gradient for the "Obtained" segment
-  var gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(1, "#36A2EB");
-  gradient.addColorStop(0, "#EAF5FD");
+  // var DoughnutChart_first = document
+  //   .getElementById("DoughnutChart_first")
+  //   .getContext("2d");
 
-  // Create the custom plugin to draw text in the center
-  const centerTextPlugin = {
-    id: "centerTextPlugin",
-    beforeDraw: function (chart) {
-      var width = chart.width,
-        height = chart.height,
-        ctx = chart.ctx;
+  // // Create a gradient for the "Obtained" segment
+  // var gradient = DoughnutChart_first.createLinearGradient(0, 0, 0, 400);
+  // gradient.addColorStop(1, "#36A2EB");
+  // gradient.addColorStop(0, "#EAF5FD");
 
-      ctx.restore();
-      var fontSize = (height / 114).toFixed(2);
-      ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
-      ctx.textBaseline = "middle";
+  // // Create the custom plugin to draw text in the center
+  // const centerTextPlugin = {
+  //   id: "centerTextPlugin",
+  //   beforeDraw: function (chart) {
+  //     var width = chart.width,
+  //       height = chart.height,
+  //       ctx = chart.ctx;
 
-      var text1 = "70%",
-        text2 = "Obtained",
-        textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
-        textY1 = height / 2 - 10;
+  //     ctx.restore();
+  //     var fontSize = (height / 114).toFixed(2);
+  //     ctx.font = "bold " + fontSize + "em sans-serif"; // Make the font bold
+  //     ctx.textBaseline = "middle";
 
-      // Set color for the "70%" text
-      ctx.fillStyle = "#36A2EB"; // Change this color as needed
-      ctx.fillText(text1, textX1, textY1);
+  //     var text1 = "70%",
+  //       text2 = "Obtained",
+  //       textX1 = Math.round((width - ctx.measureText(text1).width) / 2),
+  //       textY1 = height / 2 - 10;
 
-      // Adjust font size for the smaller "obtained" text
-      var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
-      ctx.font = "bold " + smallerFontSize + "em Georgia";
+  //     // Set color for the "70%" text
+  //     ctx.fillStyle = "#36A2EB"; // Change this color as needed
+  //     ctx.fillText(text1, textX1, textY1);
 
-      var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
-        textY2 = height / 2 + 20;
+  //     // Adjust font size for the smaller "obtained" text
+  //     var smallerFontSize = (height / 200).toFixed(2); // Adjust the value to make it smaller
+  //     ctx.font = "bold " + smallerFontSize + "em Georgia";
 
-      // Set color for the "obtained" text
-      ctx.fillStyle = "#36A2EB"; // Change this color as needed
-      ctx.fillText(text2, textX2, textY2);
+  //     var textX2 = Math.round((width - ctx.measureText(text2).width) / 2),
+  //       textY2 = height / 2 + 20;
 
-      ctx.save();
-    },
-  };
+  //     // Set color for the "obtained" text
+  //     ctx.fillStyle = "#36A2EB"; // Change this color as needed
+  //     ctx.fillText(text2, textX2, textY2);
 
-  // Create the Doughnut chart
-  var myDoughnutChart = new Chart(DoughnutChart_first, {
-    type: "doughnut",
-    data: {
-      labels: ["Obtained", "Remaining"],
-      datasets: [
-        {
-          data: [70, 30], // 70% obtained out of 100%
-          backgroundColor: [gradient, "#ffffff"], // Gradient for "Obtained" and solid color for "Remaining"
-          hoverBackgroundColor: [gradient, "#ff0000"],
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      cutout: "70%",
-      plugins: {
-        legend: {
-          display: false, // Disable the legend
-        },
-        tooltip: {
-          callbacks: {
-            label: function (tooltipItem) {
-              return tooltipItem.label + ": " + tooltipItem.raw + "%";
-            },
-          },
-        },
-      },
-    },
-    plugins: [centerTextPlugin],
-  });
+  //     ctx.save();
+  //   },
+  // };
+
+  // // Create the Doughnut chart
+  // var myDoughnutChart = new Chart(DoughnutChart_first, {
+  //   type: "doughnut",
+  //   data: {
+  //     labels: ["Obtained", "Remaining"],
+  //     datasets: [
+  //       {
+  //         data: [70, 30], // 70% obtained out of 100%
+  //         backgroundColor: [gradient, "#ffffff"], // Gradient for "Obtained" and solid color for "Remaining"
+  //         hoverBackgroundColor: [gradient, "#ff0000"],
+  //       },
+  //     ],
+  //   },
+  //   options: {
+  //     responsive: true,
+  //     cutout: "70%",
+  //     plugins: {
+  //       legend: {
+  //         display: false, // Disable the legend
+  //       },
+  //       tooltip: {
+  //         callbacks: {
+  //           label: function (tooltipItem) {
+  //             return tooltipItem.label + ": " + tooltipItem.raw + "%";
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  //   plugins: [centerTextPlugin],
+  // });
 
   // New code for the second doughnut chart
   var DoughnutChart_second = document
@@ -474,7 +616,7 @@ console.log(avgMarkForStudent)
 
   // Create the new chart
   const chart_second_four = document.getElementById("chart_first_two"); // Get the new canvas element
-  console.log(storedTagNames)
+  console.log(storedTagNames);
   const chart2 = new Chart(chart_second_four, {
     type: chartType2,
     data: {
@@ -484,14 +626,16 @@ console.log(avgMarkForStudent)
           label: "Batch",
           backgroundColor: "#f11167",
           borderColor: "#f11167",
-          data:storedTagNames.map(tagName => avgMarkForBatch[tagName] || 0),
+          data: storedTagNames.map((tagName) => avgMarkForBatch[tagName] || 0),
           borderWidth: 1.5,
         },
         {
           label: "Individual",
           backgroundColor: "#341111",
           borderColor: "#341111",
-          data: storedTagNames.map(tagName => avgMarkForStudent[tagName] || 0),
+          data: storedTagNames.map(
+            (tagName) => avgMarkForStudent[tagName] || 0
+          ),
           borderWidth: 1.5,
         },
       ],
@@ -537,7 +681,6 @@ console.log(avgMarkForStudent)
       },
     },
   });
-  
 
   // Toggle chart type on button click
   document
@@ -550,52 +693,17 @@ console.log(avgMarkForStudent)
     });
 
   // JavaScript to populate the dropdown options-----------------------------------------
-  // var dropdown = document.getElementById("taskStatusDropdown");
-  // var options = [
-  //   "Completed Tasks",
-  //   "Time extended Tasks",
-  //   "Not completed Tasks",
-  // ];
+  var dropdown = document.getElementById("taskStatusDropdown");
+  var options = [
+    "Completed Tasks",
+    "Time extended Tasks",
+    "Not completed Tasks",
+  ];
 
-  // options.forEach(function (optionText) {
-  //   var option = document.createElement("option");
-  //   option.text = optionText;
-  //   option.value = optionText.toLowerCase().replace(/ /g, "_");
-  //   dropdown.appendChild(option);
-  // });
-
-  async function updateTable(batchId, memberId) {
-    const tableBody = document.getElementById("tableBody_second_one");
-    tableBody.innerHTML = "";
-
-    // Fetch tag names for the batch
-    const storedTagNames = await fetchTagNamesByBatchId(batchId);
-    console.log("Stored tag names:", storedTagNames);
-
-    // Fetch average marks for the student in the batch
-    const avgMarkForStudent = await fetchAverageMarksForStudent(batchId, memberId, storedTagNames);
-    console.log(avgMarkForStudent);
-
-    // Create a row for each tag and its average mark
-    storedTagNames.forEach(tagName => {
-        const row = document.createElement("tr");
-
-        // Tag name cell
-        const tagNameCell = document.createElement("td");
-        tagNameCell.textContent = tagName;
-        row.appendChild(tagNameCell);
-
-        // Average mark cell
-        const avgMarkCell = document.createElement("td");
-        const avgMark = avgMarkForStudent[tagName] || 0; // If average mark not available, default to 0
-        avgMarkCell.textContent = avgMark;
-        row.appendChild(avgMarkCell);
-
-        // Append the row to the table body
-        tableBody.appendChild(row);
-    });
-}
-
-updateTable(batchId,memberId)
+  options.forEach(function (optionText) {
+    var option = document.createElement("option");
+    option.text = optionText;
+    option.value = optionText.toLowerCase().replace(/ /g, "_");
+    dropdown.appendChild(option);
+  });
 });
-
