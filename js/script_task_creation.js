@@ -9,6 +9,7 @@ import {
   updateDoc,
   query,
   where,
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getAuth,
@@ -74,7 +75,6 @@ function getTableData() {
       taskStatus: cells[3].querySelector("button").textContent,
       timeTaken: cells[4].textContent,
       marks: cells[5].textContent,
-      imgurl: "https://via.placeholder.com/50"
     };
     data.push(rowData);
   }
@@ -83,28 +83,64 @@ function getTableData() {
 }
 
 const completeTaskBtn = document.getElementById("taskcomplete");
-  console.log(completeTaskBtn);
-  completeTaskBtn.addEventListener("click",async  () => {
+console.log(completeTaskBtn);
+completeTaskBtn.addEventListener("click", async () => {
     console.log("inside completetask");
-    const tableData = getTableData();
-    console.log("Table Data:", tableData);
-
+    
+    // Get table data
+    const newTableData = getTableData();
+    console.log("New Table Data:", newTableData);
 
     // Get task ID from localStorage
-    const taskId = localStorage.getItem("taskId")
-    console.log("taskid",taskId);
-    
+    const taskId = localStorage.getItem("taskId");
+    console.log("taskid", taskId);
+
+    // Check if task ID exists
     if (!taskId) {
-      throw new Error("Task ID not found in localStorage");
+        throw new Error("Task ID not found in localStorage");
     }
 
-    // Update task document in Firestore
-    const taskDocRef = doc(db, "tasks", taskId);
-    await updateDoc(taskDocRef, { students: tableData ,status:"completed"});
-    localStorage.clear();
-    console.log("Task updated successfully with table data.");
+    try {
+        // Get a reference to the Firestore document
+        const taskDocRef = doc(db, "tasks", taskId);
 
-  });
+        // Get the current data from the document
+        const taskDoc = await getDoc(taskDocRef);
+        if (!taskDoc.exists()) {
+            throw new Error("Task document not found in Firestore");
+        }
+
+        const currentData = taskDoc.data();
+        const currentStudents = currentData.students || [];
+
+        // Merge current data with new data
+        const updatedStudents = currentStudents.map(student => {
+            const newStudentData = newTableData.find(newData => newData.id === student.id);
+            return newStudentData ? { ...student, ...newStudentData } : student;
+        });
+
+        // Add any new students that were not in the current list
+        newTableData.forEach(newStudentData => {
+            if (!currentStudents.some(student => student.id === newStudentData.id)) {
+                updatedStudents.push(newStudentData);
+            }
+        });
+
+        // Update the document with the merged data
+        await updateDoc(taskDocRef, {
+            students: updatedStudents,
+            status: "completed",
+          
+        });
+
+        // Clear localStorage after successful update
+        localStorage.clear();
+        console.log("Task updated successfully with table data.");
+    } catch (error) {
+        console.error("Error updating task document:", error);
+    }
+});
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   // console.log((localStorage.getItem('timerEndTime')-Date.now())>0)
@@ -255,6 +291,28 @@ async function fetchStudents(batchId) {
   }
 }
 
+function listenForTaskUpdates() {
+  const taskId = localStorage.getItem("taskId");
+
+  if (!taskId) {
+    console.error("Task ID not found in localStorage");
+    return;
+  }
+
+  const taskDocRef = doc(db, "tasks", taskId);
+
+  onSnapshot(taskDocRef, (taskDoc) => {
+    if (!taskDoc.exists()) {
+      console.log("No data found for task ID:", taskId);
+      return;
+    }
+
+    console.log("Task data found. Rendering students...");
+    const taskData = taskDoc.data();
+    renderStudents(taskData.students);
+  });
+}
+
 function renderStudents(students) {
   const tableBody = document.getElementById("tableBody");
   tableBody.innerHTML = ""; // Clear previous data
@@ -262,11 +320,11 @@ function renderStudents(students) {
   students.forEach((student) => {
     const row = createStudentRow(student);
     tableBody.appendChild(row);
-    addStatusButtonFunctionality(row);
+    addStatusButtonFunctionality(row, student);
     addEditMarksFunctionality(row);
     addViewImageFunctionality(
       row,
-      student.imageUrl || "https://via.placeholder.com/50"
+      student.imgurl || "https://via.placeholder.com/50"
     );
   });
 }
@@ -276,9 +334,9 @@ function createStudentRow(student) {
   row.innerHTML = `
     <td>${student.id}</td>
     <td>${student.name}</td>
-    <td><button class="btn btn-outline-primary status pending">Pending</button></td>
-    <td><button class="btn btn-outline-primary tsk-status pending">Pending</button></td>
-    <td class="timer">00:00:00</td>
+    <td><button class="btn btn-outline-primary status ${student.submissionStatus === 'Completed' ? 'completed' : 'pending'}">${student.submissionStatus || "Pending"}</button></td>
+    <td><button class="btn btn-outline-primary tsk-status ${student.taskStatus === 'Completed' ? 'completed' : 'pending'}">${student.taskStatus || "Pending"}</button></td>
+    <td class="timer">${student.timeTaken || "00:00:00"}</td>
     <td class="marks">${student.marks || "0"}</td>
     <td><span class="edit-icon"><i class="fa-regular fa-pen-to-square"></i></span></td>
     <td><span class="view-icon"><i class="fa-regular fa-eye"></i></span></td>
@@ -286,12 +344,24 @@ function createStudentRow(student) {
   return row;
 }
 
-function addStatusButtonFunctionality(row) {
+function addStatusButtonFunctionality(row, student) {
   const statusButton = row.querySelector(".status");
-  const tskstatus = row.querySelector(".tsk-status");
+  const tskStatus = row.querySelector(".tsk-status");
   const time = row.querySelector(".timer");
   const marksContent = row.querySelector(".marks");
   
+  // Set initial state based on database data
+  if (student.submissionStatus === 'Completed') {
+    statusButton.classList.remove("pending");
+    statusButton.classList.add("completed");
+    statusButton.disabled = true;
+  }
+
+  if (student.taskStatus === 'Completed') {
+    tskStatus.classList.remove("pending");
+    tskStatus.classList.add("completed");
+  }
+
   statusButton.addEventListener("click", function () {
     const currentTime = Date.now();
     const endTime = (parseInt(localStorage.getItem("StartTime"))+  parseInt(localStorage.getItem("totalSeconds"))* 1000);
@@ -328,8 +398,10 @@ function addStatusButtonFunctionality(row) {
       this.classList.add("pending");
       this.textContent = "Pending";
     }
+    
   });
-  tskstatus.addEventListener("click", function () {
+
+  tskStatus.addEventListener("click", function () {
     if (this.classList.contains("pending")) {
       this.classList.remove("pending");
       this.classList.add("completed");
@@ -372,30 +444,42 @@ function enableMarksEditing(row) {
 
 async function updateStudentMarks(row, newMarks) {
   const studentId = row.querySelector("td").textContent;
-  const batchName = document
-    .getElementById("batchNameDisplay")
-    .textContent.replace("Batch Name: ", "");
-  const batchRef = collection(db, "batches");
-  const q = query(batchRef, where("batchName", "==", batchName));
-  const querySnapshot = await getDocs(q);
+  const taskId = localStorage.getItem("taskId");
 
-  querySnapshot.forEach(async (doc) => {
-    const batchDoc = doc.ref;
-    const batchData = doc.data();
-    const updatedStudents = batchData.members.map((student) => {
+  if (!taskId) {
+    console.error("Task ID not found in localStorage");
+    return;
+  }
+
+  const taskDocRef = doc(db, "tasks", taskId);
+
+  try {
+    const taskDoc = await getDoc(taskDocRef);
+    if (!taskDoc.exists()) {
+      throw new Error("Task document not found in Firestore");
+    }
+
+    const currentData = taskDoc.data();
+    const currentStudents = currentData.students || [];
+
+    // Update the marks for the specific student
+    const updatedStudents = currentStudents.map(student => {
       if (student.id === studentId) {
         return { ...student, marks: newMarks };
-      } else {
-        return student;
       }
+      return student;
     });
 
-    await updateDoc(batchDoc, {
-      members: updatedStudents,
+    // Update the document with the new data
+    await updateDoc(taskDocRef, {
+      students: updatedStudents
     });
-  });
+
+    console.log(`Marks updated for student ${studentId}`);
+  } catch (error) {
+    console.error("Error updating marks:", error);
+  }
 }
-
 function addViewImageFunctionality(row, imageUrl) {
   const viewIcon = row.querySelector(".view-icon");
   viewIcon.addEventListener("click", function () {
@@ -452,7 +536,7 @@ async function createTask(
       name: taskName,
       tagName: tagName,
       time: time,
-      newEndTime:time,
+      totaltime:time,
       maxMarks: maxMarks,
       description: taskDescription,
       batchId: batchId,
@@ -467,6 +551,8 @@ async function createTask(
     localStorage.setItem("taskId",taskId);
     console.log(localStorage.getItem("taskId"));
 
+    listenForTaskUpdates();
+
     console.log("Task created successfully:", taskData);
 
     // Fetch students from the batch
@@ -477,14 +563,16 @@ async function createTask(
     }
 
     const batchData = batchDoc.data();
+    console.log(batchData.members);
     const students = batchData.members.map(student => ({
       id: student.id,
       name: student.name,
+      email: student.email,
       submissionStatus: "Pending",
       taskStatus: "Pending",
       timeTaken: "00:00:00",
       marks: student.marks || "0",
-      imgurl: student.imageUrl || "https://via.placeholder.com/50"
+      imgurl: student.imgurl || "https://via.placeholder.com/50"
     }));
 
     // Update the task document with the fetched students
@@ -618,16 +706,12 @@ submitTime.addEventListener('click', async () => {
     timeExtensions.push({ extension: customIntervalMillis, timestamp: Date.now() });
     localStorage.setItem("timeExtensions", JSON.stringify(timeExtensions));
 
-    let Extensions = parseInt(localStorage.getItem("StartTime"));
-
-    timeExtensions.forEach(element => {
-        Extensions+=element.extension;
-    });
-    console.log(formatTime(Extensions-Date.now()))
+    
+    
     // Update the new end time in Firestore
     await updateDoc(taskDocRef, { 
-      newEndTime: formatTime(newEndTime - Date.now()),
-      timeExtensions: Extensions,
+      newEndTime: newEndTime,
+      totaltime:formatTime(totalSeconds*1000),
       noOfExtensions:timeExtensions.length // Save the array of extensions to Firestore
     });
 

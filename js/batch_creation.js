@@ -5,6 +5,7 @@ import {
   collection,
   addDoc,
   getDocs,
+  setDoc,
   deleteDoc,
   query,
   where,
@@ -277,8 +278,9 @@ document
     const row = tableBody[i];
     const rowData = {
       id: row.children[0].textContent.trim(), // Assuming id is in the first column (index 0)
-      name: row.children[1].textContent.trim(), // Assuming name is in the second column (index 1)
-      email: row.children[2].textContent.trim(), // Assuming email is in the third column (index 2)
+      orderid: row.children[1].textContent.trim(),
+      name: row.children[2].textContent.trim(), // Assuming name is in the second column (index 1)
+      email: row.children[3].textContent.trim(), // Assuming email is in the third column (index 2)
     };
     tableData.push(rowData);
   }
@@ -323,7 +325,7 @@ document
 
     // Add each user to the users collection and send magic link
     for (const member of tableData) {
-      await addUserAndSendMagicLink(member.id, member.name, member.email);
+      await addUserAndSendMagicLink(member.id, member.name, member.email,batchDocRef.id);
     }
 
     showMessage("Batch and users saved successfully!", "success");
@@ -333,10 +335,10 @@ document
   }
 });
 
-async function addUserAndSendMagicLink(userId, userName, userEmail) {
+async function addUserAndSendMagicLink(userId, userName, userEmail,batchId) {
   try {
     // Add user to the users collection
-    await setDoc(doc(db, "users", userId), {
+    await setDoc(doc(db, "users",batchId+''+userEmail), {
       id: userId,
       name: userName,
       email: userEmail,
@@ -350,7 +352,7 @@ async function addUserAndSendMagicLink(userId, userName, userEmail) {
       handleCodeInApp: true,
     };
 
-    await firebase.auth().sendSignInLinkToEmail(userEmail, actionCodeSettings);
+    await auth.sendSignInLinkToEmail(userEmail, actionCodeSettings);
 
     console.log(`Magic link sent to ${userEmail}`);
 
@@ -733,7 +735,7 @@ function viewChart(memberId, memberName,batchId) {
     if (batchId) {
       console.log(memberId);
       console.log(batchId);
-      window.location.href = `StudentDashboard.html?memberId=${memberId}&=batchId${batchId}`;
+      window.location.href = `StudentDashboard.html?memberId=${memberId}&batchId=${batchId}`;
     } else {
       showMessage("Batch name not found for this member.", "error");
     }
