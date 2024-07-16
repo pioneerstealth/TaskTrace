@@ -3,124 +3,175 @@ import {
   getFirestore,
   collection,
   getDocs,
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
- 
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBtsgwSa0T_b9GMESx1Tjhb1n4hohkJyOU",
-  authDomain: "tasktrace-v2.firebaseapp.com",
-  projectId: "tasktrace-v2",
-  storageBucket: "tasktrace-v2.appspot.com",
-  messagingSenderId: "863318084099",
-  appId: "1:863318084099:web:6a9abab8d8893caaf9dc36",
-  measurementId: "G-59DHK1FJ88",
+  apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
+  authDomain: "task-trace.firebaseapp.com",
+  projectId: "task-trace",
+  storageBucket: "task-trace.appspot.com",
+  messagingSenderId: "542109212256",
+  appId: "1:542109212256:web:a54bd96c131eff4a152d05",
+  measurementId: "G-MZNCSCVN54"
 };
- 
+
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
- 
+
 document.addEventListener("DOMContentLoaded", async function () {
   const chart_first_three = document.getElementById("chart_first_three");
   const chart_second_four = document.getElementById("chart_second_four");
- 
- 
-// Fetch tag names from Firestore
-async function fetchTagNames() {
-  const tagNamesSet = new Set();
-  const querySnapshot = await getDocs(collection(db, 'Marks'));
- 
-  querySnapshot.forEach((doc) => {
-    const tagName = doc.data().TagName;
-    if (tagName) {
-      tagNamesSet.add(tagName);
-    } else {
-      console.error(`Undefined TagName in document ID: ${doc.id}`);
+
+  // Fetch tag names from Firestore
+  async function fetchTagNames() {
+    const tagNamesSet = new Set();
+    const querySnapshot = await getDocs(collection(db, 'tasks'));
+
+    querySnapshot.forEach((doc) => {
+      const tagName = doc.data().tagName;
+      if (tagName) {
+        tagNamesSet.add(tagName);
+      } else {
+        console.error(`Undefined TagName in document ID: ${doc.id}`);
+      }
+    });
+
+    return Array.from(tagNamesSet);
+  }
+
+  const tagNames = await fetchTagNames();
+
+  // Fetch batch name by batchId
+  async function fetchBatchName(batchId) {
+    try {
+        // Reference to the specific document in the batches collection
+        const batchDocRef = doc(db, 'batches', batchId);
+
+        // Fetch the document
+        const batchDoc = await getDoc(batchDocRef);
+
+        if (batchDoc.exists()) {
+            // Get the batch name from the document data
+            const batchData = batchDoc.data();
+            const batchName = batchData.batchName; 
+
+            console.log(`Batch Name: ${batchName}`);
+            return batchName;
+        } else {
+            console.log("No such batch!");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching batch name: ", error);
+        return null;
     }
-  });
- 
-  return Array.from(tagNamesSet);
-}
- 
-const tagNames = await fetchTagNames();
- 
-// Fetch task times and marks for each batch
-async function fetchBatchData() {
-  const batchData = {};
-  const querySnapshot = await getDocs(collection(db, 'Marks'));
- 
-  querySnapshot.forEach((doc) => {
-    const batchName = doc.data().BatchName;
-    const tagName = doc.data().TagName;
-    const members = doc.data().Members;
-    
- 
-    if (!batchData[batchName]) {
-      batchData[batchName] = {};
-    }
- 
-    if (!batchData[batchName][tagName]) {
-      batchData[batchName][tagName] = {
-        totalTime: 0,
-        taskCount: 0,
-        totalScore:0,
-      };
-      
-    }
- 
-    members.forEach((member) => {
-      const tasks = member.Task;
-      tasks.forEach((task) => {
-        const score = task.Score;
-        const timeInMilliseconds = parseInt(task.Time, 10);
+  }
+
+  // Fetch task times and marks for each batch
+  async function fetchBatchData() {
+    const batchData = {};
+    const querySnapshot = await getDocs(collection(db, 'tasks'));
+
+    for (const doc of querySnapshot.docs) {
+      const docData = doc.data();
+      const batchId = docData.batchId;
+      const tagName = docData.tagName;
+      const students = docData.students;
+
+      const batchName = await fetchBatchName(batchId); // Fetch batch name using batchId
+
+      if (!batchName) continue;
+
+      if (!batchData[batchName]) {
+        batchData[batchName] = {};
+      }
+
+      if (!batchData[batchName][tagName]) {
+        batchData[batchName][tagName] = {
+          totalTime: 0,
+          taskCount: 0,
+          totalScore: 0,
+        };
+      }
+
+      students.forEach((student) => {
+        const timeInMilliseconds = parseTimeToMilliseconds(student.timeTaken);
+        const marks = parseFloat(student.marks);
         batchData[batchName][tagName].totalTime += timeInMilliseconds;
-        batchData[batchName][tagName].totalScore += score;
-      
+        batchData[batchName][tagName].totalScore += marks;
         batchData[batchName][tagName].taskCount += 1;
       });
-    });
-   
-  });
- 
-  return batchData;
-}
- 
-// Calculate averages
-async function calculateAverages() {
-  try {
-    const batchData = await fetchBatchData();
-    const avgData = {
-      labels: tagNames,
-      avgTimes: {},
-      avgScore: {},
-    };
- 
-    for (const batchName in batchData) {
-      avgData.avgTimes[batchName] = [];
-      avgData.avgScore[batchName] = [];
-      tagNames.forEach((tag) => {
-        if (batchData[batchName][tag]) {
-          const tagData = batchData[batchName][tag];
-          const avgTimeInMilliseconds = tagData.totalTime / tagData.taskCount;
-          const avgBatchScore = tagData.totalScore / tagData.taskCount;
-          avgData.avgTimes[batchName].push(avgTimeInMilliseconds);
-          avgData.avgScore[batchName].push(avgBatchScore);
-        } else {
-          avgData.avgScore[batchName].push(0); // No data for this tag in this batch
-        }
-      });
     }
- 
-    return avgData;
-  } catch (error) {
-    console.error('Error in calculateAverages:', error);
-    return null;
+
+    return batchData;
   }
-}
- 
- 
+  function parseTimeToMilliseconds(timeString) {
+    const timeParts = timeString.split(':').map(Number); // Split the string by ':' and convert each part to a number
+    let milliseconds = 0;
+  
+    if (timeParts.length === 3) {
+      // Format: hh:mm:ss
+      milliseconds += timeParts[0] * 60 * 60 * 1000; // Hours to milliseconds
+      milliseconds += timeParts[1] * 60 * 1000;      // Minutes to milliseconds
+      milliseconds += timeParts[2] * 1000;           // Seconds to milliseconds
+    } else if (timeParts.length === 2) {
+      // Format: mm:ss
+      milliseconds += timeParts[0] * 60 * 1000;      // Minutes to milliseconds
+      milliseconds += timeParts[1] * 1000;           // Seconds to milliseconds
+    } else if (timeParts.length === 1) {
+      // Format: ss
+      milliseconds += timeParts[0] * 1000;           // Seconds to milliseconds
+    }
+    console.log(milliseconds);
+    return milliseconds;
+  
+  }
+  const batchData = await fetchBatchData();
+  console.log(batchData);
+
+
+
+  // Calculate averages
+  async function calculateAverages() {
+    try {
+      const batchData = await fetchBatchData();
+      const avgData = {
+        labels: tagNames,
+        avgTimes: {},
+        avgScore: {},
+      };
+
+      for (const batchName in batchData) {
+        avgData.avgTimes[batchName] = [];
+        avgData.avgScore[batchName] = [];
+        tagNames.forEach((tag) => {
+          if (batchData[batchName][tag]) {
+            const tagData = batchData[batchName][tag];
+            const avgTimeInMilliseconds = tagData.totalTime / tagData.taskCount;
+            const avgBatchScore = tagData.totalScore / tagData.taskCount;
+            console.log(avgTimeInMilliseconds)
+            console.log(avgBatchScore)
+            avgData.avgTimes[batchName].push(avgTimeInMilliseconds);
+            avgData.avgScore[batchName].push(avgBatchScore);
+          } else {
+            avgData.avgTimes[batchName].push(0); // No data for this tag in this batch
+            avgData.avgScore[batchName].push(0); // No data for this tag in this batch
+          }
+        });
+      }
+
+      return avgData;
+    } catch (error) {
+      console.error('Error in calculateAverages:', error);
+      return null;
+    }
+  }
   const avgData = await calculateAverages();
   console.log(avgData);
  var color;
@@ -190,8 +241,6 @@ async function calculateAverages() {
       chart1.config.type = chartType1;
       chart1.update(); // Update the chart to reflect changes
     });
- 
- 
  
   // chart2............
   const chart2 = new Chart(chart_second_four, {
@@ -343,7 +392,7 @@ function toggleDropdown() {
 
         // Create dummy data for the pie chart
         const data = {
-          labels: ["Tag1", "Tag2"],
+          labels:tagNames,
           datasets: [
             {
               label: "Average Mark",
@@ -530,31 +579,31 @@ document.getElementById("dropdown_2").addEventListener("change", updateTitle);
 async function populateBatchDropdowns() {
   try {
     console.log("Fetching batches...");
-    const batchesSnapshot = await getDocs(collection(db, "Marks"));
-    const batches = batchesSnapshot.docs.map((doc) => doc.data().BatchName);
+    const batchesSnapshot = await getDocs(collection(db, "batches"));
+    const batches = batchesSnapshot.docs.map((doc) => doc.data().batchName);
     const uniqueBatches = [...new Set(batches)];
     const dropdown1 = document.getElementById("dropdown_1");
     const dropdown2 = document.getElementById("dropdown_2");
     
-     // Clear existing options
-     dropdown1.innerHTML = '';
-     dropdown2.innerHTML = '';
+    // Clear existing options
+    dropdown1.innerHTML = '';
+    dropdown2.innerHTML = '';
 
     uniqueBatches.forEach((batch) => {
       const option1 = document.createElement("option");
       option1.value = batch;
       option1.text = batch;
       dropdown1.appendChild(option1);
- 
+
       const option2 = document.createElement("option");
       option2.value = batch;
       option2.text = batch;
       dropdown2.appendChild(option2);
     });
- 
+
     // Update table headers
     updateTableHeaders();
- 
+
     // Add event listeners for dropdown changes
     dropdown1.addEventListener("change", updateTableHeaders);
     dropdown2.addEventListener("change", updateTableHeaders);
@@ -562,6 +611,8 @@ async function populateBatchDropdowns() {
     console.error("Error fetching batches:", error);
   }
 }
+
+populateBatchDropdowns();
  
 function updateTableHeaders() {
   const dropdown1 = document.getElementById("dropdown_1");
