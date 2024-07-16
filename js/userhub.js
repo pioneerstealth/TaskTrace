@@ -22,7 +22,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
   authDomain: "task-trace.firebaseapp.com",
   projectId: "task-trace",
-  storageBucket: "task-trace",
+  storageBucket: "task-trace.appspot.com",
   messagingSenderId: "542109212256",
   appId: "1:542109212256:web:a54bd96c131eff4a152d05",
   measurementId: "G-MZNCSCVN54"
@@ -53,10 +53,12 @@ function fetchUserData() {
           const fullName = userData.fullName;
           const email = userData.email;
           const role = userData.role;
+          const imgurl = userData.imgurl;
 
           // Update UI with fetched data
           const infoDiv = document.getElementById("info");
           infoDiv.innerHTML = `
+            <img id="profile-pic" src="${imgurl}" alt="Profile Picture">
             <p id="fullname">Name: ${fullName}</p>
             <p id="email">${email}</p>
             <p id="role">Role: ${role}</p>
@@ -86,6 +88,7 @@ function fetchUserData() {
     console.log("User not signed in.");
   }
 }
+
 
 // Call fetchUserData when the page loads if user is already logged in
 onAuthStateChanged(auth, (user) => {
@@ -137,7 +140,8 @@ async function fetchActiveTask() {
       const taskName = taskData.name;
       const taskDescription = taskData.description;
       const createdAt = taskData.createdAt.toDate();
-      const timeLimit = taskData.time; // Assume format is "HH:MM:SS"
+      const timeLimit = taskData.totaltime; 
+      console.log(timeLimit)// Assume format is "HH:MM:SS"
 
       // Convert time limit to milliseconds
       const [hours, minutes, seconds] = timeLimit.split(':').map(Number);
@@ -149,8 +153,8 @@ async function fetchActiveTask() {
         console.log(`Active task found: ${taskName}`); // Debugging
         activeTaskHtml += `
           <div>
-            <p>Name: ${taskName}</p>
-            <p>Description: ${taskDescription}</p>
+            <p id="taskname">Name: ${taskName}</p>
+            <p id="taskdescription">Description: ${taskDescription}</p>
           </div>
         `;
         timeLeftMs = taskExpiration - now; // Calculate remaining time
@@ -290,4 +294,9 @@ const startTimer = (seconds) => {
 // Fetch and display active task when the page loads
 window.onload = () => {
   fetchActiveTask();
+};
+
+// Redirect to feedback page
+document.getElementById('submit').onclick = function() {
+  window.location.href = 'feedback.html';
 };

@@ -50,7 +50,7 @@ body, html {
 
 .user-info{
     width: 250px;
-    height: 250px;
+    height: 290px;
     z-index: 2;
     background-color: white;
     position: absolute;
@@ -311,9 +311,9 @@ html, body {
 
 .forms{
   position: absolute;
-  top: 22%;
+  top: 12%;
   right: 10%;
-  height: 370px;
+  height: 500px;
   width: 580px;
   background-color: white;
   border-radius: 10px;
@@ -324,7 +324,7 @@ html, body {
   height: 50px;
   width: 500px;
   position: absolute;
-  top: 7%;
+  top: 5%;
   left: 7%;
   border: 1px solid rgba(128, 128, 128, 0.557);
   border-radius: 5px;
@@ -332,31 +332,37 @@ html, body {
 }
 
 .description{
-  height: 130px;
+  height: 70px;
   width: 500px;
   position: absolute;
-  top: 26%;
+  top: 18%;
   left: 7%;
   border: 1px solid rgba(128, 128, 128, 0.557);
   border-radius: 5px;
   /* box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px; */
 }
 
-.upload{
+.image-section{
   height: 50px;
   width: 500px;
   position: absolute;
-  top: 66%;
+  top: 37%;
   left: 7%;
-  border: 1px solid rgba(128, 128, 128, 0.557);
+  /* border: 1px solid rgba(128, 128, 128, 0.557); */
   border-radius: 5px;
   /* box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px; */
 }
 
-.forms a{
+#myimg{
+    height: 200px;
+    width: 200px;
+    border: 2px solid black;
+}
+
+#submit{
   position: absolute;
   bottom: 7%;
-  left: 40%;
+  left: 60%;
   text-decoration: none;
   background-color: #1756B3;
   color: white;
@@ -365,11 +371,35 @@ html, body {
   text-align: center;
 }
 
+#select{
+    position: absolute;
+    bottom: 7%;
+    left: 18%;
+    text-decoration: none;
+    background-color: #1756B3;
+    color: white;
+    padding: 5px 25px;
+    border-radius: 10px;
+    text-align: center;   
+}
+
+#upload{
+    position: absolute;
+    bottom: 7%;
+    left: 38.8%;
+    text-decoration: none;
+    background-color: #1756B3;
+    color: white;
+    padding: 5px 25px;
+    border-radius: 10px;
+    text-align: center;
+}
+
 /* /////////////////////////////USER/////////////////////////////////////////////// */
 
 #fullname{
     /* position: absolute; */
-    margin-top: 30%;
+    margin-top: 55%;
     text-align: center;
     color: red;
 }
@@ -389,4 +419,23 @@ html, body {
     color: white;
     padding: 7px 8px;
     border-radius: 6px;
+}
+
+#taskname{
+    text-align: center;
+}
+
+#taskdescription{
+    text-align: center;
+    margin-top: 50px;
+}
+
+#profile-pic{
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%;
+    position: absolute;
+    margin-top: 8%;
+    margin-left: 30%;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 }
