@@ -218,7 +218,7 @@ async function fetchAverageMarksForBatch(batchId, tagNames) {
 let avgMarkForBatch= await fetchAverageMarksForBatch(batchId,storedTagNames)
 console.log(avgMarkForBatch)
 
-
+//function to implemt 
 // Function to fetch average marks for a particular student in a batch for each tag
 async function fetchAverageMarksForStudent(batchId, memberId, tagNames) {
   try {
