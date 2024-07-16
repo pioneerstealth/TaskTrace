@@ -17,8 +17,7 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
@@ -35,7 +34,7 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const memberId = params.get("memberId");
   const batchId = params.get("batchId");
@@ -92,61 +91,114 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchTagNamesByBatchId(batchId) {
     try {
-      // Query tasks collection where batchId matches
       const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
       const querySnapshot = await getDocs(q);
 
-      const tagNames = [];
+      const tagNamesSet = new Set();
 
-      // Iterate through all matching task documents
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        tagNames.push(data.tagName);
+        const tagName = data.tagName;
+        if (tagName) {
+          tagNamesSet.add(tagName);
+        } else {
+          console.error(`Undefined TagName in document ID: ${doc.id}`);
+        }
       });
 
+      const tagNames = Array.from(tagNamesSet);
       console.log(`Tag Names for batchId ${batchId}:`, tagNames);
+      return tagNames;
     } catch (error) {
       console.error("Error fetching tag names:", error);
+      return []; // Return an empty array in case of error
     }
   }
 
-  // Example usage
-  fetchTagNamesByBatchId(batchId);
+  const storedTagNames = await fetchTagNamesByBatchId(batchId);
+  console.log("Stored tag names:", storedTagNames);
 
-  // Function to calculate average marks based on tagName
-  async function calculateAverageMarks(tagName) {
-    try {
-      // Query tasks collection where tagName matches
-      const q = query(collection(db, "tasks"), where("tagName", "==", tagName));
+
+  // const tagName=fetchTagNamesByBatchId(batchId);
+  // console.log(tagName)
+
+// Function to fetch average marks for a batch for each tag
+async function fetchAverageMarksForBatch(batchId, tagNames) {
+  try {
+    const averageMarks = {};
+
+    // Fetch data for each tag
+    for (const tagName of tagNames) {
+      const q = query(collection(db, "tasks"), where("batchId", "==", batchId), where("tagName", "==", tagName));
       const querySnapshot = await getDocs(q);
 
       let totalMarks = 0;
       let studentCount = 0;
 
-      // Iterate through all matching task documents
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-
-        // Iterate through all students in each task document
         data.students.forEach((student) => {
           totalMarks += parseFloat(student.marks);
           studentCount++;
         });
       });
 
-      // Calculate average marks
-      const averageMarks = studentCount
-        ? (totalMarks / studentCount).toFixed(2)
-        : 0;
-
-      console.log(`Average Marks for tagName ${tagName}:`, averageMarks);
-    } catch (error) {
-      console.error("Error calculating average marks:", error);
+      const averageMark = studentCount ? (totalMarks / studentCount).toFixed(2) : 0;
+      averageMarks[tagName] = parseFloat(averageMark);
     }
-  }
 
-  // Example usage
-  calculateAverageMarks("JAVA");
+    console.log("Average Marks for Batch:", averageMarks);
+    return averageMarks;
+  } catch (error) {
+    console.error("Error fetching average marks:", error);
+    return {}; // Return an empty object in case of error
+  }
+}
+
+
+let avgMarkForBatch= await fetchAverageMarksForBatch(batchId,storedTagNames)
+console.log(avgMarkForBatch)
+
+// Function to fetch average marks for a particular student in a batch for each tag
+// Function to fetch average marks for a particular student in a batch for each tag
+async function fetchAverageMarksForStudent(batchId, memberId, tagNames) {
+  try {
+    const averageMarks = {};
+
+    // Fetch data for each tag
+    for (const tagName of tagNames) {
+      const q = query(collection(db, "tasks"), where("batchId", "==", batchId), where("tagName", "==", tagName));
+      const querySnapshot = await getDocs(q);
+
+      let totalMarks = 0;
+      let taskCount = 0;
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        data.students.forEach((student) => {
+          if (student.id === memberId) {
+            totalMarks += parseFloat(student.marks);
+            taskCount++;
+          }
+        });
+      });
+
+      const averageMark = taskCount ? (totalMarks / taskCount).toFixed(2) : 0;
+      averageMarks[tagName] = parseFloat(averageMark);
+    }
+
+    console.log("Average Marks for Student:", averageMarks);
+    return averageMarks;
+  } catch (error) {
+    console.error("Error fetching average marks for student:", error);
+    return {};
+  }
+}
+
+
+let avgMarkForStudent= await fetchAverageMarksForStudent(batchId,memberId,storedTagNames)
+console.log(avgMarkForStudent)
+
 
   // Call the function with the parameters from the URL
   // fetchBatchAndMemberInfo(memberId, batchId);
@@ -363,24 +415,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Create the new chart
   const chart_second_four = document.getElementById("chart_first_two"); // Get the new canvas element
-
+  console.log(storedTagNames)
   const chart2 = new Chart(chart_second_four, {
     type: chartType2,
     data: {
-      labels: [0, "Red", "Blue", "Yellow", "Green", "Purple", "Orange", ""],
+      labels: storedTagNames,
       datasets: [
         {
           label: "Batch",
           backgroundColor: "#f11167",
           borderColor: "#f11167",
-          data: [0, 1, 9, 13, 15, 8, 8],
+          data:storedTagNames.map(tagName => avgMarkForBatch[tagName] || 0),
           borderWidth: 1.5,
         },
         {
           label: "Individual",
           backgroundColor: "#341111",
           borderColor: "#341111",
-          data: [0, 11, 19, 16, 0, 0, 16],
+          data: storedTagNames.map(tagName => avgMarkForStudent[tagName] || 0),
           borderWidth: 1.5,
         },
       ],
@@ -396,15 +448,15 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       },
       animation: {
-        duration: 2000, // Animation duration in milliseconds
-        easing: "bounce", // Animation effect
+        duration: 2000,
+        easing: "bounce",
       },
       scales: {
         y: {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Average Mark", // Set your Y axis label here
+            text: "Average Mark",
             font: {
               size: 14,
               weight: "bold",
@@ -415,7 +467,7 @@ document.addEventListener("DOMContentLoaded", () => {
         x: {
           title: {
             display: true,
-            text: "Task Tags", // Set your X axis label here
+            text: "Task Tags",
             font: {
               size: 14,
               weight: "bold",
@@ -426,6 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     },
   });
+  
 
   // Toggle chart type on button click
   document
