@@ -134,6 +134,129 @@ document.addEventListener("DOMContentLoaded", async () => {
   //   });
 
   //store tagname------------------------------
+  async function fetchTagNamesByBatchId(batchId) {
+    try {
+      const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
+      const querySnapshot = await getDocs(q);
+
+      const tagNamesSet = new Set();
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const tagName = data.tagName;
+        if (tagName) {
+          tagNamesSet.add(tagName);
+        } else {
+          console.error(`Undefined TagName in document ID: ${doc.id}`);
+        }
+      });
+
+      const tagNames = Array.from(tagNamesSet);
+      console.log(`Tag Names for batchId ${batchId}:`, tagNames);
+      return tagNames;
+    } catch (error) {
+      console.error("Error fetching tag names:", error);
+      return []; // Return an empty array in case of error
+    }
+  }
+
+  const storedTagNames = await fetchTagNamesByBatchId(batchId);
+  console.log("Stored tag names:", storedTagNames);
+
+  // const tagName=fetchTagNamesByBatchId(batchId);
+  // console.log(tagName)
+
+  // Function to fetch average marks for a batch for each tag
+  async function fetchAverageMarksForBatch(batchId, tagNames) {
+    try {
+      const averageMarks = {};
+
+      // Fetch data for each tag
+      for (const tagName of tagNames) {
+        const q = query(
+          collection(db, "tasks"),
+          where("batchId", "==", batchId),
+          where("tagName", "==", tagName)
+        );
+        const querySnapshot = await getDocs(q);
+
+        let totalMarks = 0;
+        let studentCount = 0;
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          data.students.forEach((student) => {
+            totalMarks += parseFloat(student.marks);
+            studentCount++;
+          });
+        });
+
+        const averageMark = studentCount
+          ? (totalMarks / studentCount).toFixed(2)
+          : 0;
+        averageMarks[tagName] = parseFloat(averageMark);
+      }
+
+      console.log("Average Marks for Batch:", averageMarks);
+      return averageMarks;
+    } catch (error) {
+      console.error("Error fetching average marks:", error);
+      return {}; // Return an empty object in case of error
+    }
+  }
+
+  let avgMarkForBatch = await fetchAverageMarksForBatch(
+    batchId,
+    storedTagNames
+  );
+  console.log(avgMarkForBatch);
+
+  // Function to fetch average marks for a particular student in a batch for each tag
+  // Function to fetch average marks for a particular student in a batch for each tag
+  async function fetchAverageMarksForStudent(batchId, memberId, tagNames) {
+    try {
+      const averageMarks = {};
+
+      // Fetch data for each tag
+      for (const tagName of tagNames) {
+        const q = query(
+          collection(db, "tasks"),
+          where("batchId", "==", batchId),
+          where("tagName", "==", tagName)
+        );
+        const querySnapshot = await getDocs(q);
+
+        let totalMarks = 0;
+        let taskCount = 0;
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          data.students.forEach((student) => {
+            if (student.id === memberId) {
+              totalMarks += parseFloat(student.marks);
+              taskCount++;
+            }
+          });
+        });
+
+        const averageMark = taskCount ? (totalMarks / taskCount).toFixed(2) : 0;
+        averageMarks[tagName] = parseFloat(averageMark);
+      }
+
+      console.log("Average Marks for Student:", averageMarks);
+      return averageMarks;
+    } catch (error) {
+      console.error("Error fetching average marks for student:", error);
+      return {};
+    }
+  }
+
+  let avgMarkForStudent = await fetchAverageMarksForStudent(
+    batchId,
+    memberId,
+    storedTagNames
+  );
+  console.log(avgMarkForStudent);
 
   async function getUniqueTagNames(batchId) {
     // Get tasks from Firestore
