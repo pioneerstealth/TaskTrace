@@ -1,11 +1,6 @@
   import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, doc, setDoc, updateDoc, getDoc } from './firebase_config.js';
 
-  // onAuthStateChanged(auth, (user) => {
-  //   if (user) {
-  //     // Redirect to userhub.html if the user is already logged in
-  //     window.location.href = "userhub.html";
-  //   }
-  // });
+ 
 
   let isSigningUp = false;
 

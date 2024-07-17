@@ -236,37 +236,7 @@ document
     });
   });
 
-//   function addUser(fullName, email) {
-//     const dummyPassword = "TemporaryPassword123!";
-//     const auth = getAuth();
 
-//     // Check if the email is already in use
-//     fetchSignInMethodsForEmail(auth, email)
-//         .then((signInMethods) => {
-//             if (signInMethods.length > 0) {
-//                 throw new Error(`The email address ${email} is already in use.`);
-//             } else {
-//                 // Create user if the email is not in use
-//                 return createUserWithEmailAndPassword(auth, email, dummyPassword);
-//             }
-//         })
-//         .then((userCredential) => {
-//             const user = userCredential.user;
-//             return setDoc(doc(database, "users", user.uid), {
-//                 email: user.email,
-//                 role: "user",
-//                 fullName: fullName,
-//             });
-//         })
-//         .then(() => {
-//             console.log(`User ${fullName} created successfully.`);
-//         })
-//         .catch((error) => {
-//             console.error('Error creating user:', error.message);
-//         });
-// }
-
-// Event listener for Save button to save batch data to Firestore
 document
   .getElementById("saveButton")
   .addEventListener("click", async function () {

@@ -313,11 +313,28 @@ function listenForTaskUpdates() {
   });
 }
 
+let currentPage = 1;
+const studentsPerPage = 10;
+let filteredStudents = [];
+let allStudents = [];
+
 function renderStudents(students) {
+  allStudents = [...students];
+  filteredStudents = [...students];
+  renderPaginatedStudents();
+  setupPagination();
+  setupSearch();
+}
+
+function renderPaginatedStudents() {
   const tableBody = document.getElementById("tableBody");
   tableBody.innerHTML = ""; // Clear previous data
 
-  students.forEach((student) => {
+  const startIndex = (currentPage - 1) * studentsPerPage;
+  const endIndex = startIndex + studentsPerPage;
+  const paginatedStudents = filteredStudents.slice(startIndex, endIndex);
+
+  paginatedStudents.forEach((student) => {
     const row = createStudentRow(student);
     tableBody.appendChild(row);
     addStatusButtonFunctionality(row, student);
@@ -327,6 +344,57 @@ function renderStudents(students) {
       student.imgurl || "https://via.placeholder.com/50"
     );
   });
+}
+
+function setupPagination() {
+  const paginationContainer = document.getElementById("pagination");
+  paginationContainer.innerHTML = "";
+
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.innerText = i;
+    pageButton.classList.add("btn", "btn-outline-primary", "mx-1");
+    if (i === currentPage) {
+      pageButton.classList.add("active");
+    }
+    pageButton.addEventListener("click", () => {
+      currentPage = i;
+      renderPaginatedStudents();
+      setupPagination();
+    });
+    paginationContainer.appendChild(pageButton);
+  }
+}
+
+function setupSearch() {
+  const searchInput = document.getElementById("searchInput");
+  searchInput.addEventListener("input", () => {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    if (searchTerm === "") {
+      // If search term is empty, show all students
+      filteredStudents = [...allStudents];
+    } else {
+      // Filter students based on search term
+      filteredStudents = allStudents.filter(student => 
+        startsWithSearch(student.name.toLowerCase(), searchTerm) ||
+        startsWithSearch(student.id.toLowerCase(), searchTerm)
+      );
+    }
+    currentPage = 1;
+    renderPaginatedStudents();
+    setupPagination();
+  });
+}
+
+function startsWithSearch(str, search) {
+  if (search.length > str.length) return false;
+  
+  for (let i = 0; i < search.length; i++) {
+    if (str[i] !== search[i]) return false;
+  }
+  return true;
 }
 
 function createStudentRow(student) {
@@ -353,13 +421,14 @@ function addStatusButtonFunctionality(row, student) {
   const taskDocRef = doc(db, "tasks", taskId);
   
   // Set initial state based on database data
-  if (student.submissionStatus === 'Completed') {
+  if (student.submissionStatus === "Completed") {
     statusButton.classList.remove("pending");
     statusButton.classList.add("completed");
     statusButton.disabled = true;
+    time.textContent = student.timeTaken;
   }
 
-  if (student.taskStatus === 'Completed') {
+  if (student.taskStatus === "Completed") {
     tskStatus.classList.remove("pending");
     tskStatus.classList.add("completed");
   }
@@ -390,22 +459,15 @@ function addStatusButtonFunctionality(row, student) {
         }
         marksContent.textContent = marks;
 
-        // Update database
-        await updateStudentData(taskDocRef, student.id, {
-            submissionStatus: "Completed",
-            marks: marks.toString(),
-            timeTaken: timeTaken
-        });
-    } else {
-        this.classList.remove("completed");
-        this.classList.add("pending");
-        this.textContent = "Pending";
-
-        // Update database
-        await updateStudentData(taskDocRef, student.id, {
-            submissionStatus: "Pending"
-        });
-    }
+        const updatedFields = {
+          submissionStatus: "Completed",
+          marks: marks.toString(),
+          timeTaken: timeTaken
+      };
+      
+      const updatedStudent = await updateStudentData(taskDocRef, student.id, updatedFields);
+      Object.assign(student, updatedStudent);
+    } 
   });
 
   tskStatus.addEventListener("click", async function () {
@@ -414,21 +476,60 @@ function addStatusButtonFunctionality(row, student) {
       this.classList.add("completed");
       this.textContent = "Completed";
 
-      // Update database
-      await updateStudentData(taskDocRef, student.id, {
+      const updatedFields = {
         taskStatus: "Completed"
-      });
+    };
+
+    const updatedStudent = await updateStudentData(taskDocRef, student.id, updatedFields);
+    Object.assign(student, updatedStudent);
+      // Update database
+      
     } else {
       this.classList.remove("completed");
       this.classList.add("pending");
       this.textContent = "Pending";
 
       // Update database
-      await updateStudentData(taskDocRef, student.id, {
+      const updatedFields = {
         taskStatus: "Pending"
-      });
+    };
+
+    const updatedStudent = await updateStudentData(taskDocRef, student.id, updatedFields);
+    Object.assign(student, updatedStudent);
     }
+
   });
+}
+
+async function updateStudentData(taskDocRef, studentId, updatedFields) {
+  try {
+    const taskDoc = await getDoc(taskDocRef);
+    if (!taskDoc.exists()) {
+      throw new Error("Task document not found in Firestore");
+    }
+
+    const currentData = taskDoc.data();
+    const currentStudents = currentData.students || [];
+
+    // Update the fields for the specific student
+    const updatedStudents = currentStudents.map(student => {
+      if (student.id === studentId) {
+        return { ...student, ...updatedFields };
+      }
+      return student;
+    });
+
+    // Update the document with the new data
+    await updateDoc(taskDocRef, {
+      students: updatedStudents
+    });
+
+    console.log(`Data updated for student ${studentId}`);
+    return updatedStudents.find(student => student.id === studentId);
+  } catch (error) {
+    console.error("Error updating student data:", error);
+    throw error;
+  }
 }
 
 function addEditMarksFunctionality(row) {

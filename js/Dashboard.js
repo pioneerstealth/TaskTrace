@@ -7,7 +7,7 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
+ 
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
@@ -18,21 +18,21 @@ const firebaseConfig = {
   appId: "1:542109212256:web:a54bd96c131eff4a152d05",
   measurementId: "G-MZNCSCVN54"
 };
-
+ 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
+ 
 document.addEventListener("DOMContentLoaded", async function () {
   const chart_first_three = document.getElementById("chart_first_three");
   const chart_second_four = document.getElementById("chart_second_four");
-
+ 
   // Fetch tag names from Firestore
   async function fetchTagNames() {
     const tagNamesSet = new Set();
     const querySnapshot = await getDocs(collection(db, 'tasks'));
-
+ 
     querySnapshot.forEach((doc) => {
       const tagName = doc.data().tagName;
       if (tagName) {
@@ -41,26 +41,26 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.error(`Undefined TagName in document ID: ${doc.id}`);
       }
     });
-
+ 
     return Array.from(tagNamesSet);
   }
-
+ 
   const tagNames = await fetchTagNames();
-
+ 
   // Fetch batch name by batchId
   async function fetchBatchName(batchId) {
     try {
         // Reference to the specific document in the batches collection
         const batchDocRef = doc(db, 'batches', batchId);
-
+ 
         // Fetch the document
         const batchDoc = await getDoc(batchDocRef);
-
+ 
         if (batchDoc.exists()) {
             // Get the batch name from the document data
             const batchData = batchDoc.data();
-            const batchName = batchData.batchName; 
-
+            const batchName = batchData.batchName;
+ 
             console.log(`Batch Name: ${batchName}`);
             return batchName;
         } else {
@@ -72,26 +72,26 @@ document.addEventListener("DOMContentLoaded", async function () {
         return null;
     }
   }
-
+ 
   // Fetch task times and marks for each batch
   async function fetchBatchData() {
     const batchData = {};
     const querySnapshot = await getDocs(collection(db, 'tasks'));
-
+ 
     for (const doc of querySnapshot.docs) {
       const docData = doc.data();
       const batchId = docData.batchId;
       const tagName = docData.tagName;
       const students = docData.students;
-
+ 
       const batchName = await fetchBatchName(batchId); // Fetch batch name using batchId
-
+ 
       if (!batchName) continue;
-
+ 
       if (!batchData[batchName]) {
         batchData[batchName] = {};
       }
-
+ 
       if (!batchData[batchName][tagName]) {
         batchData[batchName][tagName] = {
           totalTime: 0,
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           totalScore: 0,
         };
       }
-
+ 
       students.forEach((student) => {
         const timeInMilliseconds = parseTimeToMilliseconds(student.timeTaken);
         const marks = parseFloat(student.marks);
@@ -108,13 +108,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         batchData[batchName][tagName].taskCount += 1;
       });
     }
-
+ 
     return batchData;
   }
   function parseTimeToMilliseconds(timeString) {
     const timeParts = timeString.split(':').map(Number); // Split the string by ':' and convert each part to a number
     let milliseconds = 0;
-  
+ 
     if (timeParts.length === 3) {
       // Format: hh:mm:ss
       milliseconds += timeParts[0] * 60 * 60 * 1000; // Hours to milliseconds
@@ -130,13 +130,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
     console.log(milliseconds);
     return milliseconds;
-  
+ 
   }
   const batchData = await fetchBatchData();
   console.log(batchData);
-
-
-
+ 
+ 
+ 
   // Calculate averages
   async function calculateAverages() {
     try {
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         avgTimes: {},
         avgScore: {},
       };
-
+ 
       for (const batchName in batchData) {
         avgData.avgTimes[batchName] = [];
         avgData.avgScore[batchName] = [];
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           }
         });
       }
-
+ 
       return avgData;
     } catch (error) {
       console.error('Error in calculateAverages:', error);
@@ -309,8 +309,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       chart2.config.type = chartType2;
       chart2.update(); // Update the chart to reflect changes
     });
-
-
+ 
+ 
   // first table population--------------------------------------
   const tableBody_second_three = document.getElementById(
     "tableBody_second_three"
@@ -389,7 +389,7 @@ function toggleDropdown() {
         console.log(dropdown1)
         console.log(avgData)
         console.log(avgData.avgScore[dropdown1])
-
+ 
         // Create dummy data for the pie chart
         const data = {
           labels:tagNames,
@@ -397,7 +397,7 @@ function toggleDropdown() {
             {
               label: "Average Mark",
               data:avgData.avgScore[dropdown1],
-              backgroundColor: ["Red", "Blue"],
+              backgroundColor: ["Red", "Blue","Green","Yellow","Purple","Orange","Brown","Black"],
             },
           ],
         };
@@ -537,7 +537,7 @@ document.getElementById("dropdown_2").addEventListener("change", updateTitle);
             {
               label: "Average Time",
               data:avgData.avgTimes[dropdown1],
-              backgroundColor: ["pink", "green"], // Adjust colors as needed
+              backgroundColor: ["Red", "Blue","Green","Yellow","Purple","Orange","Brown","Black"], // Adjust colors as needed
             },
           ],
         };
@@ -584,26 +584,26 @@ async function populateBatchDropdowns() {
     const uniqueBatches = [...new Set(batches)];
     const dropdown1 = document.getElementById("dropdown_1");
     const dropdown2 = document.getElementById("dropdown_2");
-    
+   
     // Clear existing options
     dropdown1.innerHTML = '';
     dropdown2.innerHTML = '';
-
+ 
     uniqueBatches.forEach((batch) => {
       const option1 = document.createElement("option");
       option1.value = batch;
       option1.text = batch;
       dropdown1.appendChild(option1);
-
+ 
       const option2 = document.createElement("option");
       option2.value = batch;
       option2.text = batch;
       dropdown2.appendChild(option2);
     });
-
+ 
     // Update table headers
     updateTableHeaders();
-
+ 
     // Add event listeners for dropdown changes
     dropdown1.addEventListener("change", updateTableHeaders);
     dropdown2.addEventListener("change", updateTableHeaders);
@@ -611,7 +611,7 @@ async function populateBatchDropdowns() {
     console.error("Error fetching batches:", error);
   }
 }
-
+ 
 populateBatchDropdowns();
  
 function updateTableHeaders() {
@@ -637,3 +637,4 @@ populateTableBody2();
 await populateBatchDropdowns();
  
 });
+ 

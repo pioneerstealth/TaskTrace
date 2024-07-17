@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family   =Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap');
-
+ 
 * {
     box-sizing: border-box;
     margin: 0px;
     padding: 0px;
 }
-
+ 
 body {
     display: flex;
     flex-direction: column;
@@ -18,44 +18,44 @@ body {
     width: 100%;
     padding: 5px 5px 5px 5px;
 }
-
+ 
 /* Width of the scrollbar */
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
 }
-
+ 
 /* Track (background of the scrollbar) */
 ::-webkit-scrollbar-track {
     background: #ffffff;
 }
-
+ 
 /* Handle (dragging part of the scrollbar) */
 ::-webkit-scrollbar-thumb {
     background: #1756B3;
     border-radius: 10px;
-
+ 
 }
-
+ 
 /* Handle when hovered */
 ::-webkit-scrollbar-thumb:hover {
     background: #90B4EA;
 }
-
+ 
 /* Button (buttons on the scrollbar) */
 ::-webkit-scrollbar-button {
     background: #ffffff;
     height: 3px;
     width: 0px;
 }
-
+ 
 /* Corner (corner where horizontal and vertical scrollbars meet) */
 ::-webkit-scrollbar-corner {
     background: #1756B3;
 }
-
-
-
+ 
+ 
+ 
 .navbar_Dashboard {
     /* position: sticky; */
     display: flex;
@@ -67,7 +67,7 @@ body {
     width: 100%;
     height: 39px;
 }
-
+ 
 .logo_title {
     display: flex;
     flex-direction: row;
@@ -77,14 +77,14 @@ body {
     height: 30px;
     gap: 10px;
 }
-
+ 
 .logo {
     background-color: #ffffff;
     border-radius: 15px;
     width: 30px;
     height: 30px;
 }
-
+ 
 .logo img {
     width: 100%;
     height: 100%;
@@ -92,7 +92,7 @@ body {
     border-radius: 15px;
     /* Maintains aspect ratio */
 }
-
+ 
 .title {
     display: flex;
     align-items: center;
@@ -103,7 +103,7 @@ body {
     font-style: normal;
     color: #fff;
 }
-
+ 
 .home_icon {
     background-image: url('../assets/images/home-hashtag.png');
     background-size: cover;
@@ -112,9 +112,9 @@ body {
     width: 25px;
     height: 25px;
 }
-
-
-
+ 
+ 
+ 
 .Dashboard_section {
     display: flex;
     flex-direction: column;
@@ -124,13 +124,13 @@ body {
     padding: 20px 45px 20px 45px;
     gap: 25px;
 }
-
+ 
 .one {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
-
+ 
 .search {
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     border-radius: 0px 6px 6px 0px;
@@ -143,26 +143,26 @@ body {
     background-repeat: no-repeat;
     border: none;
 }
-
+ 
 .Search_form {
-
+ 
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     display: flex;
     flex-direction: row;
-
+ 
     width: 340px;
     height: 30px;
 }
-
+ 
 .searchbox {
     border-radius: 6px 0px 0px 6px;
     padding-left: 15px;
     width: 310px;
     height: 30px;
     border: none;
-
+ 
 }
-
+ 
 .dropdown_one {
     background-color: #ffffff;
     padding-left: 12px;
@@ -172,15 +172,15 @@ body {
     border-radius: 6px;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     min-width: 325px;
-
+ 
 }
-
+ 
 .dropdown_one p {
     display: flex;
     align-items: center;
 }
-
-
+ 
+ 
 .dropdown_one select {
     font-family: "Playfair", serif;
     font-size: 15px;
@@ -191,9 +191,9 @@ body {
         "wdth"100;
     border: none;
 }
-
-
-
+ 
+ 
+ 
 .two {
     display: flex;
     flex-direction: row;
@@ -207,7 +207,7 @@ body {
     -ms-overflow-style: none;
     /* IE and Edge */
 }
-
+ 
 /* Show scrollbar when hovering over the .two element */
 .two:hover {
     scrollbar-width: auto;
@@ -215,7 +215,7 @@ body {
     -ms-overflow-style: auto;
     /* IE and Edge */
 }
-
+ 
 .two_card {
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     width: 170px;
@@ -227,7 +227,7 @@ body {
     justify-content: space-between;
     padding: 13px;
 }
-
+ 
 .first_two1 {
     font-family: "Playfair", serif;
     font-optical-sizing: auto;
@@ -240,7 +240,7 @@ body {
     /* background-color: chocolate; */
     min-height: 25px;
 }
-
+ 
 .first_two2 {
     font-family: "Playfair", serif;
     font-optical-sizing: auto;
@@ -255,19 +255,19 @@ body {
     min-height: 44px;
     gap: 5px;
 }
-
+ 
 .first_two2_1 {
     min-height: 30px;
     font-size: 30px;
 }
-
+ 
 .first_two2_2 {
     display: flex;
     align-items: end;
     min-height: 30px;
     font-size: 17px;
 }
-
+ 
 .first_two3 {
     display: flex;
     align-items: center;
@@ -276,20 +276,20 @@ body {
     /* background-color: violet; */
     min-height: 25px;
 }
-
+ 
 .three {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
-
+ 
 .three_card {
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     height: 370px;
     border-radius: 4px;
     background-color: rgb(255, 255, 255);
 }
-
+ 
 #first_three {
     display: flex;
     flex-direction: column;
@@ -297,13 +297,13 @@ body {
     padding: 0rem 2rem 0rem 2rem;
     width: 650px;
 }
-
+ 
 .title_togle {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
-
+ 
 .switch-button {
     background: rgba(58, 115, 212, 0.56);
     border-radius: 7.5px;
@@ -320,7 +320,7 @@ body {
     padding-right: 43px;
     /* 35% of original width + 2% */
 }
-
+ 
 .switch-button:before {
     content: "Line";
     position: absolute;
@@ -335,7 +335,7 @@ body {
     z-index: 3;
     pointer-events: none;
 }
-
+ 
 .switch_button_checkbox {
     cursor: pointer;
     position: absolute;
@@ -347,13 +347,13 @@ body {
     opacity: 0;
     z-index: 2;
 }
-
+ 
 .switch_button_checkbox:checked+.switch-button-label:before {
     transform: translateX(43px);
     /* 35% of original width + 2% */
     transition: transform 300ms linear;
 }
-
+ 
 .switch_button_checkbox+.switch-button-label {
     position: relative;
     padding: 3.75px 0;
@@ -362,7 +362,7 @@ body {
     user-select: none;
     pointer-events: none;
 }
-
+ 
 .switch_button_checkbox+.switch-button-label:before {
     content: "";
     background: #fff;
@@ -376,14 +376,14 @@ body {
     transform: translateX(0);
     transition: transform 300ms;
 }
-
+ 
 .switch_button_checkbox+.switch-button-label .switch-button-label-span {
     position: relative;
 }
-
-
-
-
+ 
+ 
+ 
+ 
 #second_three {
     display: flex;
     flex-direction: column;
@@ -395,48 +395,48 @@ body {
     gap: 10px;
     /* Adds scrollbars only when necessary */
 }
-
+ 
 .second_three1 {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-
+ 
 }
-
+ 
 .second_three_title {
-
+ 
     font-weight: 600;
     font-style: normal;
 }
-
+ 
 .pi {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 5px;
 }
-
+ 
 .pi label {
     font-size: 14px;
     color: gray;
     margin-right: 5px;
     /* optional: space between label and checkbox */
 }
-
+ 
 .table_head {
     color: #828282;
     font-weight: 500;
 }
-
+ 
 .table_head {
     color: #828282;
     font-weight: 500;
     /* border: 1px solid #000; */
     /* Add border to the table header */
 }
-
+ 
 table {
     width: 100%;
     /* Make the table full width */
@@ -445,39 +445,39 @@ table {
     /* border: 1px solid #000;
     border-radius: 5px; */
 }
-
+ 
 table, th, td {
     border: 1px solid #000;
     /* Add border to the table, table headers, and table cells */
     border-radius: 5px;
 }
-
+ 
 th, td {
     padding: 8px;
     text-align: center;
     width: 0%;
     /* Add padding for better readability */
-
+ 
 }
-
+ 
 #chartContainer {
     width: 300px;
     height: 300px;
 }
-
+ 
 .four {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
-
+ 
 .four_card {
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     height: 370px;
     border-radius: 4px;
     background-color: rgb(255, 255, 255);
 }
-
+ 
 #first_four {
     display: flex;
     flex-direction: column;
@@ -488,22 +488,22 @@ th, td {
     padding: 1rem;
     gap: 10px;
 }
-
+ 
 .first_four1 {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-
+ 
 }
-
+ 
 .first_four_title {
-
+ 
     font-weight: 600;
     font-style: normal;
 }
-
+ 
 #second_four {
     display: flex;
     flex-direction: column;
