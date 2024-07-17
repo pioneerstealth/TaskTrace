@@ -349,6 +349,8 @@ function addStatusButtonFunctionality(row, student) {
   const tskStatus = row.querySelector(".tsk-status");
   const time = row.querySelector(".timer");
   const marksContent = row.querySelector(".marks");
+  const taskId = localStorage.getItem("taskId");
+  const taskDocRef = doc(db, "tasks", taskId);
   
   // Set initial state based on database data
   if (student.submissionStatus === 'Completed') {
@@ -362,55 +364,69 @@ function addStatusButtonFunctionality(row, student) {
     tskStatus.classList.add("completed");
   }
 
-  statusButton.addEventListener("click", function () {
-    const taskDocRef = doc(db, "tasks", taskId);
+  statusButton.addEventListener("click", async function () {
     const currentTime = Date.now();
-    const endTime = (parseInt(localStorage.getItem("StartTime"))+  parseInt(localStorage.getItem("totalSeconds"))* 1000);
-    console.log(endTime);
+    const endTime = (parseInt(localStorage.getItem("StartTime")) + parseInt(localStorage.getItem("totalSeconds")) * 1000);
     const reductionPercentage = parseInt(localStorage.getItem("reductionPercentage"));
-    console.log("reductionpercent :" + reductionPercentage);
     
     const customInterval = localStorage.getItem("timeToReduce");
     const [hours, minutes, seconds] = customInterval.split(":").map(part => parseInt(part, 10));
     const customIntervalMillis = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
-    
-    console.log("customInterval :" + customIntervalMillis);
     
     if (this.classList.contains("pending")) {
         this.classList.remove("pending");
         this.classList.add("completed");
         this.textContent = "Completed";
         this.disabled = true;
-        console.log(Date.now() - parseInt(localStorage.getItem("StartTime")));
-        time.textContent = formatTime(Date.now() - parseInt(localStorage.getItem("StartTime")));
+        const timeTaken = formatTime(Date.now() - parseInt(localStorage.getItem("StartTime")));
+        time.textContent = timeTaken;
         let marks = parseInt(localStorage.getItem("maxMarks"));
     
         if (currentTime > endTime && reductionPercentage > 0) {
             const millisLate = currentTime - endTime;
             const intervalsLate = Math.floor(millisLate / customIntervalMillis);
-            console.log(millisLate);
-            console.log(intervalsLate);
             const deductions = intervalsLate * (reductionPercentage * marks / 100);
             marks = Math.max(0, marks - deductions);
         }
         marksContent.textContent = marks;
+
+        // Update database
+        await updateStudentData(taskDocRef, student.id, {
+            submissionStatus: "Completed",
+            marks: marks.toString(),
+            timeTaken: timeTaken
+        });
     } else {
-      this.classList.remove("completed");
-      this.classList.add("pending");
-      this.textContent = "Pending";
+        this.classList.remove("completed");
+        this.classList.add("pending");
+        this.textContent = "Pending";
+
+        // Update database
+        await updateStudentData(taskDocRef, student.id, {
+            submissionStatus: "Pending"
+        });
     }
-    
   });
 
-  tskStatus.addEventListener("click", function () {
+  tskStatus.addEventListener("click", async function () {
     if (this.classList.contains("pending")) {
       this.classList.remove("pending");
       this.classList.add("completed");
       this.textContent = "Completed";
+
+      // Update database
+      await updateStudentData(taskDocRef, student.id, {
+        taskStatus: "Completed"
+      });
     } else {
       this.classList.remove("completed");
       this.classList.add("pending");
       this.textContent = "Pending";
+
+      // Update database
+      await updateStudentData(taskDocRef, student.id, {
+        taskStatus: "Pending"
+      });
     }
   });
 }
@@ -471,10 +487,10 @@ async function updateStudentMarks(row, newMarks) {
       return student;
     });
 
-    // Update the document with the new data
-    // await updateDoc(taskDocRef, {
-    //   students: updatedStudents
-    // });
+    //Update the document with the new data
+    await updateDoc(taskDocRef, {
+      students: updatedStudents
+    });
 
     console.log(`Marks updated for student ${studentId}`);
   } catch (error) {
