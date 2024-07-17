@@ -430,12 +430,35 @@ body {
     font-weight: 500;
 }
 
-#markTable_second_three th:nth-child(2), #markTable_second_three th:nth-child(3) {
-    text-align: right;
+.table_head {
+    color: #828282;
+    font-weight: 500;
+    /* border: 1px solid #000; */
+    /* Add border to the table header */
 }
 
+table {
+    width: 100%;
+    /* Make the table full width */
+    border-collapse: collapse;
+    /* Ensure borders are collapsed for a cleaner look */
+    /* border: 1px solid #000;
+    border-radius: 5px; */
+}
 
+table, th, td {
+    border: 1px solid #000;
+    /* Add border to the table, table headers, and table cells */
+    border-radius: 5px;
+}
 
+th, td {
+    padding: 8px;
+    text-align: center;
+    width: 0%;
+    /* Add padding for better readability */
+
+}
 
 #chartContainer {
     width: 300px;
