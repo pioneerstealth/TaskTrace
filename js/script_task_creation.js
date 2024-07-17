@@ -363,6 +363,7 @@ function addStatusButtonFunctionality(row, student) {
   }
 
   statusButton.addEventListener("click", function () {
+    const taskDocRef = doc(db, "tasks", taskId);
     const currentTime = Date.now();
     const endTime = (parseInt(localStorage.getItem("StartTime"))+  parseInt(localStorage.getItem("totalSeconds"))* 1000);
     console.log(endTime);
@@ -471,9 +472,9 @@ async function updateStudentMarks(row, newMarks) {
     });
 
     // Update the document with the new data
-    await updateDoc(taskDocRef, {
-      students: updatedStudents
-    });
+    // await updateDoc(taskDocRef, {
+    //   students: updatedStudents
+    // });
 
     console.log(`Marks updated for student ${studentId}`);
   } catch (error) {
