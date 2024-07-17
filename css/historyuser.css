@@ -1,0 +1,147 @@
+
+
+body {
+    font-family: Arial, sans-serif;
+    /* padding: 20px; */
+  }
+    /* nav bar */
+    .navbar_log_sign {
+      display: flex;
+      flex-direction: row;
+      border-radius: 6px 6px 0px 0px;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1756B3;
+      width: 100%;  
+      height: 7%;
+  }
+  .logo_title {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin: 0px 0px 0px 30px;
+    width: 150px;
+    height: 30px;
+    gap: 10px;
+  }
+  
+  .logo {
+    background-color: #ffffff;
+    border-radius: 15px;
+    width: 30px;
+    height: 30px;
+  }
+  
+  .logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Maintains aspect ratio */
+  }
+  .title1 {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-family: "Cinzel", serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    color: #fff;
+  }
+  .home_logo img {
+    width: 20px;
+    height: 20px;
+    margin-top: 5px;
+    margin-right: 15px;
+  } 
+  /* nav bar ends here  */
+  
+  
+  h1 {
+    display: flex;
+    color: #000;
+    align-items:center;
+    justify-content:center;
+    background-color:#DDEBFF;
+    padding-block: 20px;
+    margin-inline: 10px;
+    border-radius: 5px;
+  }
+  .headings{
+    display: flex;
+    justify-content: space-between;
+    margin-inline: 20px;
+    margin-right: 100px;
+  }
+  .title{
+    background-color: #fff;
+    padding-inline: 16px;
+    border-radius: 36px;
+    border: 1px solid black;
+    box-shadow: 5px 5px 5px rgba(116, 143, 232, 0.3);
+  
+  
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .task-name {
+    font-weight: bold;
+  }
+  
+  .task-info {
+    color: #555;
+  }
+  
+  
+  
+  @media only screen and (max-width: 600px) {
+    /* Styles for screens smaller than 600px */
+  
+    .navbar_log_sign {
+      flex-direction: row;
+      height: auto;
+    }
+  
+      .logo_title {
+      /* justify-content:left; */
+      margin: 10px ;
+      
+    }
+    .title1{
+      font-size: 14px;
+  
+    }
+  
+    .home_logo img {
+      margin: 10px ;
+    }
+  
+    h1 {
+      font-size: 24px; /* Adjust font size */
+      padding-block: 10px; /* Adjust padding */
+    }
+  
+    .headings {
+      flex-direction: row; /* Stack the titles vertically */
+      align-items: center; /* Center align the titles */
+      margin-right: 0; /* Remove the right margin */
+    }
+  
+    .title {
+      margin-bottom: 10px; /* Add some space between the titles */
+      font-size: 12px;
+    }
+  }
+  
+  
