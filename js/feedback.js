@@ -16,13 +16,13 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 
 // Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
-    authDomain: "task-trace.firebaseapp.com",
-    projectId: "task-trace",
-    storageBucket: "task-trace.appspot.com",
-    messagingSenderId: "542109212256",
-    appId: "1:542109212256:web:a54bd96c131eff4a152d05",
-    measurementId: "G-MZNCSCVN54"
+  apiKey: "AIzaSyAGVP2-tmrfh9VziN4EfSTSEOr9DIj1r8k",
+  authDomain: "task-trace.firebaseapp.com",
+  projectId: "task-trace",
+  storageBucket: "task-trace.appspot.com",
+  messagingSenderId: "542109212256",
+  appId: "1:542109212256:web:a54bd96c131eff4a152d05",
+  measurementId: "G-MZNCSCVN54"
 };
 
 // Initialize Firebase
