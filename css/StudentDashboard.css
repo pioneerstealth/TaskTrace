@@ -383,8 +383,15 @@ body {
 
 }
 
+.first_imgHead_image img {
+    aspect-ratio: 1/1;
+    width: 170px;
+
+}
+
 .first_imgHead_image {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     overflow: hidden;
