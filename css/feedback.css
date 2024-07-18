@@ -57,7 +57,7 @@ body {
 
 .user-info{
     width: 250px;
-    height: 250px;
+    height: 290px;
     z-index: 2;
     background-color: white;
     position: absolute;
@@ -124,7 +124,7 @@ body {
 
 #fullname{
     /* position: absolute; */
-    margin-top: 30%;
+    margin-top: 55%;
     text-align: center;
     color: red;
 }
@@ -144,4 +144,14 @@ body {
     color: white;
     padding: 7px 8px;
     border-radius: 6px;
+}
+
+#profile-pic{
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%;
+    position: absolute;
+    margin-top: 8%;
+    margin-left: 30%;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 }
