@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   setTimeout(function () {
     document.getElementById("loadingAnimation_bg").style.display = "none";
-  }, 15000); // 10000 milliseconds = 10 seconds
+  }, 9000); // 10000 milliseconds = 10 seconds
 
   //fetch batch name and student name function----------------------------------------
   async function fetchBatchNameAndStudentName(documentId, memberId) {

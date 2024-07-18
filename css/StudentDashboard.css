@@ -244,7 +244,7 @@ body {
 .Dashboard_section {
     display: flex;
     flex-direction: column;
-    background: linear-gradient(to bottom right, #ffffff, #c4dcff);
+    background: linear-gradient(to bottom right, #DDEBFF, #90B4EA);
     width: 100%;
     /* height: 100vh; */
     padding: 1rem 3rem 1rem 3rem;
@@ -367,7 +367,7 @@ body {
     flex-direction: column;
     justify-content: start;
     align-items: center;
-    gap: 7rem;
+    gap: 2rem;
     padding: 1.5rem 0rem 0rem 0rem;
 }
 
@@ -383,8 +383,24 @@ body {
 
 }
 
+.line2 {
+    margin-top: 0px;
+    width: 200px;
+    height: 3px;
+    background: linear-gradient(to right, #2977ec, #6a99df, #a0b9dd, #c5e9fc, #a0b9dd, #6a99df, #0064f9);
+    background-size: 200% 100%;
+    animation: runningBackground 5s linear infinite;
+}
+
+.first_imgHead_image img {
+    /* aspect-ratio: 1/1; */
+    width: 170px;
+
+}
+
 .first_imgHead_image {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     overflow: hidden;
@@ -403,7 +419,7 @@ body {
 
 .first_imgHead_heading {
     text-align: center;
-    width: 210px;
+    width: 250px;
     font-weight: 600;
     font-size: 20px;
     color: #558ad9;
@@ -440,6 +456,7 @@ body {
 
 
 .first_pi_data {
+    margin-top: 50px;
     display: flex;
     flex-direction: column;
     align-items: center;
