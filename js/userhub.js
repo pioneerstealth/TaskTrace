@@ -54,7 +54,6 @@ function fetchUserData() {
           const email = userData.email;
           const role = userData.role;
           const imgurl = userData.imgurl;
-
           // Update UI with fetched data
           const infoDiv = document.getElementById("info");
           infoDiv.innerHTML = `
@@ -233,7 +232,7 @@ const updateDigit = (el, newDigit) => {
   if (currentDigit !== newDigit) {
     el.cardFaceB.textContent = newDigit;
 
-    el.card.addEventListener("transitionend", () => {
+     el.card.addEventListener("transitionend", () => {
       el.digit.dataset.digitBefore = newDigit;
       el.cardFaceA.textContent = newDigit;
 

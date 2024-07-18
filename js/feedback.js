@@ -2,15 +2,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 import {
-     getFirestore, 
-     collection, 
-     addDoc,
+    getFirestore,
+    collection,
+    addDoc,
     doc,
-    getDocs,
     getDoc,
+    getDocs,
     query,
     orderBy,
-    limit 
+    limit
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -30,7 +30,6 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth();
-
 
 // Function to handle form submission
 document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
@@ -52,11 +51,17 @@ document.getElementById('feedbackForm').addEventListener('submit', async (e) => 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
+                // Fetch user's profile information from Firestore
+                const userDocRef = doc(db, "users", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+                const userName = userDocSnap.exists() ? userDocSnap.data().fullName : "Anonymous";
+
                 // Add a new document with a generated ID in the 'new_feedback' collection
                 await addDoc(collection(db, 'new_feedback'), {
                     rating: rating,
                     feedbackText: feedbackText,
                     uid: user.uid,
+                    username: userName,
                     timestamp: new Date()
                 });
                 alert('Feedback submitted successfully!');
@@ -74,56 +79,58 @@ document.getElementById('feedbackForm').addEventListener('submit', async (e) => 
 
 // Fetch user data and update UI
 function fetchUserData() {
-    const user = auth.currentUser;
-    if (user) {
-      const userDocRef = doc(db, "users", user.uid);
-      getDoc(userDocRef)
-        .then((docSnap) => {
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            const fullName = userData.fullName;
-            const email = userData.email;
-            const role = userData.role;
-  
-            // Update UI with fetched data
-            const infoDiv = document.getElementById("info");
-            infoDiv.innerHTML = `
-              <p id="fullname">Name: ${fullName}</p>
-              <p id="email">${email}</p>
-              <p id="role">Role: ${role}</p>
-              <a href="#" id="signout" class="signout">Sign Out</a>
-            `;
-            const signoutButton = document.getElementById("signout");
-  
-            // Add an event listener to the signout button
-            signoutButton.addEventListener("click", () => {
-              signOut(auth)
-                .then(() => {
-                  console.log("User signed out successfully.");
-                  window.location.href = "./login_signup.html";
-                })
-                .catch((error) => {
-                  console.error("Error signing out:", error);
-                });
-            });
-          } else {
-            console.log("No such document!");
-          }
-        })
-        .catch((error) => {
-          console.error("Error getting user document:", error);
-        });
-    } else {
-      console.log("User not signed in.");
-    }
+  const user = auth.currentUser;
+  if (user) {
+    const userDocRef = doc(db, "users", user.uid);
+    getDoc(userDocRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          const fullName = userData.fullName;
+          const email = userData.email;
+          const role = userData.role;
+          const imgurl = userData.imgurl;
+          // Update UI with fetched data
+          const infoDiv = document.getElementById("info");
+          infoDiv.innerHTML = `
+            <img id="profile-pic" src="${imgurl}" alt="Profile Picture">
+            <p id="fullname">Name: ${fullName}</p>
+            <p id="email">${email}</p>
+            <p id="role">Role: ${role}</p>
+            <a href="#" id="signout" class="signout">Sign Out</a>
+          `;
+          const signoutButton = document.getElementById("signout");
+
+          // Add an event listener to the signout button
+          signoutButton.addEventListener("click", () => {
+            signOut(auth)
+              .then(() => {
+                console.log("User signed out successfully.");
+                window.location.href = "./login_signup.html";
+              })
+              .catch((error) => {
+                console.error("Error signing out:", error);
+              });
+          });
+        } else {
+          console.log("No such document!");
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting user document:", error);
+      });
+  } else {
+    console.log("User not signed in.");
   }
-  
-  // Call fetchUserData when the page loads if user is already logged in
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      fetchUserData();
-    }
-  });
+}
+
+
+// Call fetchUserData when the page loads if user is already logged in
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    fetchUserData();
+  }
+});
   
   // Prevent page refresh on user icon click
   document.getElementById("user").addEventListener("click", (event) => {

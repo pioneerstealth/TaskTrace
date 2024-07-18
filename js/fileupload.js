@@ -40,6 +40,7 @@ let ImgName, ImgUrl;
 let files = [];
 let reader = new FileReader();
 
+
 // Selection process
 document.getElementById("select").onclick = function(e) {
   const input = document.createElement('input');
@@ -51,7 +52,6 @@ document.getElementById("select").onclick = function(e) {
     files = e.target.files;
     reader = new FileReader();
     reader.onload = function() {
-      console.log(reader.result);
       document.getElementById("myimg").src = reader.result;
     }
     reader.readAsDataURL(files[0]);
@@ -60,7 +60,7 @@ document.getElementById("select").onclick = function(e) {
 
 // Upload process
 document.getElementById('upload').onclick = function() {
-  const ImgName = document.getElementById('namebox').value;
+  const ImgName = document.getElementById('namebox').value.trim();
 
   if (files.length > 0) {
     const storageRef = ref(storage, 'Images/' + ImgName + ".png");
@@ -89,7 +89,6 @@ document.getElementById('upload').onclick = function() {
           const tasksRef = collection(database, 'tasks');
           const queryTasks = query(tasksRef);
 
-          // Check if user exists in any task document
           getDocs(queryTasks).then((querySnapshot) => {
             let userFoundInAnyTask = false;
 
@@ -107,7 +106,11 @@ document.getElementById('upload').onclick = function() {
               const updatedStudents = taskData.students.map(student => {
                 if (student.email === userEmail) {
                   userFound = true;
-                  return { ...student, imgurl: ImgUrl };
+                  return { 
+                    ...student, 
+                    imgurl: ImgUrl, 
+                    submissionStatus: "Completed"
+                  };                  
                 } else {
                   return student;
                 }
@@ -115,39 +118,37 @@ document.getElementById('upload').onclick = function() {
 
               if (userFound) {
                 userFoundInAnyTask = true;
-                updateDoc(taskDocRef, { students: updatedStudents }).then(() => {
-                  console.log(`Image URL added to students array in task ${taskId}`);
+
+                updateDoc(taskDocRef, {
+                  students: updatedStudents,
+                  taskStatus: "Completed"
+                }).then(() => {
+                  console.log(`Task ${taskId} updated successfully.`);
                 }).catch((error) => {
-                  console.error('Error updating task document:', error);
+                  console.error(`Error updating task ${taskId}: `, error);
                 });
-              } else {
-                console.log(`User with email ${userEmail} not found in task ${taskId}`);
               }
             });
 
-            if (userFoundInAnyTask) {
-              // Set image URL in tasks collection if user is found in any task document
-              setDoc(doc(database, 'tasks', ImgName), {
-                Name: ImgName,
-                Link: ImgUrl,
-                Id: user.uid
-              }).then(() => {
-                alert('Image added successfully');
-              }).catch((error) => {
-                alert('Error adding image to Firestore: ' + error.message);
-              });
-            } else {
-              console.log(`No tasks found for user with email ${userEmail}`);
+            if (!userFoundInAnyTask) {
+              console.log('User email not found in any task.');
             }
           }).catch((error) => {
-            console.error('Error querying tasks collection:', error);
+            console.error('Error retrieving tasks: ', error);
           });
-        }).catch((error) => {
-          alert('Error getting download URL: ' + error.message);
+
+          setDoc(doc(database, "ImagesLinks", ImgName), {
+            ImageName: ImgName,
+            ImageURL: ImgUrl
+          }).then(() => {
+            console.log('Image URL saved successfully.');
+          }).catch((error) => {
+            console.error('Error saving image URL: ', error);
+          });
         });
       }
     );
   } else {
-    alert('Please select a file to upload');
+    alert('No image selected.');
   }
-};
+}
