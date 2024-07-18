@@ -133,6 +133,24 @@ completeTaskBtn.addEventListener("click", async () => {
           
         });
 
+        let totalTime = 0;
+        let studentCount = 0;
+        updatedStudents.forEach(student => {
+            if (student.timeTaken && student.timeTaken !== "00:00:00") {
+                totalTime += parseTimeToMilliseconds(student.timeTaken);
+                studentCount++;
+            }
+        });
+        
+        const avgTimeInMilliseconds = studentCount > 0 ? totalTime / studentCount : 0;
+        
+        // Update the document with the merged data and average time
+        await updateDoc(taskDocRef, {
+            students: updatedStudents,
+            status: "completed",
+            avgTime: avgTimeInMilliseconds
+        });
+
         // Clear localStorage after successful update
         localStorage.clear();
         console.log("Task updated successfully with table data.");
@@ -140,6 +158,29 @@ completeTaskBtn.addEventListener("click", async () => {
         console.error("Error updating task document:", error);
     }
 });
+
+
+function parseTimeToMilliseconds(timeString) {
+  const timeParts = timeString.split(':').map(Number); // Split the string by ':' and convert each part to a number
+  let milliseconds = 0;
+
+  if (timeParts.length === 3) {
+    // Format: hh:mm:ss
+    milliseconds += timeParts[0] * 60 * 60 * 1000; // Hours to milliseconds
+    milliseconds += timeParts[1] * 60 * 1000;      // Minutes to milliseconds
+    milliseconds += timeParts[2] * 1000;           // Seconds to milliseconds
+  } else if (timeParts.length === 2) {
+    // Format: mm:ss
+    milliseconds += timeParts[0] * 60 * 1000;      // Minutes to milliseconds
+    milliseconds += timeParts[1] * 1000;           // Seconds to milliseconds
+  } else if (timeParts.length === 1) {
+    // Format: ss
+    milliseconds += timeParts[0] * 1000;           // Seconds to milliseconds
+  }
+  console.log(milliseconds);
+  return milliseconds;
+
+}
 
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -251,6 +292,64 @@ button.addEventListener("click", async () => {
     console.log("Task name and description are required.");
   }
 });
+
+// Time Recommendation
+const timeRecommendation = document.getElementById('timeRecommendation');
+
+// Function to get and display the time recommendation
+async function updateTimeRecommendation() {
+  const tagName = tagNameInput.value.trim();
+  
+  if (tagName) {
+    timeRecommendation.textContent = 'Calculating recommendation...';
+    const recommendation = await getTimeRecommendation(tagName);
+    timeRecommendation.textContent = recommendation;
+  } else {
+    timeRecommendation.textContent = '';
+  }
+}
+
+// Add event listeners
+tagNameInput.addEventListener('blur', updateTimeRecommendation);
+tagNameInput.addEventListener('keypress', (event) => {
+  if (event.key === 'Enter') {
+    updateTimeRecommendation();
+  }
+});
+
+// Existing getTimeRecommendation and getAverageTimeForTag functions remain the same
+async function getAverageTimeForTag(tagName) {
+  const querySnapshot = await getDocs(query(collection(db, 'tasks'), where('tagName', '==', tagName)));
+  
+  let totalTime = 0;
+  let taskCount = 0;
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    if (data.avgTime) {
+      totalTime += data.avgTime;
+      taskCount++;
+    }
+  });
+
+  return taskCount > 0 ? totalTime / taskCount : null;
+}
+
+async function getTimeRecommendation(tagName) {
+  const avgTimeInMilliseconds = await getAverageTimeForTag(tagName);
+  
+  if (avgTimeInMilliseconds === null) {
+    return "No data available for this tag. Please set an appropriate time.";
+  }
+
+  const avgMinutes = Math.round(avgTimeInMilliseconds / (60 * 1000));
+  const recommendedTime = avgMinutes.toFixed(2); // Round up to nearest 5 minutes
+
+  return `Based on previous tasks, the recommended time for this tag is ${recommendedTime} minutes.`;
+}
+
+
+
 
 async function fetchBatches() {
   const batchRef = collection(db, "batches");
@@ -413,6 +512,11 @@ function createStudentRow(student) {
 }
 
 function addStatusButtonFunctionality(row, student) {
+
+  if (student == null) {
+    console.error('student is null');
+    return;
+}
   const statusButton = row.querySelector(".status");
   const tskStatus = row.querySelector(".tsk-status");
   const time = row.querySelector(".timer");
@@ -426,6 +530,31 @@ function addStatusButtonFunctionality(row, student) {
     statusButton.classList.add("completed");
     statusButton.disabled = true;
     time.textContent = student.timeTaken;
+    if(parseInt(student.marks) == 0 && student.timeTaken == "00:00:00"){
+
+      const currentTime = Date.now();
+      const startTime = parseInt(localStorage.getItem("StartTime"));
+      const endTime = startTime + parseInt(localStorage.getItem("totalSeconds")) * 1000;
+      const reductionPercentage = parseInt(localStorage.getItem("reductionPercentage"));
+      const maxMarks = parseInt(localStorage.getItem("maxMarks"));
+      
+      const customInterval = localStorage.getItem("timeToReduce");
+      const [hours, minutes, seconds] = customInterval.split(":").map(part => parseInt(part, 10));
+      const customIntervalMillis = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
+      
+      const timeTaken = formatTime(currentTime - startTime);
+      let marks = maxMarks;
+      
+      if (currentTime > endTime && reductionPercentage > 0) {
+        const millisLate = currentTime - endTime;
+        const intervalsLate = Math.floor(millisLate / customIntervalMillis);
+        const deductions = intervalsLate * (reductionPercentage * maxMarks / 100);
+        marks = Math.max(0, maxMarks - deductions);
+      }
+      
+      time.textContent = timeTaken;
+      marksContent.textContent = marks;
+    }
   }
 
   if (student.taskStatus === "Completed") {
