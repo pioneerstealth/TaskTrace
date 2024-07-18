@@ -37,6 +37,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const memberId = params.get("memberId");
   const batchId = params.get("batchId");
 
+  setTimeout(function () {
+    document.getElementById("loadingAnimation_bg").style.display = "none";
+  }, 15000); // 10000 milliseconds = 10 seconds
+
   //fetch batch name and student name function----------------------------------------
   async function fetchBatchNameAndStudentName(documentId, memberId) {
     try {
@@ -74,120 +78,74 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
   async function getTaskData(batchId) {
-
     const taskData = [];
 
     const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
 
-
-
     const querySnapshot = await getDocs(q);
 
-
-
     querySnapshot.forEach((doc) => {
-
-        taskData.push(doc.data());
-
+      taskData.push(doc.data());
     });
-
-
 
     console.log("Retrieved task data: ", taskData);
 
     return taskData;
+  }
 
-}
+  let taskData = await getTaskData(batchId);
 
+  console.log(taskData);
 
+  function processData(taskData, memberId, batchId) {
+    let completedTasks = 0;
 
- let taskData= await getTaskData(batchId)
+    let timeExtendedTasks = 0;
 
+    let notCompletedTasks = 0;
 
+    taskData.forEach((task) => {
+      task.students.forEach((student) => {
+        if (student.id === memberId) {
+          if (student.taskStatus === "Completed") {
+            console.log("completed");
 
- console.log(taskData)
+            const totalTimeSeconds = timeStringToSeconds(task.time);
 
+            const timeTakenSeconds = timeStringToSeconds(student.timeTaken);
 
+            const newEndTimeSeconds = timeStringToSeconds(task.totaltime);
 
-
-
- function processData(taskData, memberId, batchId) {
-
-  let completedTasks = 0;
-
-  let timeExtendedTasks = 0;
-
-  let notCompletedTasks = 0;
-
-
-
-  taskData.forEach(task => {
-
-    task.students.forEach(student => {
-
-      if (student.id === memberId) {
-
-        if (student.taskStatus === 'Completed') {
-
-          console.log("completed");
-
-          const totalTimeSeconds = timeStringToSeconds(task.time);
-
-          const timeTakenSeconds = timeStringToSeconds(student.timeTaken);
-
-          const newEndTimeSeconds = timeStringToSeconds(task.totaltime);
-
-
-
-          if (totalTimeSeconds!==newEndTimeSeconds) {
-
-            timeExtendedTasks++;
-
-          } else {
-
-            completedTasks++;
-
+            if (totalTimeSeconds !== newEndTimeSeconds) {
+              timeExtendedTasks++;
+            } else {
+              completedTasks++;
+            }
+          } else if (student.taskStatus === "Pending") {
+            notCompletedTasks++;
           }
-
-        } else if (student.taskStatus === 'Pending') {
-
-          notCompletedTasks++;
-
         }
-
-      }
-
+      });
     });
 
-  });
+    console.log("Completed Tasks:", completedTasks);
 
+    console.log("Time Extended Tasks:", timeExtendedTasks);
 
+    console.log("Not Completed Tasks:", notCompletedTasks);
 
-  console.log('Completed Tasks:', completedTasks);
+    return [completedTasks, timeExtendedTasks, notCompletedTasks];
+  }
 
-  console.log('Time Extended Tasks:', timeExtendedTasks);
+  // Utility function to convert time strings to seconds
 
-  console.log('Not Completed Tasks:', notCompletedTasks);
+  function timeStringToSeconds(timeString) {
+    const [hours, minutes, seconds] = timeString.split(":").map(Number);
 
-  return [completedTasks, timeExtendedTasks, notCompletedTasks];
+    return hours * 3600 + minutes * 60 + seconds;
+  }
 
-}
-
-
-
-// Utility function to convert time strings to seconds
-
-function timeStringToSeconds(timeString) {
-
-  const [hours, minutes, seconds] = timeString.split(':').map(Number);
-
-  return hours * 3600 + minutes * 60 + seconds;
-
-}
-
-
-
-let taskStatus=processData(taskData,memberId,batchId);
+  let taskStatus = processData(taskData, memberId, batchId);
   // first_imgHead_heading population-----------------------------------------
 
   function first_imgHead_heading_populate(batchName, studentName) {
@@ -439,6 +397,8 @@ let taskStatus=processData(taskData,memberId,batchId);
             data: [overallPercentage, remainingPercentage],
             backgroundColor: [gradient, "#ffffff"],
             hoverBackgroundColor: [gradient, "#ff4743"],
+            borderColor: ["black", "white"],
+            borderWidth: 0.1,
           },
         ],
       },
@@ -500,8 +460,6 @@ let taskStatus=processData(taskData,memberId,batchId);
     console.error("Error:", error);
   }
 
- 
-
   // pie chart----------------------------------------------------------------
   // Select the canvas element
   const first_piChart = document
@@ -514,11 +472,7 @@ let taskStatus=processData(taskData,memberId,batchId);
     datasets: [
       {
         data: taskStatus, // Dummy data
-        backgroundColor: [
-          "#00ed00",
-          "#009efa",
-          "#ed1f17",
-        ],
+        backgroundColor: ["#AADEA7", "#E6F69D", "#2D87BB"],
         // borderColor: [
         //   "#ed1f17",
         //   "rgba(255, 206, 86, 1)",
@@ -553,7 +507,6 @@ let taskStatus=processData(taskData,memberId,batchId);
 
   // Create the pie chart
   const myPieChart = new Chart(first_piChart, config);
-
 
   // New code for the second doughnut chart
   var DoughnutChart_second = document
@@ -606,6 +559,8 @@ let taskStatus=processData(taskData,memberId,batchId);
           data: [60, 40],
           backgroundColor: [gradientSecond, "#ffffff"],
           hoverBackgroundColor: [gradientSecond, "#ff4743"],
+          borderColor: ["black", "white"],
+          borderWidth: 0.1,
         },
       ],
     },
@@ -643,15 +598,15 @@ let taskStatus=processData(taskData,memberId,batchId);
       datasets: [
         {
           label: "Batch",
-          backgroundColor: "#f11167",
-          borderColor: "#f11167",
+          backgroundColor: "#FFA500",
+          borderColor: "#FFA500",
           data: storedTagNames.map((tagName) => avgMarkForBatch[tagName] || 0),
           borderWidth: 1.5,
         },
         {
           label: "Individual",
-          backgroundColor: "#341111",
-          borderColor: "#341111",
+          backgroundColor: "#32CD32",
+          borderColor: "#32CD32",
           data: storedTagNames.map(
             (tagName) => avgMarkForStudent[tagName] || 0
           ),
@@ -726,12 +681,9 @@ let taskStatus=processData(taskData,memberId,batchId);
   //   dropdown.appendChild(option);
   // });
   async function updateTable(batchId, memberId) {
-
     const tableBody = document.getElementById("tableBody_second_one");
 
     tableBody.innerHTML = "";
-
-
 
     // Fetch tag names for the batch
 
@@ -739,55 +691,44 @@ let taskStatus=processData(taskData,memberId,batchId);
 
     console.log("Stored tag names:", storedTagNames);
 
-
-
     // Fetch average marks for the student in the batch
 
-    const avgMarkForStudent = await fetchAverageMarksForStudent(batchId, memberId, storedTagNames);
+    const avgMarkForStudent = await fetchAverageMarksForStudent(
+      batchId,
+      memberId,
+      storedTagNames
+    );
 
     console.log(avgMarkForStudent);
 
-
-
     // Create a row for each tag and its average mark
 
-    storedTagNames.forEach(tagName => {
+    storedTagNames.forEach((tagName) => {
+      const row = document.createElement("tr");
 
-        const row = document.createElement("tr");
+      // Tag name cell
 
+      const tagNameCell = document.createElement("td");
 
+      tagNameCell.textContent = tagName;
 
-        // Tag name cell
+      row.appendChild(tagNameCell);
 
-        const tagNameCell = document.createElement("td");
+      // Average mark cell
 
-        tagNameCell.textContent = tagName;
+      const avgMarkCell = document.createElement("td");
 
-        row.appendChild(tagNameCell);
+      const avgMark = avgMarkForStudent[tagName] || 0; // If average mark not available, default to 0
 
+      avgMarkCell.textContent = avgMark;
 
+      row.appendChild(avgMarkCell);
 
-        // Average mark cell
+      // Append the row to the table body
 
-        const avgMarkCell = document.createElement("td");
-
-        const avgMark = avgMarkForStudent[tagName] || 0; // If average mark not available, default to 0
-
-        avgMarkCell.textContent = avgMark;
-
-        row.appendChild(avgMarkCell);
-
-
-
-        // Append the row to the table body
-
-        tableBody.appendChild(row);
-
+      tableBody.appendChild(row);
     });
+  }
 
-}
-
-
-
-updateTable(batchId,memberId)
+  updateTable(batchId, memberId);
 });
