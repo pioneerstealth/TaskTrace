@@ -367,7 +367,7 @@ body {
     flex-direction: column;
     justify-content: start;
     align-items: center;
-    gap: 7rem;
+    gap: 2rem;
     padding: 1.5rem 0rem 0rem 0rem;
 }
 
@@ -381,6 +381,15 @@ body {
     align-items: center;
     gap: 10px;
 
+}
+
+.line2 {
+    margin-top: 0px;
+    width: 200px;
+    height: 3px;
+    background: linear-gradient(to right, #2977ec, #6a99df, #a0b9dd, #c5e9fc, #a0b9dd, #6a99df, #0064f9);
+    background-size: 200% 100%;
+    animation: runningBackground 5s linear infinite;
 }
 
 .first_imgHead_image img {
@@ -410,7 +419,7 @@ body {
 
 .first_imgHead_heading {
     text-align: center;
-    width: 210px;
+    width: 250px;
     font-weight: 600;
     font-size: 20px;
     color: #558ad9;
@@ -447,6 +456,7 @@ body {
 
 
 .first_pi_data {
+    margin-top: 50px;
     display: flex;
     flex-direction: column;
     align-items: center;
