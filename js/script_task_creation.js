@@ -787,9 +787,15 @@ function formatTime(ms) {
 const exportBtn = document.getElementById("exportBtn");
 
 exportBtn.addEventListener('click',()=>{
-  const table = document.querySelector('table');
-  const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-  XLSX.writeFile(wb, ""+taskName.value+".xlsx");
+  console.log(`Downloading task data for batch: ${taskName.value}`);
+  const formattedData = allStudents.map((student) => {
+    const { id, name,  marks, submissionStatus, taskStatus, timeTaken } = student;
+    return { id, name,  marks, submissionStatus, taskStatus, timeTaken };
+  });
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(formattedData);
+  XLSX.utils.book_append_sheet(wb, ws, "Task Data");
+  XLSX.writeFile(wb, `${taskName.value}_taskData.xlsx`);
 })
 
 const extendTimeBtn = document.querySelector('.extend-time-btn');
