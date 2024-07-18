@@ -530,6 +530,31 @@ function addStatusButtonFunctionality(row, student) {
     statusButton.classList.add("completed");
     statusButton.disabled = true;
     time.textContent = student.timeTaken;
+    if(parseInt(student.marks) == 0 && student.timeTaken == "00:00:00"){
+
+      const currentTime = Date.now();
+      const startTime = parseInt(localStorage.getItem("StartTime"));
+      const endTime = startTime + parseInt(localStorage.getItem("totalSeconds")) * 1000;
+      const reductionPercentage = parseInt(localStorage.getItem("reductionPercentage"));
+      const maxMarks = parseInt(localStorage.getItem("maxMarks"));
+      
+      const customInterval = localStorage.getItem("timeToReduce");
+      const [hours, minutes, seconds] = customInterval.split(":").map(part => parseInt(part, 10));
+      const customIntervalMillis = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
+      
+      const timeTaken = formatTime(currentTime - startTime);
+      let marks = maxMarks;
+      
+      if (currentTime > endTime && reductionPercentage > 0) {
+        const millisLate = currentTime - endTime;
+        const intervalsLate = Math.floor(millisLate / customIntervalMillis);
+        const deductions = intervalsLate * (reductionPercentage * maxMarks / 100);
+        marks = Math.max(0, maxMarks - deductions);
+      }
+      
+      time.textContent = timeTaken;
+      marksContent.textContent = marks;
+    }
   }
 
   if (student.taskStatus === "Completed") {
