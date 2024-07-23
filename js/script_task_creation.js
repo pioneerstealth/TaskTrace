@@ -131,10 +131,30 @@ completeTaskBtn.addEventListener("click", async () => {
       }
     });
 
+
     // Update the document with the merged data
     await updateDoc(taskDocRef, {
       students: updatedStudents,
       status: "completed",
+    });
+
+    let totalTime = 0;
+    let studentCount = 0;
+    updatedStudents.forEach((student) => {
+      if (student.timeTaken && student.timeTaken !== "00:00:00") {
+        totalTime += parseTimeToMilliseconds(student.timeTaken);
+        studentCount++;
+      }
+    });
+
+    const avgTimeInMilliseconds =
+      studentCount > 0 ? totalTime / studentCount : 0;
+
+    // Update the document with the merged data and average time
+    await updateDoc(taskDocRef, {
+      students: updatedStudents,
+      status: "completed",
+      avgTime: avgTimeInMilliseconds,
     });
 
     // Clear localStorage after successful update
