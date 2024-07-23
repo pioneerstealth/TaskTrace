@@ -294,9 +294,9 @@ document
       });
 
     // Add each user to the users collection and send magic link
-    for (const member of tableData) {
-      await addUserAndSendMagicLink(member.id, member.name, member.email,batchDocRef.id);
-    }
+    // for (const member of tableData) {
+    //   await addUserAndSendMagicLink(member.id, member.name, member.email,batchDocRef.id);
+    // }
 
       showMessage("Batch and users saved successfully!", "success");
     } catch (error) {
@@ -305,33 +305,33 @@ document
     }
   });
 
-async function addUserAndSendMagicLink(userId, userName, userEmail,batchId) {
-  try {
-    // Add user to the users collection
-    await setDoc(doc(db, "users",batchId+''+userEmail), {
-      id: userId,
-      name: userName,
-      email: userEmail,
-      lastLogin: new Date(),
-      role: "user",
-    });
+// async function addUserAndSendMagicLink(userId, userName, userEmail,batchId) {
+//   try {
+//     // Add user to the users collection
+//     await setDoc(doc(db, "users",batchId+''+userEmail), {
+//       id: userId,
+//       name: userName,
+//       email: userEmail,
+//       lastLogin: new Date(),
+//       role: "user",
+//     });
 
-    // Send magic link to the user's email
-    const actionCodeSettings = {
-      url: window.location.href,
-      handleCodeInApp: true,
-    };
+//     // Send magic link to the user's email
+//     const actionCodeSettings = {
+//       url: window.location.href,
+//       handleCodeInApp: true,
+//     };
 
-    await auth.sendSignInLinkToEmail(userEmail, actionCodeSettings);
+//     await auth.sendSignInLinkToEmail(userEmail, actionCodeSettings);
 
-    console.log(`Magic link sent to ${userEmail}`);
+//     console.log(`Magic link sent to ${userEmail}`);
 
-    // Inform the user to check their email
-    window.localStorage.setItem("emailForSignIn", userEmail);
-  } catch (error) {
-    console.error("Error adding user and sending magic link: ", error);
-  }
-}
+//     // Inform the user to check their email
+//     window.localStorage.setItem("emailForSignIn", userEmail);
+//   } catch (error) {
+//     console.error("Error adding user and sending magic link: ", error);
+//   }
+// }
 
 // Event listener for Delete Batch button
 document

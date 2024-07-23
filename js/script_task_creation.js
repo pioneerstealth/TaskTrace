@@ -91,13 +91,12 @@ completeTaskBtn.addEventListener("click", async () => {
     const newTableData = getTableData();
     console.log("New Table Data:", newTableData);
 
-    // Get task ID from localStorage
-    const taskId = localStorage.getItem("taskId");
-    console.log("taskid", taskId);
+    // Get task ID from the current active task
+    
 
     // Check if task ID exists
     if (!taskId) {
-        throw new Error("Task ID not found in localStorage");
+        throw new Error("No active task found");
     }
 
     try {

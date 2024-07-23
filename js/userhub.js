@@ -136,6 +136,7 @@ async function fetchActiveTask() {
 
     snapshot.forEach((doc) => {
       const taskData = doc.data();
+      const taskId = doc.id;
       const taskName = taskData.name;
       const taskDescription = taskData.description;
       const createdAt = taskData.createdAt.toDate();
@@ -150,6 +151,9 @@ async function fetchActiveTask() {
       const taskExpiration = new Date(createdAt.getTime() + timeLimitMs);
 
       if (status != "completed") {
+        const taskId = doc.id;
+        console.log("taskId : "+ taskId);
+        localStorage.setItem("taskId",taskId);
         console.log(`Active task found: ${taskName}`); // Debugging
         activeTaskHtml += `
           <div>
