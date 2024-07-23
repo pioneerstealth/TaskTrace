@@ -29,7 +29,7 @@ const firebaseConfig = {
   storageBucket: "task-trace.appspot.com",
   messagingSenderId: "542109212256",
   appId: "1:542109212256:web:a54bd96c131eff4a152d05",
-  measurementId: "G-MZNCSCVN54"
+  measurementId: "G-MZNCSCVN54",
 };
 
 // Initialize Firebase app
@@ -62,11 +62,12 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 function getTableData() {
-  const table = document.querySelector('table');
+  const table = document.querySelector("table");
   const rows = table.getElementsByTagName("tr");
   const data = [];
 
-  for (let i = 1; i < rows.length; i++) { // Skip the header row
+  for (let i = 1; i < rows.length; i++) {
+    // Skip the header row
     const cells = rows[i].getElementsByTagName("td");
     const rowData = {
       id: cells[0].textContent,
@@ -85,102 +86,64 @@ function getTableData() {
 const completeTaskBtn = document.getElementById("taskcomplete");
 console.log(completeTaskBtn);
 completeTaskBtn.addEventListener("click", async () => {
-    console.log("inside completetask");
-    
-    // Get table data
-    const newTableData = getTableData();
-    console.log("New Table Data:", newTableData);
+  console.log("inside completetask");
 
-    // Get task ID from the current active task
-    
+  // Get table data
+  const newTableData = getTableData();
+  console.log("New Table Data:", newTableData);
 
-    // Check if task ID exists
-    if (!taskId) {
-        throw new Error("No active task found");
-    }
+  // Get task ID from localStorage
+  const taskId = localStorage.getItem("taskId");
+  console.log("taskid", taskId);
 
-    try {
-        // Get a reference to the Firestore document
-        const taskDocRef = doc(db, "tasks", taskId);
-
-        // Get the current data from the document
-        const taskDoc = await getDoc(taskDocRef);
-        if (!taskDoc.exists()) {
-            throw new Error("Task document not found in Firestore");
-        }
-
-        const currentData = taskDoc.data();
-        const currentStudents = currentData.students || [];
-
-        // Merge current data with new data
-        const updatedStudents = currentStudents.map(student => {
-            const newStudentData = newTableData.find(newData => newData.id === student.id);
-            return newStudentData ? { ...student, ...newStudentData } : student;
-        });
-
-        // Add any new students that were not in the current list
-        newTableData.forEach(newStudentData => {
-            if (!currentStudents.some(student => student.id === newStudentData.id)) {
-                updatedStudents.push(newStudentData);
-            }
-        });
-
-        // Update the document with the merged data
-        await updateDoc(taskDocRef, {
-            students: updatedStudents,
-            status: "completed",
-          
-        });
-
-        let totalTime = 0;
-        let studentCount = 0;
-        updatedStudents.forEach(student => {
-            if (student.timeTaken && student.timeTaken !== "00:00:00") {
-                totalTime += parseTimeToMilliseconds(student.timeTaken);
-                studentCount++;
-            }
-        });
-        
-        const avgTimeInMilliseconds = studentCount > 0 ? totalTime / studentCount : 0;
-        
-        // Update the document with the merged data and average time
-        await updateDoc(taskDocRef, {
-            students: updatedStudents,
-            status: "completed",
-            avgTime: avgTimeInMilliseconds
-        });
-
-        // Clear localStorage after successful update
-        localStorage.clear();
-        console.log("Task updated successfully with table data.");
-    } catch (error) {
-        console.error("Error updating task document:", error);
-    }
-});
-
-
-function parseTimeToMilliseconds(timeString) {
-  const timeParts = timeString.split(':').map(Number); // Split the string by ':' and convert each part to a number
-  let milliseconds = 0;
-
-  if (timeParts.length === 3) {
-    // Format: hh:mm:ss
-    milliseconds += timeParts[0] * 60 * 60 * 1000; // Hours to milliseconds
-    milliseconds += timeParts[1] * 60 * 1000;      // Minutes to milliseconds
-    milliseconds += timeParts[2] * 1000;           // Seconds to milliseconds
-  } else if (timeParts.length === 2) {
-    // Format: mm:ss
-    milliseconds += timeParts[0] * 60 * 1000;      // Minutes to milliseconds
-    milliseconds += timeParts[1] * 1000;           // Seconds to milliseconds
-  } else if (timeParts.length === 1) {
-    // Format: ss
-    milliseconds += timeParts[0] * 1000;           // Seconds to milliseconds
+  // Check if task ID exists
+  if (!taskId) {
+    throw new Error("Task ID not found in localStorage");
   }
-  console.log(milliseconds);
-  return milliseconds;
 
-}
+  try {
+    // Get a reference to the Firestore document
+    const taskDocRef = doc(db, "tasks", taskId);
 
+    // Get the current data from the document
+    const taskDoc = await getDoc(taskDocRef);
+    if (!taskDoc.exists()) {
+      throw new Error("Task document not found in Firestore");
+    }
+
+    const currentData = taskDoc.data();
+    const currentStudents = currentData.students || [];
+
+    // Merge current data with new data
+    const updatedStudents = currentStudents.map((student) => {
+      const newStudentData = newTableData.find(
+        (newData) => newData.id === student.id
+      );
+      return newStudentData ? { ...student, ...newStudentData } : student;
+    });
+
+    // Add any new students that were not in the current list
+    newTableData.forEach((newStudentData) => {
+      if (
+        !currentStudents.some((student) => student.id === newStudentData.id)
+      ) {
+        updatedStudents.push(newStudentData);
+      }
+    });
+
+    // Update the document with the merged data
+    await updateDoc(taskDocRef, {
+      students: updatedStudents,
+      status: "completed",
+    });
+
+    // Clear localStorage after successful update
+    localStorage.clear();
+    console.log("Task updated successfully with table data.");
+  } catch (error) {
+    console.error("Error updating task document:", error);
+  }
+});
 
 document.addEventListener("DOMContentLoaded", async () => {
   // console.log((localStorage.getItem('timerEndTime')-Date.now())>0)
@@ -190,13 +153,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     tableContainer.classList.add("fadeIn");
     timerSection.classList.add("scaleUpFromBottom");
     const batchData = localStorage.getItem("batch");
-    fetchStudents(batchData);
+    const taskId = localStorage.getItem("taskId");
+    const students = await fetchRefreshStudents(taskId);
+    renderStudents(students);
     initializeTimer();
   }
   document.getElementById("imagePopup").style.display = "none";
   await fetchBatches(); // Fetch and display batches on page load
-  // Other event listeners and functionality remain 
+  // Other event listeners and functionality remain
 });
+
+async function fetchRefreshStudents(taskId) {
+  // Reference to the Firestore document
+  const taskDocRef = doc(db, "tasks", taskId);
+  
+  try {
+    // Fetch the document data
+    const taskDoc = await getDoc(taskDocRef);
+    
+    // Check if the document exists
+    if (taskDoc.exists()) {
+      const taskData = taskDoc.data();
+      return taskData.students;
+    } else {
+      console.log("No such document!");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching document: ", error);
+    return [];
+  }
+}
+
 
 const tagNameInput = document.getElementById("tagName");
 const tagNameSuggestions = document.getElementById("tagNameSuggestions");
@@ -264,11 +252,13 @@ button.addEventListener("click", async () => {
   timerSection.classList.add("scaleUpFromBottom");
   const selectedBatchId = document.getElementById("batchSelect").value;
   const taskName = document.getElementById("taskName").value;
-  localStorage.setItem("taskName",taskName);
+  localStorage.setItem("taskName", taskName);
   const tagName = document.getElementById("tagName").value;
   const taskDescription = document.getElementById("taskDescription").value;
   const time = document.getElementById("time").value;
-  const reductionPercentage = document.getElementById("reductionPercentage").value;
+  const reductionPercentage = document.getElementById(
+    "reductionPercentage"
+  ).value;
   localStorage.setItem("reductionPercentage", reductionPercentage);
   console.log(reductionPercentage);
   const timeToReduce = document.getElementById("timeToReduce").value;
@@ -291,64 +281,6 @@ button.addEventListener("click", async () => {
     console.log("Task name and description are required.");
   }
 });
-
-// Time Recommendation
-const timeRecommendation = document.getElementById('timeRecommendation');
-
-// Function to get and display the time recommendation
-async function updateTimeRecommendation() {
-  const tagName = tagNameInput.value.trim();
-  
-  if (tagName) {
-    timeRecommendation.textContent = 'Calculating recommendation...';
-    const recommendation = await getTimeRecommendation(tagName);
-    timeRecommendation.textContent = recommendation;
-  } else {
-    timeRecommendation.textContent = '';
-  }
-}
-
-// Add event listeners
-tagNameInput.addEventListener('blur', updateTimeRecommendation);
-tagNameInput.addEventListener('keypress', (event) => {
-  if (event.key === 'Enter') {
-    updateTimeRecommendation();
-  }
-});
-
-// Existing getTimeRecommendation and getAverageTimeForTag functions remain the same
-async function getAverageTimeForTag(tagName) {
-  const querySnapshot = await getDocs(query(collection(db, 'tasks'), where('tagName', '==', tagName)));
-  
-  let totalTime = 0;
-  let taskCount = 0;
-
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    if (data.avgTime) {
-      totalTime += data.avgTime;
-      taskCount++;
-    }
-  });
-
-  return taskCount > 0 ? totalTime / taskCount : null;
-}
-
-async function getTimeRecommendation(tagName) {
-  const avgTimeInMilliseconds = await getAverageTimeForTag(tagName);
-  
-  if (avgTimeInMilliseconds === null) {
-    return "No data available for this tag. Please set an appropriate time.";
-  }
-
-  const avgMinutes = Math.round(avgTimeInMilliseconds / (60 * 1000));
-  const recommendedTime = avgMinutes.toFixed(2); // Round up to nearest 5 minutes
-
-  return `Based on previous tasks, the recommended time for this tag is ${recommendedTime} minutes.`;
-}
-
-
-
 
 async function fetchBatches() {
   const batchRef = collection(db, "batches");
@@ -465,6 +397,61 @@ function setupPagination() {
     paginationContainer.appendChild(pageButton);
   }
 }
+const timeRecommendation = document.getElementById("timeRecommendation");
+
+// Function to get and display the time recommendation
+async function updateTimeRecommendation() {
+  const tagName = tagNameInput.value.trim();
+
+  if (tagName) {
+    timeRecommendation.textContent = "Calculating recommendation...";
+    const recommendation = await getTimeRecommendation(tagName);
+    timeRecommendation.textContent = recommendation;
+  } else {
+    timeRecommendation.textContent = "";
+  }
+}
+
+// Add event listeners
+tagNameInput.addEventListener("blur", updateTimeRecommendation);
+tagNameInput.addEventListener("keypress", (event) => {
+  if (event.key === "Enter") {
+    updateTimeRecommendation();
+  }
+});
+
+// Existing getTimeRecommendation and getAverageTimeForTag functions remain the same
+async function getAverageTimeForTag(tagName) {
+  const querySnapshot = await getDocs(
+    query(collection(db, "tasks"), where("tagName", "==", tagName))
+  );
+
+  let totalTime = 0;
+  let taskCount = 0;
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    if (data.avgTime) {
+      totalTime += data.avgTime;
+      taskCount++;
+    }
+  });
+
+  return taskCount > 0 ? totalTime / taskCount : null;
+}
+
+async function getTimeRecommendation(tagName) {
+  const avgTimeInMilliseconds = await getAverageTimeForTag(tagName);
+
+  if (avgTimeInMilliseconds === null) {
+    return "No data available for this tag. Please set an appropriate time.";
+  }
+
+  const avgMinutes = Math.round(avgTimeInMilliseconds / (60 * 1000));
+  const recommendedTime = avgMinutes.toFixed(2); // Round up to nearest 5 minutes
+
+  return `Based on previous tasks, the recommended time for this tag is ${recommendedTime} minutes.`;
+}
 
 function setupSearch() {
   const searchInput = document.getElementById("searchInput");
@@ -475,9 +462,10 @@ function setupSearch() {
       filteredStudents = [...allStudents];
     } else {
       // Filter students based on search term
-      filteredStudents = allStudents.filter(student => 
-        startsWithSearch(student.name.toLowerCase(), searchTerm) ||
-        startsWithSearch(student.id.toLowerCase(), searchTerm)
+      filteredStudents = allStudents.filter(
+        (student) =>
+          startsWithSearch(student.name.toLowerCase(), searchTerm) ||
+          startsWithSearch(student.id.toLowerCase(), searchTerm)
       );
     }
     currentPage = 1;
@@ -488,7 +476,7 @@ function setupSearch() {
 
 function startsWithSearch(str, search) {
   if (search.length > str.length) return false;
-  
+
   for (let i = 0; i < search.length; i++) {
     if (str[i] !== search[i]) return false;
   }
@@ -500,8 +488,12 @@ function createStudentRow(student) {
   row.innerHTML = `
     <td>${student.id}</td>
     <td>${student.name}</td>
-    <td><button class="btn btn-outline-primary status ${student.submissionStatus === 'Completed' ? 'completed' : 'pending'}">${student.submissionStatus || "Pending"}</button></td>
-    <td><button class="btn btn-outline-primary tsk-status ${student.taskStatus === 'Completed' ? 'completed' : 'pending'}">${student.taskStatus || "Pending"}</button></td>
+    <td><button class="btn btn-outline-primary status ${
+      student.submissionStatus === "Completed" ? "completed" : "pending"
+    }">${student.submissionStatus || "Pending"}</button></td>
+    <td><button class="btn btn-outline-primary tsk-status ${
+      student.taskStatus === "Completed" ? "completed" : "pending"
+    }">${student.taskStatus || "Pending"}</button></td>
     <td class="timer">${student.timeTaken || "00:00:00"}</td>
     <td class="marks">${student.marks || "0"}</td>
     <td><span class="edit-icon"><i class="fa-regular fa-pen-to-square"></i></span></td>
@@ -511,48 +503,41 @@ function createStudentRow(student) {
 }
 
 function addStatusButtonFunctionality(row, student) {
-
   if (student == null) {
-    console.error('student is null');
+    console.error("student is null");
     return;
-}
+  }
+
   const statusButton = row.querySelector(".status");
   const tskStatus = row.querySelector(".tsk-status");
   const time = row.querySelector(".timer");
   const marksContent = row.querySelector(".marks");
   const taskId = localStorage.getItem("taskId");
-  const taskDocRef = doc(db, "tasks", taskId);
+
+  if (!taskId) {
+    console.error("taskId is null or undefined");
+    return;
+  }
+
+  let taskDocRef;
+  try {
+    taskDocRef = doc(db, "tasks", taskId);
+  } catch (error) {
+    console.error("Error creating document reference:", error);
+    return;
+  }
+
   
+
   // Set initial state based on database data
   if (student.submissionStatus === "Completed") {
     statusButton.classList.remove("pending");
     statusButton.classList.add("completed");
     statusButton.disabled = true;
-    time.textContent = student.timeTaken;
-    if(parseInt(student.marks) == 0 && student.timeTaken == "00:00:00"){
 
-      const currentTime = Date.now();
-      const startTime = parseInt(localStorage.getItem("StartTime"));
-      const endTime = startTime + parseInt(localStorage.getItem("totalSeconds")) * 1000;
-      const reductionPercentage = parseInt(localStorage.getItem("reductionPercentage"));
-      const maxMarks = parseInt(localStorage.getItem("maxMarks"));
-      
-      const customInterval = localStorage.getItem("timeToReduce");
-      const [hours, minutes, seconds] = customInterval.split(":").map(part => parseInt(part, 10));
-      const customIntervalMillis = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
-      
-      const timeTaken = formatTime(currentTime - startTime);
-      let marks = maxMarks;
-      
-      if (currentTime > endTime && reductionPercentage > 0) {
-        const millisLate = currentTime - endTime;
-        const intervalsLate = Math.floor(millisLate / customIntervalMillis);
-        const deductions = intervalsLate * (reductionPercentage * maxMarks / 100);
-        marks = Math.max(0, maxMarks - deductions);
-      }
-      
-      time.textContent = timeTaken;
-      marksContent.textContent = marks;
+    time.textContent = student.timeTaken;
+    if (parseInt(student.marks) == 0 && student.timeTaken == "00:00:00") {
+      updateCompletedStatus();
     }
   }
 
@@ -562,71 +547,109 @@ function addStatusButtonFunctionality(row, student) {
   }
 
   statusButton.addEventListener("click", async function () {
-    const currentTime = Date.now();
-    const endTime = (parseInt(localStorage.getItem("StartTime")) + parseInt(localStorage.getItem("totalSeconds")) * 1000);
-    const reductionPercentage = parseInt(localStorage.getItem("reductionPercentage"));
-    
-    const customInterval = localStorage.getItem("timeToReduce");
-    const [hours, minutes, seconds] = customInterval.split(":").map(part => parseInt(part, 10));
-    const customIntervalMillis = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
-    
     if (this.classList.contains("pending")) {
-        this.classList.remove("pending");
-        this.classList.add("completed");
-        this.textContent = "Completed";
-        this.disabled = true;
-        const timeTaken = formatTime(Date.now() - parseInt(localStorage.getItem("StartTime")));
-        time.textContent = timeTaken;
-        let marks = parseInt(localStorage.getItem("maxMarks"));
-    
-        if (currentTime > endTime && reductionPercentage > 0) {
-            const millisLate = currentTime - endTime;
-            const intervalsLate = Math.floor(millisLate / customIntervalMillis);
-            const deductions = intervalsLate * (reductionPercentage * marks / 100);
-            marks = Math.max(0, marks - deductions);
-        }
-        marksContent.textContent = marks;
-
-        const updatedFields = {
-          submissionStatus: "Completed",
-          marks: marks.toString(),
-          timeTaken: timeTaken
-      };
-      
-      const updatedStudent = await updateStudentData(taskDocRef, student.id, updatedFields);
-      Object.assign(student, updatedStudent);
-    } 
+      await updateSubmissionStatus("Completed");
+    }
   });
 
   tskStatus.addEventListener("click", async function () {
     if (this.classList.contains("pending")) {
-      this.classList.remove("pending");
-      this.classList.add("completed");
-      this.textContent = "Completed";
-
-      const updatedFields = {
-        taskStatus: "Completed"
-    };
-
-    const updatedStudent = await updateStudentData(taskDocRef, student.id, updatedFields);
-    Object.assign(student, updatedStudent);
-      // Update database
-      
+      await updateTaskStatus("Completed");
     } else {
-      this.classList.remove("completed");
-      this.classList.add("pending");
-      this.textContent = "Pending";
+      await updateTaskStatus("Pending");
+    }
+  });
 
-      // Update database
-      const updatedFields = {
-        taskStatus: "Pending"
-    };
+  async function updateSubmissionStatus(status) {
+    const currentTime = Date.now();
+    const startTime = parseInt(localStorage.getItem("StartTime"));
+    const endTime =
+      startTime + parseInt(localStorage.getItem("totalSeconds")) * 1000;
+    const reductionPercentage = parseInt(
+      localStorage.getItem("reductionPercentage")
+    );
+    const maxMarks = parseInt(localStorage.getItem("maxMarks"));
+    const customInterval = localStorage.getItem("timeToReduce");
+    const [hours, minutes, seconds] = customInterval
+      .split(":")
+      .map((part) => parseInt(part, 10));
+    const customIntervalMillis =
+      (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
 
-    const updatedStudent = await updateStudentData(taskDocRef, student.id, updatedFields);
-    Object.assign(student, updatedStudent);
+    const timeTaken = formatTime(currentTime - startTime);
+    let marks = maxMarks;
+
+    if (currentTime > endTime && reductionPercentage > 0) {
+      const millisLate = currentTime - endTime;
+      const intervalsLate = Math.floor(millisLate / customIntervalMillis);
+      const deductions =
+        intervalsLate * ((reductionPercentage * maxMarks) / 100);
+      marks = Math.max(0, maxMarks - deductions);
     }
 
-  });
+    statusButton.classList.remove("pending");
+    statusButton.classList.add("completed");
+    statusButton.textContent = "Completed";
+    statusButton.disabled = true;
+    time.textContent = timeTaken;
+    marksContent.textContent = marks;
+
+    const updatedFields = {
+      submissionStatus: status,
+      marks: marks.toString(),
+      timeTaken: timeTaken,
+    };
+
+    await updateStudentData(taskDocRef, student.id, updatedFields);
+  }
+
+  async function updateTaskStatus(status) {
+    tskStatus.classList.toggle("pending", status === "Pending");
+    tskStatus.classList.toggle("completed", status === "Completed");
+    tskStatus.textContent = status;
+
+    const updatedFields = { taskStatus: status };
+    await updateStudentData(taskDocRef, student.id, updatedFields);
+  }
+
+  async function updateCompletedStatus() {
+    const currentTime = Date.now();
+    const startTime = parseInt(localStorage.getItem("StartTime"));
+    const endTime =
+      startTime + parseInt(localStorage.getItem("totalSeconds")) * 1000;
+    const reductionPercentage = parseInt(
+      localStorage.getItem("reductionPercentage")
+    );
+    const maxMarks = parseInt(localStorage.getItem("maxMarks"));
+    const customInterval = localStorage.getItem("timeToReduce");
+    const [hours, minutes, seconds] = customInterval
+      .split(":")
+      .map((part) => parseInt(part, 10));
+    const customIntervalMillis =
+      (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
+
+    const timeTaken = formatTime(currentTime - startTime);
+    let marks = maxMarks;
+
+    if (currentTime > endTime && reductionPercentage > 0) {
+      const millisLate = currentTime - endTime;
+      const intervalsLate = Math.floor(millisLate / customIntervalMillis);
+      const deductions =
+        intervalsLate * ((reductionPercentage * maxMarks) / 100);
+      marks = Math.max(0, maxMarks - deductions);
+    }
+
+    time.textContent = timeTaken;
+    marksContent.textContent = marks;
+
+    const updatedFields = {
+      marks: marks.toString(),
+      timeTaken: timeTaken,
+    };
+
+    await updateStudentData(taskDocRef, student.id, updatedFields);
+  }
+  
 }
 
 async function updateStudentData(taskDocRef, studentId, updatedFields) {
@@ -640,7 +663,7 @@ async function updateStudentData(taskDocRef, studentId, updatedFields) {
     const currentStudents = currentData.students || [];
 
     // Update the fields for the specific student
-    const updatedStudents = currentStudents.map(student => {
+    const updatedStudents = currentStudents.map((student) => {
       if (student.id === studentId) {
         return { ...student, ...updatedFields };
       }
@@ -649,11 +672,11 @@ async function updateStudentData(taskDocRef, studentId, updatedFields) {
 
     // Update the document with the new data
     await updateDoc(taskDocRef, {
-      students: updatedStudents
+      students: updatedStudents,
     });
 
     console.log(`Data updated for student ${studentId}`);
-    return updatedStudents.find(student => student.id === studentId);
+    return updatedStudents.find((student) => student.id === studentId);
   } catch (error) {
     console.error("Error updating student data:", error);
     throw error;
@@ -709,7 +732,7 @@ async function updateStudentMarks(row, newMarks) {
     const currentStudents = currentData.students || [];
 
     // Update the marks for the specific student
-    const updatedStudents = currentStudents.map(student => {
+    const updatedStudents = currentStudents.map((student) => {
       if (student.id === studentId) {
         return { ...student, marks: newMarks };
       }
@@ -718,7 +741,7 @@ async function updateStudentMarks(row, newMarks) {
 
     //Update the document with the new data
     await updateDoc(taskDocRef, {
-      students: updatedStudents
+      students: updatedStudents,
     });
 
     console.log(`Marks updated for student ${studentId}`);
@@ -770,31 +793,31 @@ async function createTask(
     if (!userDoc.exists()) {
       throw new Error("User document not found");
     }
-    localStorage.setItem("StartTime",Date.now());
-    localStorage.setItem(taskName,true);
+    localStorage.setItem("StartTime", Date.now());
+    localStorage.setItem(taskName, true);
     const userData = userDoc.data();
     if (userData.role !== "admin") {
       throw new Error("User is not authorized to create tasks");
     }
 
     const taskData = {
-      status:"active",
+      status: "active",
       name: taskName,
       tagName: tagName,
       time: time,
-      totaltime:time,
+      totaltime: time,
       maxMarks: maxMarks,
       description: taskDescription,
       batchId: batchId,
       createdBy: currentUser.uid,
       createdAt: new Date(),
-      students:[]
+      students: [],
     };
 
     const taskDocRef = await addDoc(collection(db, "tasks"), taskData);
     taskId = taskDocRef.id;
-    console.log("taskId",taskId);
-    localStorage.setItem("taskId",taskId);
+    console.log("taskId", taskId);
+    localStorage.setItem("taskId", taskId);
     console.log(localStorage.getItem("taskId"));
 
     listenForTaskUpdates();
@@ -810,7 +833,7 @@ async function createTask(
 
     const batchData = batchDoc.data();
     console.log(batchData.members);
-    const students = batchData.members.map(student => ({
+    const students = batchData.members.map((student) => ({
       id: student.id,
       name: student.name,
       email: student.email,
@@ -818,16 +841,16 @@ async function createTask(
       taskStatus: "Pending",
       timeTaken: "00:00:00",
       marks: student.marks || "0",
-      imgurl: student.imgurl || "https://via.placeholder.com/50"
+      imgurl: student.imgurl || "https://via.placeholder.com/50",
     }));
 
     // Update the task document with the fetched students
     await updateDoc(taskDocRef, { students: students });
 
-      leftPanel.classList.add("cardFlip");
-      rightPanel.classList.add("slideOutRight");
-      tableContainer.classList.add("fadeIn");
-      timerSection.classList.add("scaleUpFromBottom");
+    leftPanel.classList.add("cardFlip");
+    rightPanel.classList.add("slideOutRight");
+    tableContainer.classList.add("fadeIn");
+    timerSection.classList.add("scaleUpFromBottom");
   } catch (error) {
     console.error("Error creating task:", error);
   }
@@ -854,9 +877,11 @@ function startTimer() {
     startTimerClock();
   } else {
     const timevalue = time.value;
-    const [hours, minutes, seconds] = timevalue.split(":").map(part => parseInt(part, 10));
+    const [hours, minutes, seconds] = timevalue
+      .split(":")
+      .map((part) => parseInt(part, 10));
     const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    localStorage.setItem("totalSeconds",totalSeconds);
+    localStorage.setItem("totalSeconds", totalSeconds);
     const endTime = Date.now() + totalSeconds * 1000;
     localStorage.setItem("timerEndTime", endTime);
     startTimerClock();
@@ -886,7 +911,9 @@ function startTimerClock() {
 
       updateClock(hours, minutes, seconds);
 
-      const flipClockContainer = document.querySelector(".flip-clock-container");
+      const flipClockContainer = document.querySelector(
+        ".flip-clock-container"
+      );
       if (timeLeft <= 60000) {
         flipClockContainer.classList.add("red");
       } else {
@@ -899,7 +926,6 @@ function startTimerClock() {
   window.timerInterval = setInterval(updateTimer, 1000);
   updateTimer(); // Call immediately to avoid delay
 }
-
 
 function formatTime(ms) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -914,30 +940,27 @@ function formatTime(ms) {
 
 const exportBtn = document.getElementById("exportBtn");
 
-exportBtn.addEventListener('click',()=>{
-  console.log(`Downloading task data for batch: ${taskName.value}`);
-  const formattedData = allStudents.map((student) => {
-    const { id, name,  marks, submissionStatus, taskStatus, timeTaken } = student;
-    return { id, name,  marks, submissionStatus, taskStatus, timeTaken };
-  });
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.json_to_sheet(formattedData);
-  XLSX.utils.book_append_sheet(wb, ws, "Task Data");
-  XLSX.writeFile(wb, `${taskName.value}_taskData.xlsx`);
-})
-
-const extendTimeBtn = document.querySelector('.extend-time-btn');
-const submitTime= document.getElementById('submitTime');
-const popup = document.getElementById('popup-extend');
-const timeInput = document.getElementById('timeToExtend');
-extendTimeBtn.addEventListener('click', () => {
-            popup.style.display = 'block';
+exportBtn.addEventListener("click", () => {
+  const table = document.querySelector("table");
+  const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+  XLSX.writeFile(wb, "" + taskName.value + ".xlsx");
 });
 
-submitTime.addEventListener('click', async () => {
+const extendTimeBtn = document.querySelector(".extend-time-btn");
+const submitTime = document.getElementById("submitTime");
+const popup = document.getElementById("popup-extend");
+const timeInput = document.getElementById("timeToExtend");
+extendTimeBtn.addEventListener("click", () => {
+  popup.style.display = "block";
+});
+
+submitTime.addEventListener("click", async () => {
   const time = timeInput.value;
-  const [hours, minutes, seconds] = time.split(":").map(part => parseInt(part, 10));
-  const customIntervalMillis = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
+  const [hours, minutes, seconds] = time
+    .split(":")
+    .map((part) => parseInt(part, 10));
+  const customIntervalMillis =
+    (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
 
   if (customIntervalMillis) {
     let currentEndTime = parseInt(localStorage.getItem("timerEndTime"));
@@ -950,21 +973,25 @@ submitTime.addEventListener('click', async () => {
     const taskDocRef = doc(db, "tasks", taskId);
 
     // Update the total seconds in localStorage
-    const totalSeconds = parseInt(localStorage.getItem("totalSeconds") || "0") + customIntervalMillis / 1000;
+    const totalSeconds =
+      parseInt(localStorage.getItem("totalSeconds") || "0") +
+      customIntervalMillis / 1000;
     localStorage.setItem("totalSeconds", totalSeconds);
 
     // Retrieve and update the time extensions array in localStorage
-    const timeExtensions = JSON.parse(localStorage.getItem("timeExtensions")) || [];
-    timeExtensions.push({ extension: customIntervalMillis, timestamp: Date.now() });
+    const timeExtensions =
+      JSON.parse(localStorage.getItem("timeExtensions")) || [];
+    timeExtensions.push({
+      extension: customIntervalMillis,
+      timestamp: Date.now(),
+    });
     localStorage.setItem("timeExtensions", JSON.stringify(timeExtensions));
 
-    
-    
     // Update the new end time in Firestore
-    await updateDoc(taskDocRef, { 
+    await updateDoc(taskDocRef, {
       newEndTime: newEndTime,
-      totaltime:formatTime(totalSeconds*1000),
-      noOfExtensions:timeExtensions.length // Save the array of extensions to Firestore
+      totaltime: formatTime(totalSeconds * 1000),
+      noOfExtensions: timeExtensions.length, // Save the array of extensions to Firestore
     });
 
     console.log("New End Time: " + formatTime(newEndTime - Date.now()));
@@ -978,13 +1005,13 @@ submitTime.addEventListener('click', async () => {
   }
 
   // Hide the popup and clear the time input field
-  popup.style.display = 'none';
-  timeInput.value = '';
+  popup.style.display = "none";
+  timeInput.value = "";
 });
 
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup) {
-                popup.style.display = 'none';
-                timeInput.value = '';
-            }
-        });
+popup.addEventListener("click", (e) => {
+  if (e.target === popup) {
+    popup.style.display = "none";
+    timeInput.value = "";
+  }
+});
