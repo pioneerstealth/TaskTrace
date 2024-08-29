@@ -373,14 +373,14 @@ function listenForTaskUpdates() {
 
   const taskDocRef = doc(db, "tasks", taskId);
 
-  onSnapshot(taskDocRef, (taskDoc) => {
+  onSnapshot(taskDocRef, async (taskDoc) => {
     if (!taskDoc.exists()) {
       console.log("No data found for task ID:", taskId);
       return;
     }
 
     console.log("Task data found. Rendering students...");
-    const taskData = taskDoc.data();
+    const taskData = await taskDoc.data();
     renderStudents(taskData.students);
   });
 }
@@ -623,7 +623,7 @@ function addStatusButtonFunctionality(row, student) {
 
     if (currentTime > endTime && reductionPercentage > 0) {
       const millisLate = currentTime - endTime;
-      const intervalsLate = Math.floor(millisLate / customIntervalMillis);
+      const intervalsLate = Math.ceil(millisLate / customIntervalMillis);
       const deductions =
         intervalsLate * ((reductionPercentage * maxMarks) / 100);
       marks = Math.max(0, maxMarks - deductions);
