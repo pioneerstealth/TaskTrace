@@ -1032,7 +1032,7 @@ exportBtn.addEventListener("click", exporttoexcel);
   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
   // Write the workbook to a file
-  XLSX.writeFile(wb, taskName.value + ".xlsx");
+  XLSX.writeFile(wb, taskName + ".xlsx");
 };
 
 const extendTimeBtn = document.querySelector(".extend-time-btn");
