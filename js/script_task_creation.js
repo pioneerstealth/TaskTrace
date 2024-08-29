@@ -983,10 +983,28 @@ function formatTime(ms) {
 
 const exportBtn = document.getElementById("exportBtn");
 
-exportBtn.addEventListener("click", () => {
-  const table = document.querySelector("table");
-  const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-  XLSX.writeFile(wb, "" + taskName.value + ".xlsx");
+exportBtn.addEventListener("click", async () => {
+  const allStudentsData = await fetchRefreshStudents(localStorage.getItem("taskId"));
+
+  const rearrangedData = allStudentsData.map(student => ({
+    id: student.id,
+    name: student.name,
+    email: student.email,
+    submissionStatus: student.submissionStatus,
+    taskStatus: student.taskStatus,
+    timeTaken: student.timeTaken,
+    marks: student.marks,
+    imgurl: student.imgurl,
+  }));
+  // Create a worksheet from the student data
+  const ws = XLSX.utils.json_to_sheet(rearrangedData);
+
+  // Create a new workbook and append the worksheet
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+  // Write the workbook to a file
+  XLSX.writeFile(wb, taskName.value + ".xlsx");
 });
 
 const extendTimeBtn = document.querySelector(".extend-time-btn");

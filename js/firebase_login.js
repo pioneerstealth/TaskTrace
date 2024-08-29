@@ -119,6 +119,49 @@
       console.log("User not signed in.");
     }
   }
+  
+  document.getElementById("signUp_form").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent the form from submitting
+  
+    // Get form elements
+    const fullName = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email_input_signUp").value.trim();
+    const password = document.getElementById("password_input_signUp").value.trim();
+  
+    // Regular expressions for validation
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  
+    // Validation flags
+    let valid = true;
+  
+    // Validate Name
+    if (fullName === "") {
+      alert("Name is required.");
+      valid = false;
+    }
+  
+    // Validate Email
+    if (!emailPattern.test(email)) {
+      alert("Please enter a valid email address.");
+      valid = false;
+    }
+  
+    // Validate Password
+    if (!passwordPattern.test(password)) {
+      alert("Password must be at least 8 characters long, and include at least one uppercase letter, one lowercase letter, and one number.");
+      valid = false;
+    }
+  
+    // If valid, submit the form or perform further actions
+    if (valid) {
+      alert("Form submitted successfully!");
+      // You can proceed with form submission or further processing
+      // For example, you could send the data to your server here
+      // document.getElementById("signUp_form").submit();
+    }
+  });
+  
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
