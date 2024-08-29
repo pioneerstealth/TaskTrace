@@ -60,7 +60,7 @@
           const userData = docSnap.data();
           const role = userData.role;
           if (role === 'admin') {
-            window.location.href = "index.html";
+            window.location.href = "home.html";
           } else {
             window.location.href = "userhub.html";
           }

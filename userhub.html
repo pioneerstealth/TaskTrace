@@ -6,8 +6,20 @@
     <link rel="icon" href="./assets/images/tasktrace_logo1.png" type="image/png" />
     <title>User Hub</title>
     <link rel="stylesheet" href="css/userhub.css">
+    <script  defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body>
+    <style>
+        #pdfCanvas {
+            border: 1px solid black;
+            width: 30%;
+            height: auto;
+        }
+        .fileupload{
+            display: none;
+        }
+
+    </style>
     <div class="container">
         <div class="navbar_log_sign">
             <div class="logo_title">
@@ -74,8 +86,13 @@
             <div class="task-title"></div>
             <div class="description"></div>
             <div class="image-section">
-                Image Name <input id="namebox" type="text"> <br><br>
-                <img id="myimg"> <label id="UpProgress"></label><br><br>
+                
+                <form id="pdfForm">
+                    Image Name <input id="namebox" type="text"> <br><br>
+                    <input  class="fileupload" type="file" id="uploadPDF" accept="image/*,.pdf" />
+                    <label id="UpProgress"></label><br><br>
+                </form>
+                <canvas id="pdfCanvas" style="display: none;"></canvas><br><br>
             </div>
             <button id="select" href="">SELECT</button>
             <button id="submit" href="">SUBMIT</button>

@@ -46,20 +46,84 @@ let reader = new FileReader();
 
 // Selection process
 document.getElementById("select").onclick = function (e) {
-  const input = document.createElement("input");
+  const input = document.getElementById('uploadPDF');
   input.id = "fileinput";
   input.type = "file";
   input.click();
 
   input.onchange = (e) => {
-    files = e.target.files;
-    reader = new FileReader();
-    reader.onload = function () {
-      document.getElementById("myimg").src = reader.result;
+    const file = input.files[0];
+    files[0] =file;
+    console.log(files.length);
+
+    if (file && file.type === 'application/pdf') {
+        const fileURL = URL.createObjectURL(file);
+        document.getElementById('pdfCanvas').style="display:block";
+        renderPDF(fileURL);
+    } 
+    else if (file && file.type.startsWith('image/')) {
+
+      document.getElementById('pdfCanvas').style="display:block";
+      const fileURL = URL.createObjectURL(file);
+
+    // Get the canvas element and context
+    const canvas = document.getElementById('pdfCanvas');
+    const context = canvas.getContext('2d');
+
+    // Create a new Image object
+    const img = new Image();
+    img.src = fileURL;
+
+    // When the image is loaded, draw it on the canvas
+    img.onload = function() {
+        // Set canvas dimensions to match the image dimensions
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Draw the image on the canvas
+        context.drawImage(img, 0, 0);
+
+        // Clean up the object URL
+        URL.revokeObjectURL(fileURL);
     };
-    reader.readAsDataURL(files[0]);
+
+    // Handle errors
+    img.onerror = function() {
+        console.error('Failed to load the image.');
+        URL.revokeObjectURL(fileURL);
+    };
+    }
+    else {
+        alert('Please upload a valid PDF file.');
+    }
   };
 };
+
+
+function renderPDF(url) {
+  const canvas = document.getElementById('pdfCanvas');
+  const context = canvas.getContext('2d');
+
+  // Load the PDF document
+  pdfjsLib.getDocument(url).promise.then(pdf => {
+      // Fetch the first page
+      pdf.getPage(1).then(page => {
+          const viewport = page.getViewport({ scale: 1.5 });
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          // Render the page into the canvas context
+          const renderContext = {
+              canvasContext: context,
+              viewport: viewport
+          };
+          page.render(renderContext);
+      });
+  }).catch(error => {
+      console.error('Error loading PDF: ', error);
+      alert('An error occurred while loading the PDF.');
+  });
+}
 
 // Upload process
 document.getElementById("upload").onclick = function () {

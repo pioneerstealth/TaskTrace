@@ -146,6 +146,7 @@ completeTaskBtn.addEventListener("click", async () => {
         studentCount++;
       }
     });
+    
 
     const avgTimeInMilliseconds =
       studentCount > 0 ? totalTime / studentCount : 0;
@@ -164,6 +165,27 @@ completeTaskBtn.addEventListener("click", async () => {
     console.error("Error updating task document:", error);
   }
 });
+
+function parseTimeToMilliseconds(timeString) {
+  const timeParts = timeString.split(":").map(Number);
+  
+  let hours = 0, minutes = 0, seconds = 0;
+
+  if (timeParts.length === 3) {
+      [hours, minutes, seconds] = timeParts;
+  } else if (timeParts.length === 2) {
+      [minutes, seconds] = timeParts;
+  } else if (timeParts.length === 1) {
+      [seconds] = timeParts;
+  }
+
+  const totalMilliseconds =
+      (hours * 3600000) + // 1 hour = 3600000 milliseconds
+      (minutes * 60000) +  // 1 minute = 60000 milliseconds
+      (seconds * 1000);    // 1 second = 1000 milliseconds
+
+  return totalMilliseconds;
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   // console.log((localStorage.getItem('timerEndTime')-Date.now())>0)
@@ -780,6 +802,7 @@ function displayImagePopup(imageUrl) {
   const popup = document.getElementById("imagePopup");
   const popupImage = document.getElementById("popupImage");
   popupImage.src = imageUrl;
+  console.log(imageUrl);
   popup.style.display = "block";
 }
 
