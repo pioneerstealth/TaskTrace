@@ -86,6 +86,7 @@ function getTableData() {
 const completeTaskBtn = document.getElementById("taskcomplete");
 console.log(completeTaskBtn);
 completeTaskBtn.addEventListener("click", async () => {
+  exporttoexcel();
   console.log("inside completetask");
 
   // Get table data
@@ -983,7 +984,9 @@ function formatTime(ms) {
 
 const exportBtn = document.getElementById("exportBtn");
 
-exportBtn.addEventListener("click", async () => {
+exportBtn.addEventListener("click", exporttoexcel);
+  
+  async function exporttoexcel(){
   const allStudentsData = await fetchRefreshStudents(localStorage.getItem("taskId"));
 
   const rearrangedData = allStudentsData.map(student => ({
@@ -1005,7 +1008,7 @@ exportBtn.addEventListener("click", async () => {
 
   // Write the workbook to a file
   XLSX.writeFile(wb, taskName.value + ".xlsx");
-});
+};
 
 const extendTimeBtn = document.querySelector(".extend-time-btn");
 const submitTime = document.getElementById("submitTime");
