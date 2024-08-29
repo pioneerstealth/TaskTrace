@@ -32,6 +32,8 @@ const firebaseConfig = {
   measurementId: "G-MZNCSCVN54",
 };
 
+
+
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -46,12 +48,16 @@ const tableContainer = document.querySelector(
 const timerSection = document.querySelector(".timer-section");
 
 // Check if user is authenticated on page load
-onAuthStateChanged(auth, async (user) => {
+await onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
+
     // Retrieve user document from Firestore
     const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+
+    console.log(currentUser.uid);
     if (userDoc.exists() && userDoc.data().role === "admin") {
+      fetchBatches();
     } else {
       // Redirect to login/signup page if user is not admin
       window.location.href = "login_signup.html";
@@ -202,7 +208,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initializeTimer();
   }
   document.getElementById("imagePopup").style.display = "none";
-  await fetchBatches(); // Fetch and display batches on page load
+   // Fetch and display batches on page load
   // Other event listeners and functionality remain
 });
 
@@ -286,6 +292,7 @@ tagNameInput.addEventListener("input", function () {
     }
   });
 });
+let taskName;
 
 const button = document.querySelector(".create-task-button");
 button.addEventListener("click", async () => {
@@ -294,7 +301,7 @@ button.addEventListener("click", async () => {
   tableContainer.classList.add("fadeIn");
   timerSection.classList.add("scaleUpFromBottom");
   const selectedBatchId = document.getElementById("batchSelect").value;
-  const taskName = document.getElementById("taskName").value;
+  taskName = document.getElementById("taskName").value;
   localStorage.setItem("taskName", taskName);
   const tagName = document.getElementById("tagName").value;
   const taskDescription = document.getElementById("taskDescription").value;
@@ -326,30 +333,48 @@ button.addEventListener("click", async () => {
 });
 
 async function fetchBatches() {
-  const batchRef = collection(db, "batches");
-  const querySnapshot = await getDocs(batchRef);
+  try {
+    console.log("usrid"+ currentUser.uid)
+    // Reference to the batches collection
+    const batchQuery = await getDocs(
+      query(
+        collection(db, "batches"),
+        where("createdBy", "==", currentUser.uid)
+      )
+    );
+    const batchDocs = batchQuery.docs;
+    
+    
+    const batchSelect = document.getElementById("batchSelect");
 
-  const batchSelect = document.getElementById("batchSelect");
+    // Check if there are any documents returned
+    
+      // Populate the dropdown with batch names
+      batchDocs.forEach(async (doc) => {
+        const batchName = doc.data().batchName;
+        const option = document.createElement("option");
+        option.value = doc.id; // Assign batch ID as option value
+        option.textContent = batchName;
+        batchSelect.appendChild(option);
+      
 
-  querySnapshot.forEach((doc) => {
-    const batchName = doc.data().batchName;
-    const option = document.createElement("option");
-    option.value = doc.id; // Assign batch ID as option value
-    option.textContent = batchName;
-    batchSelect.appendChild(option);
-  });
+      // Add event listener to handle batch selection
+      batchSelect.addEventListener("change", async (event) => {
+        const selectedBatchId = event.target.value;
+        localStorage.setItem("batch", selectedBatchId);
+        await fetchStudents(selectedBatchId);
+      });
 
-  // Add event listener to handle batch selection
-  batchSelect.addEventListener("change", async (event) => {
-    const selectedBatchId = event.target.value;
-    localStorage.setItem("batch", selectedBatchId);
-    await fetchStudents(selectedBatchId);
-  });
-
-  // Fetch students for the initially selected batch
-  const initialBatchId = batchSelect.value; // Assuming default selected value
-  await fetchStudents(initialBatchId);
+      // Fetch students for the initially selected batch
+      const initialBatchId = batchSelect.value; // Get the first batch ID as default selection
+      localStorage.setItem("batch", initialBatchId); // Store the initially selected batch
+      await fetchStudents(initialBatchId);
+    })
+  } catch (error) {
+    console.error("Error fetching batches: ", error);
+  }
 }
+
 
 async function fetchStudents(batchId) {
   const batchRef = doc(db, "batches", batchId);
