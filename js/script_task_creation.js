@@ -319,7 +319,8 @@ button.addEventListener("click", async () => {
   const maxMarks = document.getElementById("maxMarks").value;
   localStorage.setItem("maxMarks", maxMarks);
   startTimer();
-  if (taskName && taskDescription) {
+  if (taskName!="") {
+    console.log("Upto call of create task working....");
     await createTask(
       selectedBatchId,
       taskName,
@@ -856,6 +857,7 @@ async function createTask(
   time,
   maxMarks
 ) {
+  console.log("Inside Create task");
   try {
     if (!currentUser) {
       throw new Error("User is not authenticated");
@@ -887,6 +889,8 @@ async function createTask(
       students: [],
     };
 
+    console.log("Upto firebase update working ....!");
+
     const taskDocRef = await addDoc(collection(db, "tasks"), taskData);
 
     taskId = taskDocRef.id;
@@ -902,7 +906,9 @@ async function createTask(
     // Fetch students from the batch
     const batchDocRef = doc(db, "batches", batchId);
     const batchDoc = await getDoc(batchDocRef);
+
     if (!batchDoc.exists()) {
+      console.log("batchfetchissue")
       throw new Error("Batch document not found");
     }
 
