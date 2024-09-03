@@ -297,9 +297,8 @@ let taskName;
 
 const button = document.querySelector(".create-task-button");
 button.addEventListener("click", async () => {
-  if (document.getElementById("batchSelect").value.trim() !== "" && document.getElementById("taskName").value.trim() !== "" && document.getElementById("time").value !==""&&document.getElementById("maxMarks").value!=="") {
-    button.disabled = false;
-    leftPanel.classList.add("cardFlip");
+  if (document.getElementById("batchSelect").value.trim() !== "" && document.getElementById("taskName").value.trim() !== "" && document.getElementById("time").value !==""&&document.getElementById("maxMarks").value!=="") { 
+  leftPanel.classList.add("cardFlip");
   rightPanel.classList.add("slideOutRight");
   tableContainer.classList.add("fadeIn");
   timerSection.classList.add("scaleUpFromBottom");
@@ -333,8 +332,6 @@ button.addEventListener("click", async () => {
   } else {
     console.log("Task name and description are required.");
   }
-  } else {
-    button.disabled = true;
   }
 });
 
