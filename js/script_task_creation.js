@@ -373,7 +373,7 @@ async function fetchBatches() {
       const selectedBatchId = event.target.value;
       if (selectedBatchId) {
         localStorage.setItem("batch", selectedBatchId);
-        await fetchStudents(selectedBatchId);
+        //await fetchStudents(selectedBatchId);
       }
     });
     
@@ -391,20 +391,19 @@ async function fetchBatches() {
 async function fetchStudents(batchId) {
   try {
     const studentsQuery = query(
-      collection(db, "batches", selectedBatchId, "students")
+      collection(db, "batches", batchId, "students")
     );
     const studentSnapshot = await getDocs(studentsQuery);
     // Process the studentSnapshot as needed
+    if (studentSnapshot.exists()) {
+      const students = studentSnapshot.data().members || [];
+      //renderStudents(students);
+    } else {
+      console.log("No batch found with ID:", batchId);
+      // Handle error or display message
+    }
   } catch (error) {
     console.error("Error fetching students: ", error);
-  }
-
-  if (studentSnapshot.exists()) {
-    const students = studentSnapshot.data().members || [];
-    renderStudents(students);
-  } else {
-    console.log("No batch found with ID:", batchId);
-    // Handle error or display message
   }
 }
 
