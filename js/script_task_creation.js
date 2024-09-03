@@ -541,7 +541,8 @@ async function getTimeRecommendation(tagName) {
 
 function setupSearch() {
   const searchInput = document.getElementById("searchInput");
-  searchInput.addEventListener("input", () => {
+
+  function performSearch() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     if (searchTerm === "") {
       // If search term is empty, show all students
@@ -557,6 +558,20 @@ function setupSearch() {
     currentPage = 1;
     renderPaginatedStudents();
     setupPagination();
+  }
+
+  // Perform search on input
+  searchInput.addEventListener("input", performSearch);
+
+  // Perform search when focus is lost (clicking outside the search box)
+  searchInput.addEventListener("blur", performSearch);
+
+  // Prevent form submission on Enter key
+  searchInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      performSearch();
+    }
   });
 }
 
