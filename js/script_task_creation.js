@@ -539,40 +539,47 @@ async function getTimeRecommendation(tagName) {
   return `Based on previous tasks, the recommended time for this tag is ${recommendedTime} minutes.`;
 }
 
+let currentSearchTerm = '';
+
 function setupSearch() {
   const searchInput = document.getElementById("searchInput");
 
   function performSearch() {
-    const searchTerm = searchInput.value.toLowerCase().trim();
-    if (searchTerm === "") {
-      // If search term is empty, show all students
-      filteredStudents = [...allStudents];
-    } else {
-      // Filter students based on search term
-      filteredStudents = allStudents.filter(
-        (student) =>
-          startsWithSearch(student.name.toLowerCase(), searchTerm) ||
-          startsWithSearch(student.id.toLowerCase(), searchTerm)
-      );
-    }
-    currentPage = 1;
-    renderPaginatedStudents();
-    setupPagination();
+    currentSearchTerm = searchInput.value.toLowerCase().trim();
+    filterAndRenderStudents();
   }
 
-  // Perform search on input
   searchInput.addEventListener("input", performSearch);
-
-  // Perform search when focus is lost (clicking outside the search box)
   searchInput.addEventListener("blur", performSearch);
 
-  // Prevent form submission on Enter key
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       performSearch();
     }
   });
+}
+
+function filterAndRenderStudents() {
+  if (currentSearchTerm === "") {
+    filteredStudents = [...allStudents];
+  } else {
+    filteredStudents = allStudents.filter(
+      (student) =>
+        startsWithSearch(student.name.toLowerCase(), currentSearchTerm) ||
+        startsWithSearch(student.id.toLowerCase(), currentSearchTerm)
+    );
+  }
+  currentPage = 1;
+  renderPaginatedStudents();
+  setupPagination();
+}
+
+
+
+// Call this function after any event that might affect the page state
+function refreshPageState() {
+  filterAndRenderStudents();
 }
 
 function startsWithSearch(str, search) {
