@@ -337,7 +337,7 @@ button.addEventListener("click", async () => {
 
 async function fetchBatches() {
   try {
-    console.log("usrid"+ currentUser.uid)
+    console.log("usrid is :"+ currentUser.uid)
     // Reference to the batches collection
     const batchQuery = await getDocs(
       query(
@@ -888,6 +888,7 @@ async function createTask(
     };
 
     const taskDocRef = await addDoc(collection(db, "tasks"), taskData);
+
     taskId = taskDocRef.id;
     console.log("taskId", taskId);
     localStorage.setItem("taskId", taskId);
@@ -896,6 +897,7 @@ async function createTask(
     listenForTaskUpdates();
 
     console.log("Task created successfully:", taskData);
+    //localStorage.setItem("taskStatus","active");
 
     // Fetch students from the batch
     const batchDocRef = doc(db, "batches", batchId);
