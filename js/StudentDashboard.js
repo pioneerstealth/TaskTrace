@@ -31,6 +31,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+// await onAuthStateChanged(auth, async (user) => {
+//   if (user) {
+//     currentUser = user;
+
+//     // Retrieve user document from Firestore
+//     const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+
+//     console.log(currentUser.uid);
+//     if (userDoc.exists() && userDoc.data().role === "admin") {
+//       fetchBatches();
+//     } else {
+//       // Redirect to login/signup page if user is not admin
+//       window.location.href = "login_signup.html";
+//     }
+//   } else {
+//     // Redirect to login/signup page if no user is authenticated
+//   }
+// });
 
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
@@ -43,26 +63,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   //fetch batch name and student name function----------------------------------------
   async function fetchBatchNameAndStudentName(documentId, memberId) {
+    console.log("batchid : " + documentId);
+    console.log("memberid : " + memberId);
     try {
-      const docRef = doc(db, "batches", documentId);
-      const docSnap = await getDoc(docRef);
+        const studentsQuery = query(
+            collection(db, "batches", documentId, "students")
+        );
+        const querySnapshot = await getDocs(studentsQuery);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        const batchName = data.batchName;
+        if (!querySnapshot.empty) {
+            // Assuming you want to get the first document in the snapshot
+            const docSnap = querySnapshot.docs[0]; // Get the first document
+            const data = docSnap.data();
+            const batchName = data.batchName;
 
-        // Find student name from members array
-        const member = data.members.find((member) => member.id === memberId);
-        const studentName = member ? member.name : "Student not found";
+            // Find student name from members array
+            const member = data.members.find((member) => member.id === memberId);
+            const studentName = member ? member.name : "Student not found";
 
-        first_imgHead_heading_populate(batchName, studentName);
-      } else {
-        console.log("No such document!");
-      }
+            first_imgHead_heading_populate(batchName, studentName);
+        } else {
+            console.log("No documents found!");
+        }
     } catch (error) {
-      console.error("Error getting document:", error);
+        console.error("Error getting documents:", error);
     }
-  }
+}
+
 
   // Example usage
   fetchBatchNameAndStudentName(batchId, memberId);
