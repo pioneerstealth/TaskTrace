@@ -327,6 +327,7 @@ body {
     background-color: #ffeacc;
     color: #FF9800;
     width: 5rem;
+    cursor: pointer;
 }
 
 .table-container-list-batchmates .edit-icon {

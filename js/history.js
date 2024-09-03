@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc ,query,where,
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
@@ -67,7 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchBatches() {
     try {
-      const querySnapshot = await getDocs(collection(db, 'batches'));
+      const batchQuery = query(
+        collection(db, "batches"),
+        where("createdBy", "==", currentUser.uid)
+      );
+      const querySnapshot = await getDocs(batchQuery);
       batchList.innerHTML = ''; // Clear previous batch list
       if (!querySnapshot.empty) {
         querySnapshot.forEach((doc) => {

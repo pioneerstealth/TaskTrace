@@ -203,6 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     timerSection.classList.add("scaleUpFromBottom");
     const batchData = localStorage.getItem("batch");
     const taskId = localStorage.getItem("taskId");
+    taskName= localStorage.getItem("taskName")
     const students = await fetchRefreshStudents(taskId);
     renderStudents(students);
     initializeTimer();
@@ -296,6 +297,11 @@ let taskName;
 
 const button = document.querySelector(".create-task-button");
 button.addEventListener("click", async () => {
+  if (document.getElementById("batchSelect").value.trim() !== "" && document.getElementById("taskName").value.trim() !== "" && document.getElementById("time").value !==""&&document.getElementById("maxMarks").value!=="") {
+    button.disabled = false;
+  } else {
+    button.disabled = true;
+  }
   leftPanel.classList.add("cardFlip");
   rightPanel.classList.add("slideOutRight");
   tableContainer.classList.add("fadeIn");
@@ -615,6 +621,7 @@ function addStatusButtonFunctionality(row, student) {
   }
 
   statusButton.addEventListener("click", async function () {
+    console.log("statusbtn:Pending->completed");
     if (this.classList.contains("pending")) {
       await updateSubmissionStatus("Completed");
     }
