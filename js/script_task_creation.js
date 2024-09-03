@@ -295,31 +295,69 @@ tagNameInput.addEventListener("input", function () {
 });
 let taskName;
 
+// Function to reset all input borders to their default state
+function resetBorders() {
+  const inputs = ["batchSelect", "taskName", "time", "maxMarks"];
+  inputs.forEach(id => document.getElementById(id).style.border = "");
+}
+
+// Function to validate the form
+function validateForm() {
+  resetBorders();
+  
+  const inputs = [
+    { id: "batchSelect", name: "Batch" },
+    { id: "taskName", name: "Task Name" },
+    { id: "time", name: "Time" },
+    { id: "maxMarks", name: "Max Marks" },
+    { id: "reductionPercentage", name: "reductionPercentage" }
+    
+  ];
+  
+  let isValid = true;
+  let errorMessage = "";
+
+  inputs.forEach(input => {
+    const element = document.getElementById(input.id);
+    if (element.value.trim() === "") {
+      element.style.border = "2px solid red";
+      isValid = false;
+      errorMessage += `${input.name} is required.\n`;
+    }
+  });
+
+  // if (!isValid) {
+  //   alert(errorMessage);
+  // }
+
+  return isValid;
+}
+
 const button = document.querySelector(".create-task-button");
 button.addEventListener("click", async () => {
-  if (document.getElementById("batchSelect").value.trim() !== "" && document.getElementById("taskName").value.trim() !== "" && document.getElementById("time").value !==""&&document.getElementById("maxMarks").value!=="") { 
-  leftPanel.classList.add("cardFlip");
-  rightPanel.classList.add("slideOutRight");
-  tableContainer.classList.add("fadeIn");
-  timerSection.classList.add("scaleUpFromBottom");
-  const selectedBatchId = document.getElementById("batchSelect").value;
-  taskName = document.getElementById("taskName").value;
-  localStorage.setItem("taskName", taskName);
-  const tagName = document.getElementById("tagName").value;
-  const taskDescription = document.getElementById("taskDescription").value;
-  const time = document.getElementById("time").value;
-  const reductionPercentage = document.getElementById(
-    "reductionPercentage"
-  ).value;
-  localStorage.setItem("reductionPercentage", reductionPercentage);
-  console.log(reductionPercentage);
-  const timeToReduce = document.getElementById("timeToReduce").value;
-  console.log(timeToReduce);
-  localStorage.setItem("timeToReduce", timeToReduce);
-  const maxMarks = document.getElementById("maxMarks").value;
-  localStorage.setItem("maxMarks", maxMarks);
-  startTimer();
-  if (taskName!="") {
+  if (validateForm()) {
+    leftPanel.classList.add("cardFlip");
+    rightPanel.classList.add("slideOutRight");
+    tableContainer.classList.add("fadeIn");
+    timerSection.classList.add("scaleUpFromBottom");
+
+    const selectedBatchId = document.getElementById("batchSelect").value;
+    const taskName = document.getElementById("taskName").value;
+    localStorage.setItem("taskName", taskName);
+    const tagName = document.getElementById("tagName").value;
+    const taskDescription = document.getElementById("taskDescription").value;
+    const time = document.getElementById("time").value;
+    const reductionPercentage = document.getElementById("reductionPercentage").value;
+    localStorage.setItem("reductionPercentage", reductionPercentage);
+    console.log(reductionPercentage);
+    const timeToReduce = document.getElementById("timeToReduce").value;
+    console.log(timeToReduce);
+    localStorage.setItem("timeToReduce", timeToReduce);
+    const maxMarks = document.getElementById("maxMarks").value;
+    localStorage.setItem("maxMarks", maxMarks);
+    
+    startTimer();
+    
     console.log("Upto call of create task working....");
     await createTask(
       selectedBatchId,
@@ -330,9 +368,6 @@ button.addEventListener("click", async () => {
       maxMarks
     );
     console.log(`Task created for batch: ${selectedBatchId}`);
-  } else {
-    console.log("Task name and description are required.");
-  }
   }
 });
 
@@ -873,8 +908,15 @@ function displayImagePopup(imageUrl) {
   popup.style.display = "block";
 }
 
-document.querySelector(".close").addEventListener("click", function () {
-  document.getElementById("imagePopup").style.display = "none";
+document.querySelector(".close").addEventListener("click", () => {
+  const elements = ["imagePopup", "popup-extend"];
+  
+  elements.forEach(id => {
+    const element = document.getElementById(id);
+    if (element && element.style.display !== "none") {
+      element.style.display = "none";
+    }
+  });
 });
 
 window.addEventListener("click", function (event) {
