@@ -16,9 +16,6 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  initElements,
-  initializeClock,
-  updateDigit,
   updateClock,
 } from "./timer_task_creation.js";
 // Your web app's Firebase configuration
@@ -492,10 +489,6 @@ function renderPaginatedStudents() {
     tableBody.appendChild(row);
     addStatusButtonFunctionality(row, student);
     addEditMarksFunctionality(row);
-    addViewImageFunctionality(
-      row,
-      student.imgurl || "https://via.placeholder.com/50"
-    );
   });
 }
 
@@ -612,13 +605,6 @@ function filterAndRenderStudents() {
   setupPagination();
 }
 
-
-
-// Call this function after any event that might affect the page state
-function refreshPageState() {
-  filterAndRenderStudents();
-}
-
 function startsWithSearch(str, search) {
   if (search.length > str.length) return false;
 
@@ -636,13 +622,9 @@ function createStudentRow(student) {
     <td><button class="btn btn-outline-primary status ${
       student.submissionStatus === "Completed" ? "completed" : "pending"
     }">${student.submissionStatus || "Pending"}</button></td>
-    <td><button class="btn btn-outline-primary tsk-status ${
-      student.taskStatus === "Completed" ? "completed" : "pending"
-    }">${student.taskStatus || "Pending"}</button></td>
     <td class="timer">${student.timeTaken || "00:00:00"}</td>
     <td class="marks">${student.marks || "0"}</td>
     <td><span class="edit-icon"><i class="fa-regular fa-pen-to-square"></i></span></td>
-    <td><span class="view-icon"><i class="fa-regular fa-eye"></i></span></td>
   `;
   return row;
 }
@@ -654,7 +636,6 @@ function addStatusButtonFunctionality(row, student) {
   }
 
   const statusButton = row.querySelector(".status");
-  const tskStatus = row.querySelector(".tsk-status");
   const time = row.querySelector(".timer");
   const marksContent = row.querySelector(".marks");
   const taskId = localStorage.getItem("taskId");
@@ -686,10 +667,6 @@ function addStatusButtonFunctionality(row, student) {
     }
   }
 
-  if (student.taskStatus === "Completed") {
-    tskStatus.classList.remove("pending");
-    tskStatus.classList.add("completed");
-  }
 
   statusButton.addEventListener("click", async function () {
     console.log("statusbtn:Pending->completed");
@@ -698,13 +675,6 @@ function addStatusButtonFunctionality(row, student) {
     }
   });
 
-  tskStatus.addEventListener("click", async function () {
-    if (this.classList.contains("pending")) {
-      await updateTaskStatus("Completed");
-    } else {
-      await updateTaskStatus("Pending");
-    }
-  });
 
   async function updateSubmissionStatus(status) {
     const currentTime = Date.now();
@@ -749,14 +719,7 @@ function addStatusButtonFunctionality(row, student) {
     await updateStudentData(taskDocRef, student.id, updatedFields);
   }
 
-  async function updateTaskStatus(status) {
-    tskStatus.classList.toggle("pending", status === "Pending");
-    tskStatus.classList.toggle("completed", status === "Completed");
-    tskStatus.textContent = status;
 
-    const updatedFields = { taskStatus: status };
-    await updateStudentData(taskDocRef, student.id, updatedFields);
-  }
 
   async function updateCompletedStatus() {
     const currentTime = Date.now();
@@ -895,20 +858,7 @@ async function updateStudentMarks(row, newMarks) {
     console.error("Error updating marks:", error);
   }
 }
-function addViewImageFunctionality(row, imageUrl) {
-  const viewIcon = row.querySelector(".view-icon");
-  viewIcon.addEventListener("click", function () {
-    displayImagePopup(imageUrl);
-  });
-}
 
-function displayImagePopup(imageUrl) {
-  const popup = document.getElementById("imagePopup");
-  const popupImage = document.getElementById("popupImage");
-  popupImage.src = imageUrl;
-  console.log(imageUrl);
-  popup.style.display = "block";
-}
 
 document.querySelector(".close").addEventListener("click", () => {
   const elements = ["imagePopup", "popup-extend"];
@@ -921,12 +871,6 @@ document.querySelector(".close").addEventListener("click", () => {
   });
 });
 
-window.addEventListener("click", function (event) {
-  const popup = document.getElementById("imagePopup");
-  if (event.target === popup) {
-    popup.style.display = "none";
-  }
-});
 
 // Task creation function
 async function createTask(
@@ -999,7 +943,6 @@ async function createTask(
       name: student.name,
       email: student.email,
       submissionStatus: "Pending",
-      taskStatus: "Pending",
       timeTaken: "00:00:00",
       marks: student.marks || "0",
       imgurl: student.imgurl || "https://via.placeholder.com/50",
@@ -1111,7 +1054,6 @@ exportBtn.addEventListener("click", exporttoexcel);
     name: student.name,
     email: student.email,
     submissionStatus: student.submissionStatus,
-    taskStatus: student.taskStatus,
     timeTaken: student.timeTaken,
     marks: student.marks,
     imgurl: student.imgurl,
