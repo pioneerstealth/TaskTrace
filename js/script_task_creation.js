@@ -204,6 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const batchData = localStorage.getItem("batch");
     const taskId = localStorage.getItem("taskId");
     taskName= localStorage.getItem("taskName")
+    console.log("taskName : "+taskName);
     const students = await fetchRefreshStudents(taskId);
     renderStudents(students);
     initializeTimer();
@@ -340,10 +341,11 @@ button.addEventListener("click", async () => {
     rightPanel.classList.add("slideOutRight");
     tableContainer.classList.add("fadeIn");
     timerSection.classList.add("scaleUpFromBottom");
-
     const selectedBatchId = document.getElementById("batchSelect").value;
-    const taskName = document.getElementById("taskName").value;
-    localStorage.setItem("taskName", taskName);
+    const taskNamedoc = document.getElementById("taskName");
+    localStorage.setItem("taskName", taskNamedoc.value);
+    console.log(taskNamedoc.value);
+    taskName= taskNamedoc.value;
     const tagName = document.getElementById("tagName").value;
     const taskDescription = document.getElementById("taskDescription").value;
     const time = document.getElementById("time").value;
