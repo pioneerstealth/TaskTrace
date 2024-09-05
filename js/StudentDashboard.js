@@ -63,36 +63,39 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   //fetch batch name and student name function----------------------------------------
   async function fetchBatchNameAndStudentName(documentId, memberId) {
-    console.log("batchid : " + documentId);
-    console.log("memberid : " + memberId);
+    console.log("Batch ID:", documentId);
+    console.log("Member ID:", memberId);
+
     try {
-        const studentsQuery = query(
-            collection(db, "batches", documentId, "students")
-        );
-        const querySnapshot = await getDocs(studentsQuery);
+        const batchDocRef = doc(db, "batches", documentId);
+        const batchDoc = await getDoc(batchDocRef);
 
-        if (!querySnapshot.empty) {
-            // Assuming you want to get the first document in the snapshot
-            const docSnap = querySnapshot.docs[0]; // Get the first document
-            const data = docSnap.data();
-            const batchName = data.batchName;
-
-            // Find student name from members array
-            const member = data.members.find((member) => member.id === memberId);
-            const studentName = member ? member.name : "Student not found";
-
-            first_imgHead_heading_populate(batchName, studentName);
-        } else {
-            console.log("No documents found!");
+        if (!batchDoc.exists()) {
+            console.log("Batch document does not exist!");
+            return;
         }
+
+        const data = batchDoc.data();
+        const batchName = data.batchName;
+        console.log("Batch Name:", batchName);
+
+        // Log members array
+        console.log("Members Array:", data.members);
+
+        // Find student name from members array
+        const member = data.members.find((member) => member.id === memberId);
+        const studentName = member ? member.name : "Student not found";
+        console.log("Student Name:", studentName);
+
+        first_imgHead_heading_populate(batchName, studentName);
     } catch (error) {
-        console.error("Error getting documents:", error);
+        console.error("Error getting documents:", error.message);
     }
 }
 
 
   // Example usage
-  fetchBatchNameAndStudentName(batchId, memberId);
+  await fetchBatchNameAndStudentName(batchId, memberId);
 
   // div clear function-----------------------------------------------------
 
@@ -220,19 +223,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return totalPercentage / taskCount;
   }
 
-  // const tagName = "JAVA";
-  // const studentId = memberId;
-  // calculateAverageMark(batchId, tagName, memberId)
-  //   .then((averageMark) => {
-  //     console.log(
-  //       `Average mark percentage for student ${studentId} in tag ${tagName}: ${averageMark}%`
-  //     );
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error calculating average mark percentage:", error);
-  //   });
 
-  //store tagname------------------------------
   async function fetchTagNamesByBatchId(batchId) {
     try {
       const q = query(collection(db, "tasks"), where("batchId", "==", batchId));
