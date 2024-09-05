@@ -76,9 +76,8 @@ function getTableData() {
       id: cells[0].textContent,
       name: cells[1].textContent,
       submissionStatus: cells[2].querySelector("button").textContent,
-      taskStatus: cells[3].querySelector("button").textContent,
-      timeTaken: cells[4].textContent,
-      marks: cells[5].textContent,
+      timeTaken: cells[3].textContent,
+      marks: cells[4].textContent,
     };
     data.push(rowData);
   }
@@ -349,7 +348,7 @@ button.addEventListener("click", async () => {
     const reductionPercentage = document.getElementById("reductionPercentage").value;
     localStorage.setItem("reductionPercentage", reductionPercentage);
     console.log(reductionPercentage);
-    const timeToReduce = document.getElementById("timeToReduce").value;
+    const timeToReduce = document.getElementById("timeToReduce").value === ""? "00:00:00":document.getElementById("timeToReduce").value;
     console.log(timeToReduce);
     localStorage.setItem("timeToReduce", timeToReduce);
     const maxMarks = document.getElementById("maxMarks").value;
@@ -945,7 +944,6 @@ async function createTask(
       submissionStatus: "Pending",
       timeTaken: "00:00:00",
       marks: student.marks || "0",
-      imgurl: student.imgurl || "https://via.placeholder.com/50",
     }));
 
     // Update the task document with the fetched students
@@ -1056,7 +1054,6 @@ exportBtn.addEventListener("click", exporttoexcel);
     submissionStatus: student.submissionStatus,
     timeTaken: student.timeTaken,
     marks: student.marks,
-    imgurl: student.imgurl,
   }));
   // Create a worksheet from the student data
   const ws = XLSX.utils.json_to_sheet(rearrangedData);

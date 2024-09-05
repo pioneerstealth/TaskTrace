@@ -399,7 +399,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
     }
 
-    const overallPercentage = totalPercentage / tagNamesArray.length;
+    let overallPercentagec = totalPercentage / tagNamesArray.length;
+    const overallPercentage = Number.isNaN(overallPercentagec) ? 0 : overallPercentagec;
+
     console.log(
       `Overall average percentage for student ${memberId}: ${overallPercentage}%`
     );
