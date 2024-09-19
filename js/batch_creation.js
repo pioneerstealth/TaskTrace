@@ -57,19 +57,51 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // Enable batch creation button for admin users
+let isFileInputTriggered = false; // Flag to control file input triggering
+
+// Enable batch creation button for admin users
 function enableBatchCreation() {
   document.getElementById("createBatchButton").disabled = false;
 }
 
 // Event listener for Create Batch button
-document
-  .getElementById("createBatchButton")
-  .addEventListener("click", function () {
+document.getElementById("createBatchButton").addEventListener("click", function (event) {
+  event.preventDefault(); // Prevent default action
+  if (!isFileInputTriggered) { // Check if the file input has already been triggered
+    isFileInputTriggered = true; // Set the flag to true
     document.getElementById("fileInput").click(); // Trigger file input click event
-    showTableContainer(); // Show table container after selecting file
-  });
+    showTableContainer();
+  }
+});
 
-// Show table container
+// Event listener for file input change
+document.getElementById("fileInput").addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  if (!file) {
+    isFileInputTriggered = false; // Reset the flag if no file is selected
+    return; // Ensure a file was selected
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    const firstSheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[firstSheetName];
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    // Remove the first row from jsonData
+    const jsonDataWithoutHeader = jsonData.slice(1);
+    displayExcelData(jsonDataWithoutHeader); // Display Excel data in the table
+    document.getElementById("saveButton").style.display = "block"; // Display save button
+    document.getElementById("fileInput").value = ""; // Reset file input
+    isFileInputTriggered = false; // Reset the flag after processing the file
+  };
+
+  reader.readAsArrayBuffer(file);
+});
+
+// Show table container function
 function showTableContainer() {
   const tableContainer = document.getElementById("tableContainer");
   if (tableContainer) {
@@ -77,31 +109,6 @@ function showTableContainer() {
   }
 }
 
-// Event listener for file input change
-
-document
-  .getElementById("fileInput")
-  .addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-      // Remove the first row from jsonData
-      const jsonDataWithoutHeader = jsonData.slice(1);
-
-      displayExcelData(jsonDataWithoutHeader); // Display Excel data in the table
-      document.getElementById("saveButton").style.display = "block"; // Display save button
-      document.getElementById("fileInput").value = "";
-    };
-
-    reader.readAsArrayBuffer(file);
-  });
 
 let isBatchSaved = false;
 
